@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"database/sql"
+	"log"
 
 	// "code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"github.com/pressly/goose"
@@ -12,6 +13,7 @@ func init() {
 }
 
 func upCreateTables(tx *sql.Tx) error {
+	log.Println("Up Migration")
 	// This code is executed when the migration is applied.
 	//dbG := db.Get()
 	return nil
