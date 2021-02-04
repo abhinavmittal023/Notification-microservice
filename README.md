@@ -1,5 +1,6 @@
 # Notifications Microservice
 ## Make a config.json inside configuration folder using following syntax:
+```javascript
 {
     "server": {
         "port": 8080
@@ -14,3 +15,4 @@
         "secret_key": "token_key"
     }
 }
+```
