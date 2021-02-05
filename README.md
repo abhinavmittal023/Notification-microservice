@@ -14,7 +14,8 @@
         "sslmode": "ssl_mode"
     },
     "token": {
-        "secret_key": "token_key"
+        "secret_key": "token_key",
+        "header_prefix": "Bearer"
     }
 }
 ```

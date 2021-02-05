@@ -3,19 +3,18 @@ package middlewares
 import (
 	"net/http"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"github.com/gin-gonic/gin"
 )
 
-//CheckIfLogged middleware checks the if user was logged in to restrict making of new user when one is logged in
+//CheckIfLogged middleware checks the if user was logged already in
 func CheckIfLogged() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
+		headerPrefix := configuration.GetResp().Token.HeaderPrefix
 
-		if len(authHeader) > 10 && authHeader[:len("Bearer")] == "Bearer" { //If bearer token found
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
-				"message": "Logout Before creating or signing into other accounts",
-			})
-			return
+		if len(authHeader) < (len(headerPrefix)+2) && authHeader[:len(headerPrefix)] == headerPrefix { //If token found
+			c.AbortWithStatus(http.StatusForbidden)
 		}
 		c.Next()
 	}

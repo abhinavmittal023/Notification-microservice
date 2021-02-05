@@ -21,7 +21,7 @@ func CheckIfFirst() gin.HandlerFunc {
 			c.Next()
 		}
 		if err != nil {
-			log.Println(err)
+			log.Println(err.Error())
 		}
 
 		c.AbortWithStatus(http.StatusUnauthorized)
