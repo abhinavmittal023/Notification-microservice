@@ -8,9 +8,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-//CustomClaims struct stores the email and other claims of the token
+//CustomClaims struct stores the UserID and other claims of the token
 type CustomClaims struct {
-	Email string
+	UserID    int64
+	Role      int
+	TokenType string
 	jwt.StandardClaims
 }
 
@@ -19,11 +21,34 @@ func getSecretKey() string {
 	return configuration.GetResp().Token.SecretKey
 }
 
-//GenerateToken function generates a new jwt token given an email and the expiry for the token
-func GenerateToken(email string, expiry time.Duration) (string, error) {
+//GenerateRefreshToken generates the refresh token with userID and given expiry
+func GenerateRefreshToken(userID int64, expiry time.Duration) (string, error) {
+
+	return GenerateToken(userID, 0, "refresh", expiry)
+
+}
+
+//GenerateAccessToken generates the access token with userID, role and given expiry
+func GenerateAccessToken(userID int64, role int, expiry time.Duration) (string, error) {
+
+	return GenerateToken(userID, role, "access", expiry)
+
+}
+
+//GenerateValidationToken generates the validation token with userID and given expiry
+func GenerateValidationToken(userID int64, expiry time.Duration) (string, error) {
+
+	return GenerateToken(userID, 0, "validation", expiry)
+
+}
+
+//GenerateToken function generates a new jwt token given userID, role, tokentype and the expiry for the token
+func GenerateToken(userID int64, role int, tokenType string, expiry time.Duration) (string, error) {
 	//writing the claims part
 	claims := &CustomClaims{
-		email,
+		userID,
+		role,
+		tokenType,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * expiry).Unix(),
 			Issuer:    "notification-microservice",
