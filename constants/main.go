@@ -13,7 +13,7 @@ func GetConstants() Constants {
 	return resp
 }
 
-//Init Function unmarshalls the config.json into the struct
+//Init Function unmarshalls the constants.json into the struct
 func Init() error {
 
 	file, err := os.Open("./constants/constants.json") //opening json file
