@@ -12,8 +12,7 @@ import (
 type CustomClaims struct {
 	UserID    int64
 	Role      int
-	TokenType string //TokenType stores why the token was generated where:
-	//1 is for access token, 2 is for validation token, 3 is for refresh token
+	TokenType string
 	jwt.StandardClaims
 }
 
