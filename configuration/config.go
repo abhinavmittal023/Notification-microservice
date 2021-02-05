@@ -14,7 +14,8 @@ type Server struct {
 
 //Token struct stores the jwt configuration
 type Token struct {
-	SecretKey string `json:"secret_key"`
+	SecretKey    string `json:"secret_key"`
+	HeaderPrefix string `json:"header_prefix"`
 }
 
 //Database struct stores the database info

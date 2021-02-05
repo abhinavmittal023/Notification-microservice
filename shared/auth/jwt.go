@@ -10,7 +10,7 @@ import (
 
 //CustomClaims struct stores the UserID and other claims of the token
 type CustomClaims struct {
-	UserID    int64
+	UserID    uint64
 	Role      int
 	TokenType string
 	jwt.StandardClaims
@@ -22,28 +22,28 @@ func getSecretKey() string {
 }
 
 //GenerateRefreshToken generates the refresh token with userID and given expiry
-func GenerateRefreshToken(userID int64, expiry time.Duration) (string, error) {
+func GenerateRefreshToken(userID uint64, expiry time.Duration) (string, error) {
 
 	return GenerateToken(userID, 0, "refresh", expiry)
 
 }
 
 //GenerateAccessToken generates the access token with userID, role and given expiry
-func GenerateAccessToken(userID int64, role int, expiry time.Duration) (string, error) {
+func GenerateAccessToken(userID uint64, role int, expiry time.Duration) (string, error) {
 
 	return GenerateToken(userID, role, "access", expiry)
 
 }
 
 //GenerateValidationToken generates the validation token with userID and given expiry
-func GenerateValidationToken(userID int64, expiry time.Duration) (string, error) {
+func GenerateValidationToken(userID uint64, expiry time.Duration) (string, error) {
 
 	return GenerateToken(userID, 0, "validation", expiry)
 
 }
 
 //GenerateToken function generates a new jwt token given userID, role, tokentype and the expiry for the token
-func GenerateToken(userID int64, role int, tokenType string, expiry time.Duration) (string, error) {
+func GenerateToken(userID uint64, role int, tokenType string, expiry time.Duration) (string, error) {
 	//writing the claims part
 	claims := &CustomClaims{
 		userID,
