@@ -9,7 +9,7 @@ type Configuration struct {
 
 //Server struct stores the server information
 type Server struct {
-	Port int `json:"port"`
+	Port string `json:"port"`
 }
 
 //Token struct stores the jwt configuration
