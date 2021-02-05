@@ -1,0 +1,6 @@
+{
+    "regex": {
+        "email": "secret",
+        "password": ""
+    }
+}
