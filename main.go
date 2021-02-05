@@ -6,6 +6,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/features"
 )
 
 func main() {
@@ -30,4 +31,8 @@ func main() {
 
 	dbG := db.Get()
 	defer dbG.Close()
+	err = features.InitServer()
+	if err != nil{
+		log.Println("Error connecting to Server")
+	}
 }

@@ -1,9 +1,11 @@
 # Notifications Microservice
+
 ## Make a config.json inside configuration folder using following syntax:
+
 ```javascript
 {
     "server": {
-        "port": 8080
+        "port": "8080"
     },
     "database": {
         "user": "your_postgres_user_name",
