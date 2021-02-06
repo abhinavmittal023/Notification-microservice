@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//CreateUser route is used to create first time system admin
-func CreateUser(router *gin.RouterGroup){
-	router.POST("/signup",signup.CreateUser)
+//SignUp route is used to create first time system admin
+func SignUp(router *gin.RouterGroup){
+	router.POST("/",signup.SignUp)
 }
