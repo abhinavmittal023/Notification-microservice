@@ -19,8 +19,8 @@ func CheckIfFirst() gin.HandlerFunc {
 		err := users.GetFirstUser(&models.User{})
 		if err == gorm.ErrRecordNotFound {
 			c.Next()
-		}
-		if err != nil {
+			return
+		}else if err != nil {
 			log.Println(err.Error())
 		}
 

@@ -2,9 +2,9 @@ package migrations
 
 import (
 	"database/sql"
-	"log"
 
-	// "code.jtg.tools/ayush.singhal/notifications-microservice/db"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/pressly/goose"
 )
 
@@ -13,14 +13,79 @@ func init() {
 }
 
 func upCreateTables(tx *sql.Tx) error {
-	log.Println("Up Migration")
-	// This code is executed when the migration is applied.
-	//dbG := db.Get()
-	return nil
+	dbG := db.Get()
+
+	err := dbG.AutoMigrate(&models.User{}).Error
+	if err != nil {
+		return err
+	}
+
+	err = dbG.Model(&models.User{}).AddUniqueIndex("email_date", "email", "deleted_at").Error
+	if err != nil {
+		return err
+	}
+
+	err = dbG.AutoMigrate(&models.Recipient{}).Error
+	if err != nil {
+		return err
+	}
+
+	err = dbG.AutoMigrate(&models.Notification{}).Error
+	if err != nil {
+		return err
+	}
+
+	err = dbG.AutoMigrate(&models.Organisation{}).Error
+	if err != nil {
+		return err
+	}
+
+
+	err = dbG.AutoMigrate(&models.Channel{}).Error
+	if err != nil {
+		return err
+	}
+
+	err = dbG.AutoMigrate(&models.RecipientNotifications{}).Error
+
+	return err
 }
 
 func downCreateTables(tx *sql.Tx) error {
-	// This code is executed when the migration is rolled back.
-	//dbG := db.Get()
-	return nil
+	dbG := db.Get()
+
+	err := dbG.Model(&models.User{}).RemoveIndex("email_date").Error
+	if err != nil {
+		return err
+	}
+	
+	err = dbG.DropTable(&models.User{}).Error
+	if err != nil {
+		return err
+	}
+
+	err = dbG.DropTable(&models.Recipient{}).Error
+	if err != nil {
+		return err
+	}
+
+	err = dbG.DropTable(&models.Notification{}).Error
+	if err != nil {
+		return err
+	}
+
+	err = dbG.DropTable(&models.Organisation{}).Error
+	if err != nil {
+		return err
+	}
+
+
+	err = dbG.DropTable(&models.Channel{}).Error
+	if err != nil {
+		return err
+	}
+
+	err = dbG.DropTable(&models.RecipientNotifications{}).Error
+
+	return err
 }
