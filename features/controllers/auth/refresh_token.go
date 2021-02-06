@@ -5,17 +5,26 @@ import (
 	"net/http"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/features/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/features/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"github.com/gin-gonic/gin"
 )
 
-//ValidateEmail Controller verifies the email after checking the token
-func ValidateEmail(c *gin.Context) {
+//RefreshAccessToken Provides a new access token given a valid refresh token
+func RefreshAccessToken(c *gin.Context) {
 
-	tokenString := c.Param("token")
+	var refreshToken serializers.RefreshToken
+	err := c.BindJSON(&refreshToken)
+	if err != nil {
+		log.Println(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"refresh_token_required": "Refresh Token is Required",
+		})
+		return
+	}
 
-	token, err := auth.ValidateToken(tokenString)
+	token, err := auth.ValidateToken(refreshToken.RefreshToken)
 	if err != nil {
 		log.Println(err.Error())
 		c.AbortWithStatus(http.StatusUnauthorized)
@@ -25,7 +34,7 @@ func ValidateEmail(c *gin.Context) {
 	claims := token.Claims.(*auth.CustomClaims)
 	var userDetails models.User
 
-	if token.Valid && claims.TokenType == "validation" {
+	if token.Valid && claims.TokenType == "refresh" {
 
 		err = users.GetUserWithID(&userDetails, claims.UserID)
 		if err != nil {
@@ -34,18 +43,17 @@ func ValidateEmail(c *gin.Context) {
 			return
 		}
 
-		userDetails.Verified = true
-		err = users.PatchUser(&userDetails)
+		refreshToken.AccessToken, err = auth.GenerateAccessToken(claims.UserID, userDetails.Role, 3)
 		if err != nil {
 			log.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"internal_error": "Internal Server Error"})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"email_id_verified": "your email id was verified"})
+		refreshToken.RefreshToken = ""
+		c.JSON(http.StatusOK, refreshToken)
 
 	} else {
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}
-
 }

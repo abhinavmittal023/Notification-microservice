@@ -6,6 +6,7 @@ import (
 )
 
 //Auth route is used to create first time system admin
-func Auth(router *gin.RouterGroup){
-	router.GET("/token/:token",auth.ValidateEmail)
+func Auth(router *gin.RouterGroup) {
+	router.GET("/token/:token", auth.ValidateEmail)
+	router.POST("/token", auth.RefreshAccessToken)
 }
