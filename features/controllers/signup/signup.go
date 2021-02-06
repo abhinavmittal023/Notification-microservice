@@ -18,11 +18,35 @@ func SignUp(c *gin.Context){
 		return
 	}
 	info.Role = 2
+
+	// match, err := regexp.MatchString(constants.GetConstants().Regex.Email, info.Email)
+
+	// if err != nil{
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
+	// 	log.Println("Internal Server Error due to email regex")
+	// 	return
+	// }
+	// if !match{
+	// 	c.JSON(http.StatusBadRequest, gin.H{"email_invalid":"Email is invalid"})
+	// 	return
+	// }	
+	
+	// match, err = regexp.MatchString(constants.GetConstants().Regex.Password, info.Password)
+
+	// if err != nil{
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
+	// 	log.Println(2)
+	// 	return
+	// }
+	// if !match{
+	// 	c.JSON(http.StatusBadRequest, gin.H{"password_weak":"Password is not strong enough"})
+	// 	return
+	// }
 	var user models.User
 	serializers.LoginInfoToUserModel(info,&user)
 	err := users.CreateUser(&user)
 	if err!= nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"message":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
 		return
 	}
 	to := []string{
@@ -30,7 +54,7 @@ func SignUp(c *gin.Context){
 	}
 	err = auth.SendValidationEmail(to,uint64(user.ID))
 	if err!= nil{
-		c.JSON(http.StatusBadRequest, gin.H{"message":"Email couldn't be sent"})
+		c.JSON(http.StatusBadRequest, gin.H{"smtp_error":"Email couldn't be sent"})
 		return
 	}
 	c.JSON(http.StatusOK,gin.H{"status":"ok"})
