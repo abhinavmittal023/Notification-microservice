@@ -3,16 +3,18 @@ package signup
 import (
 	"net/http"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/features/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/features/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
 )
 
 //SignUp Controller for /signup route
 func SignUp(c *gin.Context){
-	var info serializers.LoginInfo
+	var info serializers.SignupInfo
 	if c.BindJSON(&info) != nil {
 		c.JSON(http.StatusBadRequest,gin.H{"required":"Email,Password,FirstName are required"})
 		return
@@ -42,11 +44,14 @@ func SignUp(c *gin.Context){
 	// 	c.JSON(http.StatusBadRequest, gin.H{"password_weak":"Password is not strong enough"})
 	// 	return
 	// }
+	info.Password = hash.Message(info.Password,configuration.GetResp().PasswordHash)
+
 	var user models.User
-	serializers.LoginInfoToUserModel(info,&user)
+
+	serializers.SignupInfoToUserModel(info,&user)
 	err := users.CreateUser(&user)
 	if err!= nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"user_not_created":"User not created Error"})
 		return
 	}
 	to := []string{

@@ -4,6 +4,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/features/middlewares"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/features/routes/auth"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/features/routes/signin"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/features/routes/signup"
 	"github.com/gin-gonic/gin"
 )
@@ -31,6 +32,9 @@ func InitServer() error {
 
 	authorization := v1.Group("/auth")
 	auth.Auth(authorization)
+
+	loginGroup := v1.Group("/login",middlewares.CheckIfLogged())
+	signin.SignIn(loginGroup)
 
 	err := router.Run(":" + configuration.GetResp().Server.Port)
 	return err

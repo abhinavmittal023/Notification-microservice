@@ -18,7 +18,9 @@
         "secret_key": "<token_key>",
         "header_prefix": "Bearer",
         "expiry_time": {
-            "validation_token": 2
+            "validation_token": 2,
+            "access_token": 1,
+            "refresh_token": 3
         }
     },
     "email_notification": {

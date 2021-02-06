@@ -43,4 +43,6 @@ type EmailNotification struct{
 //ExpiryTime struct stores the expiry times of different tokens
 type ExpiryTime struct{
 	ValidationToken	time.Duration `json:"validation_token"`	
+	AccessToken	time.Duration `json:"access_token"`	
+	RefreshToken	time.Duration `json:"refresh_token"`	
 }
