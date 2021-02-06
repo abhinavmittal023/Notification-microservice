@@ -1,9 +1,12 @@
 package signup
 
 import (
+	"log"
 	"net/http"
+	"regexp"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/features/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/features/services/users"
@@ -19,37 +22,26 @@ func SignUp(c *gin.Context){
 		c.JSON(http.StatusBadRequest,gin.H{"required":"Email,Password,FirstName are required"})
 		return
 	}
-	info.Role = 2
+	info.Role = 2	//signup user will always be system admin
 
-	// match, err := regexp.MatchString(constants.GetConstants().Regex.Email, info.Email)
+	match, err := regexp.MatchString(constants.GetConstants().Regex.Email, info.Email)
 
-	// if err != nil{
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
-	// 	log.Println("Internal Server Error due to email regex")
-	// 	return
-	// }
-	// if !match{
-	// 	c.JSON(http.StatusBadRequest, gin.H{"email_invalid":"Email is invalid"})
-	// 	return
-	// }	
+	if err != nil{
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
+		log.Println("Internal Server Error due to email regex")
+		return
+	}
+	if !match{
+		c.JSON(http.StatusBadRequest, gin.H{"email_invalid":"Email is invalid"})
+		return
+	}	
 	
-	// match, err = regexp.MatchString(constants.GetConstants().Regex.Password, info.Password)
-
-	// if err != nil{
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
-	// 	log.Println(2)
-	// 	return
-	// }
-	// if !match{
-	// 	c.JSON(http.StatusBadRequest, gin.H{"password_weak":"Password is not strong enough"})
-	// 	return
-	// }
 	info.Password = hash.Message(info.Password,configuration.GetResp().PasswordHash)
 
 	var user models.User
 
 	serializers.SignupInfoToUserModel(info,&user)
-	err := users.CreateUser(&user)
+	err = users.CreateUser(&user)
 	if err!= nil{
 		c.JSON(http.StatusInternalServerError, gin.H{"user_not_created":"User not created Error"})
 		return
