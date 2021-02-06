@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"regexp"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/features/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/features/services/users"
@@ -22,9 +24,21 @@ func SignIn(c *gin.Context){
 		c.JSON(http.StatusBadRequest,gin.H{"required":"Email,Password are required"})
 		return
 	}
+
+	match, err := regexp.MatchString(constants.GetConstants().Regex.Email, info.Email)
+
+	if err != nil{
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
+		log.Println("Internal Server Error due to email regex")
+		return
+	}
+	if !match{
+		c.JSON(http.StatusBadRequest, gin.H{"email_invalid":"Email is invalid"})
+		return
+	}
 	
 	var user models.User
-	err := users.GetUserWithEmail(&user,info.Email)
+	err = users.GetUserWithEmail(&user,info.Email)
 	if err == gorm.ErrRecordNotFound{
 		c.JSON(http.StatusUnauthorized, gin.H{"email_not_present":"EmailId not in database"})
 		return
