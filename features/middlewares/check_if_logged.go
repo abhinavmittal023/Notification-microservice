@@ -13,8 +13,10 @@ func CheckIfLogged() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 		headerPrefix := configuration.GetResp().Token.HeaderPrefix
 
-		if len(authHeader) < (len(headerPrefix)+2) && authHeader[:len(headerPrefix)] == headerPrefix { //If token found
-			c.AbortWithStatus(http.StatusForbidden)
+		if len(authHeader) > (len(headerPrefix)+2) && authHeader[:len(headerPrefix)] == headerPrefix { //If token found
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"error": authHeader,
+			})
 		}
 		c.Next()
 	}
