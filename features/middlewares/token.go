@@ -16,7 +16,7 @@ func AuthorizeJWT() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 		headerPrefix := configuration.GetResp().Token.HeaderPrefix
 
-		if len(authHeader) > (len(headerPrefix)+2) || authHeader[:len(headerPrefix)] != headerPrefix {
+		if len(authHeader) < (len(headerPrefix)+2) || authHeader[:len(headerPrefix)] != headerPrefix {
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
 
