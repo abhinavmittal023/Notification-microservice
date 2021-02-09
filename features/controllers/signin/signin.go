@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
@@ -24,11 +25,12 @@ func SignIn(c *gin.Context){
 		c.JSON(http.StatusBadRequest,gin.H{"required":"Email,Password are required"})
 		return
 	}
+	info.Email = strings.ToLower(info.Email)
 
 	match, err := regexp.MatchString(constants.GetConstants().Regex.Email, info.Email)
 
 	if err != nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
 		log.Println("Internal Server Error due to email regex")
 		return
 	}
@@ -44,7 +46,8 @@ func SignIn(c *gin.Context){
 		return
 	}
 	if err!=nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
+		log.Println("Get user with email error")
 		return
 	}
 
@@ -66,12 +69,14 @@ func SignIn(c *gin.Context){
 
 	token.AccessToken,err = auth.GenerateAccessToken(uint64(user.ID),user.Role,configuration.GetResp().Token.ExpiryTime.AccessToken)
 	if err!=nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"access_token_generation_error":"Access Token not generated"})
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
+		log.Println("Access Token not generated")
 		return
 	}
 	token.RefreshToken,err = auth.GenerateRefreshToken(uint64(user.ID),configuration.GetResp().Token.ExpiryTime.RefreshToken)
 	if err!=nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"refresh_token_generation_error":"Refresh Token not generated"})
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
+		log.Println("Refresh Token not generated")
 		return
 	}
 
@@ -81,7 +86,8 @@ func SignIn(c *gin.Context){
 	})
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"signin_json_marshal_error": "JSON marshalling error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
+		log.Println("JSON marshalling error")
 		return
 	}
 	c.Data(http.StatusOK, "application/json", js)

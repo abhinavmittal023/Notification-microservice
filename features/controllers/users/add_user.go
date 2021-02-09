@@ -1,10 +1,9 @@
-package signup
+package users
 
 import (
 	"log"
 	"net/http"
 	"regexp"
-	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
@@ -16,15 +15,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//SignUp Controller for /signup route
-func SignUp(c *gin.Context){
-	var info serializers.SignupInfo
+//AddUser Controller for /users/add route
+func AddUser(c *gin.Context){
+	val,_ := c.Get("role")
+	if val != 2{
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	var info serializers.AddUserInfo
 	if c.BindJSON(&info) != nil {
 		c.JSON(http.StatusBadRequest,gin.H{"required":"Email,Password,FirstName are required"})
 		return
 	}
-	info.Email = strings.ToLower(info.Email)
-	info.Role = 2	//signup user will always be system admin
 
 	match, err := regexp.MatchString(constants.GetConstants().Regex.Email, info.Email)
 
@@ -42,7 +44,7 @@ func SignUp(c *gin.Context){
 
 	var user models.User
 
-	serializers.SignupInfoToUserModel(info,&user)
+	serializers.AddUserInfoToUserModel(info,&user)
 	err = users.CreateUser(&user)
 	if err!= nil{
 		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
