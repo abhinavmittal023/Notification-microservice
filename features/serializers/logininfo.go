@@ -18,7 +18,7 @@ type LoginResponse struct{
 }
 
 //LoginInfoToUserModel converts LoginInfo serializer to User model
-func LoginInfoToUserModel(info LoginInfo,user *models.User){
+func LoginInfoToUserModel(info *LoginInfo,user *models.User){
 	user.Email = info.Email
 	user.Password = info.Password
 }
