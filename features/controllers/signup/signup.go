@@ -42,7 +42,7 @@ func SignUp(c *gin.Context){
 
 	var user models.User
 
-	serializers.SignupInfoToUserModel(info,&user)
+	serializers.SignupInfoToUserModel(&info,&user)
 	err = users.CreateUser(&user)
 	if err!= nil{
 		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})

@@ -25,3 +25,11 @@ func GetUserWithEmail(user *models.User,email string) error {
 	res := dbg.Where("email = ?", email).First(user)
 	return res.Error
 }
+
+//GetAllUsers gets all users from the database and returns []models.User,err
+func GetAllUsers() ([]models.User,error){
+	var users []models.User
+	dbg := db.Get()
+	res := dbg.Find(&users)
+	return users,res.Error
+}

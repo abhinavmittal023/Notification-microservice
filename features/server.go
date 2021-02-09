@@ -39,6 +39,12 @@ func InitServer() error {
 
 	userGroup := v1.Group("/users",middlewares.AuthorizeJWT())
 	users.AddUser(userGroup)
+	users.ChangeUserEmail(userGroup)
+	users.ChangeUserRole(userGroup)
+	users.ChangeUserPassword(userGroup)
+	users.DeleteUser(userGroup)
+	users.GetUser(userGroup)
+	users.GetAllUsers(userGroup)
 
 	err := router.Run(":" + configuration.GetResp().Server.Port)
 	return err

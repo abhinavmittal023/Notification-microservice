@@ -14,7 +14,7 @@ type SignupInfo struct {
 }
 
 //SignupInfoToUserModel converts SignupInfo serializer to User model
-func SignupInfoToUserModel(info SignupInfo,user *models.User){
+func SignupInfoToUserModel(info *SignupInfo,user *models.User){
 	user.FirstName = info.FirstName
 	user.LastName = info.LastName
 	user.Email = info.Email
@@ -33,7 +33,7 @@ type AddUserInfo struct {
 }
 
 //AddUserInfoToUserModel converts AddUserInfo serializer to User model
-func AddUserInfoToUserModel(info AddUserInfo,user *models.User){
+func AddUserInfoToUserModel(info *AddUserInfo,user *models.User){
 	user.FirstName = info.FirstName
 	user.LastName = info.LastName
 	user.Email = info.Email
