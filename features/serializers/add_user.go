@@ -1,8 +1,6 @@
 package serializers
 
 import (
-	"strings"
-
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 )
 
@@ -19,7 +17,7 @@ type SignupInfo struct {
 func SignupInfoToUserModel(info SignupInfo,user *models.User){
 	user.FirstName = info.FirstName
 	user.LastName = info.LastName
-	user.Email = strings.ToLower(info.Email)
+	user.Email = info.Email
 	user.Password = info.Password
 	user.Verified = false
 	user.Role = info.Role
@@ -38,7 +36,7 @@ type AddUserInfo struct {
 func AddUserInfoToUserModel(info AddUserInfo,user *models.User){
 	user.FirstName = info.FirstName
 	user.LastName = info.LastName
-	user.Email = strings.ToLower(info.Email)
+	user.Email = info.Email
 	user.Password = info.Password
 	user.Verified = false
 	user.Role = info.Role
