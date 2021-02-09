@@ -8,6 +8,7 @@ type LoginInfo struct {
 	Password     string      `json:"password,omitempty" binding:"required"`
 	FirstName	string		`json:"first_name,omitempty"`
 	LastName	string		`json:"last_name,omitempty"`
+	Role		int			`json:"role"`
 }
 
 //LoginResponse formats the userDetails and TokenDetails into one struct

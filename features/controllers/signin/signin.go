@@ -61,6 +61,7 @@ func SignIn(c *gin.Context){
 	info.FirstName = user.FirstName
 	info.LastName = user.LastName
 	info.Password = ""
+	info.Role = user.Role
 	var token serializers.RefreshToken
 
 	token.AccessToken,err = auth.GenerateAccessToken(uint64(user.ID),user.Role,configuration.GetResp().Token.ExpiryTime.AccessToken)

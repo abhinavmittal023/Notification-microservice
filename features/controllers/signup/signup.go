@@ -27,7 +27,7 @@ func SignUp(c *gin.Context){
 	match, err := regexp.MatchString(constants.GetConstants().Regex.Email, info.Email)
 
 	if err != nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
 		log.Println("Internal Server Error due to email regex")
 		return
 	}
@@ -43,7 +43,7 @@ func SignUp(c *gin.Context){
 	serializers.SignupInfoToUserModel(info,&user)
 	err = users.CreateUser(&user)
 	if err!= nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"user_not_created":"User not created Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
 		return
 	}
 	to := []string{
@@ -51,7 +51,12 @@ func SignUp(c *gin.Context){
 	}
 	err = auth.SendValidationEmail(to,uint64(user.ID))
 	if err!= nil{
-		c.JSON(http.StatusBadRequest, gin.H{"smtp_error":"Email couldn't be sent"})
+		err = users.DeleteUserPermanently(&user)
+		if err!= nil{
+			c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
 		return
 	}
 	c.JSON(http.StatusOK,gin.H{"status":"ok"})
