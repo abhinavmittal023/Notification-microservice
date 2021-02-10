@@ -42,7 +42,7 @@ func SignIn(c *gin.Context){
 	var user models.User
 	err = users.GetUserWithEmail(&user,info.Email)
 	if err == gorm.ErrRecordNotFound{
-		c.JSON(http.StatusUnauthorized, gin.H{"email_not_present":"EmailId not in database"})
+		c.JSON(http.StatusUnauthorized, gin.H{"email_or_password_mismatch":"EmailId or Passwords mismatch"})
 		return
 	}
 	if err!=nil{
@@ -51,15 +51,17 @@ func SignIn(c *gin.Context){
 		return
 	}
 
+	if !hash.Validate(info.Password,user.Password,configuration.GetResp().PasswordHash){
+		c.JSON(http.StatusUnauthorized, gin.H{"email_or_password_mismatch":"EmailId or Passwords mismatch"})
+		return
+	}
+	
 	if !user.Verified{
 		c.JSON(http.StatusUnauthorized, gin.H{"email_not_verified":"EmailId not verified"})
 		return
 	}
 
-	if !hash.Validate(info.Password,user.Password,configuration.GetResp().PasswordHash){
-		c.JSON(http.StatusUnauthorized, gin.H{"incorrect_password":"Passwords mismatch"})
-		return
-	}
+	
 	
 	info.FirstName = user.FirstName
 	info.LastName = user.LastName
