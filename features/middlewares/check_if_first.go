@@ -20,7 +20,7 @@ func CheckIfFirst() gin.HandlerFunc {
 		if err == gorm.ErrRecordNotFound {
 			c.Next()
 			return
-		}else if err != nil {
+		} else if err != nil {
 			log.Println(err.Error())
 		}
 

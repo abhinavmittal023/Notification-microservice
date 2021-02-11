@@ -18,64 +18,64 @@ import (
 )
 
 //SignIn Controller for /signin route
-func SignIn(c *gin.Context){
+func SignIn(c *gin.Context) {
 	var info serializers.LoginInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest,gin.H{"required":"Email,Password are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"required": "Email,Password are required"})
 		return
 	}
 
 	match, err := regexp.MatchString(constants.GetConstants().Regex.Email, info.Email)
 
-	if err != nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_error": "Internal Server Error"})
 		log.Println("Internal Server Error due to email regex")
 		return
 	}
-	if !match{
-		c.JSON(http.StatusBadRequest, gin.H{"email_invalid":"Email is invalid"})
+	if !match {
+		c.JSON(http.StatusBadRequest, gin.H{"email_invalid": "Email is invalid"})
 		return
 	}
-	
+
 	var user models.User
-	err = users.GetUserWithEmail(&user,info.Email)
-	if err == gorm.ErrRecordNotFound{
-		c.JSON(http.StatusUnauthorized, gin.H{"email_not_present":"EmailId not in database"})
+	err = users.GetUserWithEmail(&user, info.Email)
+	if err == gorm.ErrRecordNotFound {
+		c.JSON(http.StatusUnauthorized, gin.H{"email_not_present": "EmailId not in database"})
 		return
 	}
-	if err!=nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"internal_error":"Internal Server Error"})
-		return
-	}
-
-	if !user.Verified{
-		c.JSON(http.StatusUnauthorized, gin.H{"email_not_verified":"EmailId not verified"})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"internal_error": "Internal Server Error"})
 		return
 	}
 
-	if !hash.Validate(info.Password,user.Password,configuration.GetResp().PasswordHash){
-		c.JSON(http.StatusUnauthorized, gin.H{"incorrect_password":"Passwords mismatch"})
+	if !user.Verified {
+		c.JSON(http.StatusUnauthorized, gin.H{"email_not_verified": "EmailId not verified"})
 		return
 	}
-	
+
+	if !hash.Validate(info.Password, user.Password, configuration.GetResp().PasswordHash) {
+		c.JSON(http.StatusUnauthorized, gin.H{"incorrect_password": "Passwords mismatch"})
+		return
+	}
+
 	info.FirstName = user.FirstName
 	info.LastName = user.LastName
 	info.Password = ""
 	var token serializers.RefreshToken
 
-	token.AccessToken,err = auth.GenerateAccessToken(uint64(user.ID),user.Role,configuration.GetResp().Token.ExpiryTime.AccessToken)
-	if err!=nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"access_token_generation_error":"Access Token not generated"})
+	token.AccessToken, err = auth.GenerateAccessToken(uint64(user.ID), user.Role, configuration.GetResp().Token.ExpiryTime.AccessToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"access_token_generation_error": "Access Token not generated"})
 		return
 	}
-	token.RefreshToken,err = auth.GenerateRefreshToken(uint64(user.ID),configuration.GetResp().Token.ExpiryTime.RefreshToken)
-	if err!=nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"refresh_token_generation_error":"Refresh Token not generated"})
+	token.RefreshToken, err = auth.GenerateRefreshToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.RefreshToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"refresh_token_generation_error": "Refresh Token not generated"})
 		return
 	}
 
 	js, err := json.Marshal(&serializers.LoginResponse{
-		LoginInfo: info,
+		LoginInfo:    info,
 		RefreshToken: token,
 	})
 	if err != nil {

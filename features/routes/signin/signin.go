@@ -6,6 +6,6 @@ import (
 )
 
 //SignIn route is used to sign in users
-func SignIn(router *gin.RouterGroup){
-	router.POST("/",signin.SignIn)
+func SignIn(router *gin.RouterGroup) {
+	router.POST("/", signin.SignIn)
 }

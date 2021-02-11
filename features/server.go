@@ -27,13 +27,13 @@ func InitServer() error {
 		})
 	})
 
-	firstSignUp := v1.Group("/signup",middlewares.CheckIfFirst())
+	firstSignUp := v1.Group("/signup", middlewares.CheckIfFirst())
 	signup.SignUp(firstSignUp)
 
 	authorization := v1.Group("/auth")
 	auth.Auth(authorization)
 
-	loginGroup := v1.Group("/login",middlewares.CheckIfLogged())
+	loginGroup := v1.Group("/login", middlewares.CheckIfLogged())
 	signin.SignIn(loginGroup)
 
 	err := router.Run(":" + configuration.GetResp().Server.Port)

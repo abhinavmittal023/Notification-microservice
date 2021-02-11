@@ -7,5 +7,5 @@ type Constants struct {
 
 //Regex struct stores all the required regex expressions
 type Regex struct {
-	Email    string `json:"email"`
+	Email string `json:"email"`
 }

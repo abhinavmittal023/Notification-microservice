@@ -32,7 +32,7 @@ func main() {
 	dbG := db.Get()
 	defer dbG.Close()
 	err = features.InitServer()
-	if err != nil{
+	if err != nil {
 		log.Println("Error connecting to Server")
 	}
 }

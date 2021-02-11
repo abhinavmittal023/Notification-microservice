@@ -20,7 +20,7 @@ func GetFirstUser(user *models.User) error {
 }
 
 //GetUserWithEmail gets the user with specified Email from the database
-func GetUserWithEmail(user *models.User,email string) error {
+func GetUserWithEmail(user *models.User, email string) error {
 	dbg := db.Get()
 	res := dbg.Where("email = ?", email).First(user)
 	return res.Error

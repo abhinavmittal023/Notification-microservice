@@ -40,7 +40,6 @@ func upCreateTables(tx *sql.Tx) error {
 		return err
 	}
 
-
 	err = dbG.AutoMigrate(&models.Channel{}).Error
 	if err != nil {
 		return err
@@ -58,7 +57,7 @@ func downCreateTables(tx *sql.Tx) error {
 	if err != nil {
 		return err
 	}
-	
+
 	err = dbG.DropTable(&models.User{}).Error
 	if err != nil {
 		return err
@@ -78,7 +77,6 @@ func downCreateTables(tx *sql.Tx) error {
 	if err != nil {
 		return err
 	}
-
 
 	err = dbG.DropTable(&models.Channel{}).Error
 	if err != nil {
