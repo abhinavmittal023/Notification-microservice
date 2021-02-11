@@ -10,6 +10,10 @@ import (
 //CheckIfLogged middleware checks the if user was logged already in
 func CheckIfLogged() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request.Method == "OPTIONS" {
+			c.Next() //Preflight Request
+			return
+		}
 		authHeader := c.GetHeader("Authorization")
 		headerPrefix := configuration.GetResp().Token.HeaderPrefix
 
