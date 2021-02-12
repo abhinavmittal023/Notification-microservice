@@ -8,8 +8,8 @@ import (
 )
 
 // CheckIfSystemAdmin middleware checks if the user is system admin
-func CheckIfSystemAdmin() gin.HandlerFunc{
-	return func(c *gin.Context){
+func CheckIfSystemAdmin() gin.HandlerFunc {
+	return func(c *gin.Context) {
 		if c.Request.Method == "OPTIONS" {
 			c.Next() // Preflight Request
 			return
