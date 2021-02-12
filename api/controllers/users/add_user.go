@@ -15,19 +15,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//AddUserRoute is used to add users to database
+// AddUserRoute is used to add users to database
 func AddUserRoute(router *gin.RouterGroup) {
 	router.POST("/add", AddUser)
 	router.OPTIONS("/add", preflight.Preflight)
 }
 
-//AddUser Controller for /users/add route
+// AddUser Controller for /users/add route
 func AddUser(c *gin.Context) {
-	val, _ := c.Get("role")
-	if val != 2 {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
 	var info serializers.AddUserInfo
 	if c.BindJSON(&info) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password,FirstName are required"})

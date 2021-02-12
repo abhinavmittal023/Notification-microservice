@@ -11,20 +11,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//GetAllUsersRoute is used to get all users from database
+// GetAllUsersRoute is used to get all users from database
 func GetAllUsersRoute(router *gin.RouterGroup) {
 	router.GET("/get", GetAllUsers)
 	router.OPTIONS("/get", preflight.Preflight)
 }
 
-//GetAllUsers Controller for /users/get route
+// GetAllUsers Controller for /users/get route
 func GetAllUsers(c *gin.Context) {
-	val, _ := c.Get("role")
-	if val != 2 {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
 	usersArray, err := users.GetAllUsers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})

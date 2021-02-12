@@ -8,19 +8,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Notifications interface is used to send different types of notificaitons
+//  Notifications interface is used to send different types of notificaitons
 type Notifications interface {
 	SendNotification() error
 }
 
-// Email struct implements Notifications interface
+//  Email struct implements Notifications interface
 type Email struct {
 	to      []string
 	subject string
 	message string
 }
 
-// SendNotification method send email notifications
+//  SendNotification method send email notifications
 func (email *Email) SendNotification() error {
 	from := configuration.GetResp().EmailNotification.Email
 	password := configuration.GetResp().EmailNotification.Password
@@ -30,10 +30,10 @@ func (email *Email) SendNotification() error {
 	msg := []byte("Subject: " + email.subject + "\r\n" +
 		"\r\n" + email.message + "\r\n")
 
-	// Authentication.
+	//  Authentication.
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
-	// Sending email.
+	//  Sending email.
 	err := smtp.SendMail(addr, auth, from, email.to, msg)
 	if err != nil {
 		log.Println("Unable to send email")

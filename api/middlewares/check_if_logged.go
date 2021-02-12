@@ -12,13 +12,13 @@ import (
 func CheckIfLogged() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Method == "OPTIONS" {
-			c.Next() //Preflight Request
+			c.Next() // Preflight Request
 			return
 		}
 		authHeader := c.GetHeader(constants.Authorization)
 		headerPrefix := configuration.GetResp().Token.HeaderPrefix
 		headerCheck := len(authHeader) > (len(headerPrefix)+2) && authHeader[:len(headerPrefix)] == headerPrefix
-		if headerCheck { //If token found
+		if headerCheck { // If token found
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"error": authHeader,
 			})

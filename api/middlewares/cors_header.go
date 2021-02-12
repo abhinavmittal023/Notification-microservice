@@ -8,7 +8,7 @@ import (
 func CorsHeaders() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Method == "OPTIONS" {
-			c.Next() //Preflight Request
+			c.Next() // Preflight Request
 			return
 		}
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")

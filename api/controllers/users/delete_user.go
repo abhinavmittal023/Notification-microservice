@@ -11,20 +11,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//DeleteUserRoute is used to delete users from database
+// DeleteUserRoute is used to delete users from database
 func DeleteUserRoute(router *gin.RouterGroup) {
 	router.DELETE("/delete/:id", DeleteUser)
 	router.OPTIONS("/delete/:id", preflight.Preflight)
 }
 
-//DeleteUser Controller for /users/delete/:id route
+// DeleteUser Controller for /users/delete/:id route
 func DeleteUser(c *gin.Context) {
-	val, _ := c.Get("role")
-	if val != 2 {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
 	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})

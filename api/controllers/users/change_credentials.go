@@ -12,22 +12,18 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//ChangeUserRoleRoute is used to change users role in database
-func ChangeUserRoleRoute(router *gin.RouterGroup) {
-	router.PUT("/changerole", ChangeRole)
-	router.OPTIONS("/changerole", preflight.Preflight)
+// ChangeUserCredentialsRoute is used to change users email in database
+func ChangeUserCredentialsRoute(router *gin.RouterGroup) {
+	router.PUT("/changecredentials", ChangeCredentials)
+	router.OPTIONS("/changecredentials", preflight.Preflight)
 }
 
-//ChangeRole Controller for /users/changerole route
-func ChangeRole(c *gin.Context) {
-	val, _ := c.Get("role")
-	if val != 2 {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-	var info serializers.ChangeRoleInfo
+// ChangeCredentials Controller for /users/changeemail route
+func ChangeCredentials(c *gin.Context) {
+	userID, _ := c.Get("user_id")
+	var info serializers.ChangeCredentialsInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email, Role are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Email, New Email are required"})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)
@@ -44,13 +40,13 @@ func ChangeRole(c *gin.Context) {
 		return
 	}
 
-	user, err := users.GetUserWithEmail(info.Email)
+	user, err := users.GetUserWithID(userID.(uint64))
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "EmailId not in database"})
 		return
 	}
 
-	serializers.ChangeRoleInfoToUserModel(&info, user)
+	serializers.ChangeCredentialsInfoToUserModel(&info, user)
 	err = users.PatchUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})

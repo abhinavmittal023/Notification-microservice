@@ -13,13 +13,13 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//ChangeUserPasswordRoute is used to change users password in database
+// ChangeUserPasswordRoute is used to change users password in database
 func ChangeUserPasswordRoute(router *gin.RouterGroup) {
 	router.PUT("/changepassword", ChangePassword)
 	router.OPTIONS("/changepassword", preflight.Preflight)
 }
 
-//ChangePassword Controller for /users/changepassword route
+// ChangePassword Controller for /users/changepassword route
 func ChangePassword(c *gin.Context) {
 	userID, _ := c.Get("user_id")
 	var info serializers.ChangePasswordInfo

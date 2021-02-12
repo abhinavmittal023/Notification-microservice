@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//Preflight function responds to the preflight options request
+// Preflight function responds to the preflight options request
 func Preflight(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, Authorization, origin")

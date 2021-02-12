@@ -11,11 +11,11 @@ import (
 
 // TODO: Handle case when first user fails to validate the emailID
 
-// CheckIfFirst middleware checks the if another user exists to avoid creation of other user directly
+// CheckIfFirst middleware checks if another user exists to avoid creation of other user directly
 func CheckIfFirst() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Method == "OPTIONS" {
-			c.Next() //Preflight Request
+			c.Next() // Preflight Request
 			return
 		}
 		_, err := users.GetFirstUser()

@@ -13,20 +13,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//GetUserRoute is used to get users from database
+// GetUserRoute is used to get users from database
 func GetUserRoute(router *gin.RouterGroup) {
 	router.GET("/get/:id", GetUser)
 	router.OPTIONS("/get/:id", preflight.Preflight)
 }
 
-//GetUser Controller for /users/get/:id route
+// GetUser Controller for /users/get/:id route
 func GetUser(c *gin.Context) {
-	val, _ := c.Get("role")
-	if val != 2 {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
 	userID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})

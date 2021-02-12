@@ -15,7 +15,7 @@ func AuthorizeJWT() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		if c.Request.Method == "OPTIONS" {
-			c.Next() //Preflight Request
+			c.Next() // Preflight Request
 			return
 		}
 		authHeader := c.GetHeader(constants.Authorization)
