@@ -18,8 +18,7 @@ var (
 )
 
 func main() {
-
-	flags.Parse(os.Args[1:])
+	_ = flags.Parse(os.Args[1:])
 	args := flags.Args()
 
 	if len(args) < 2 {

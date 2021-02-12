@@ -1,11 +1,15 @@
 package constants
 
-//Constants struct is for storing all the constants
-type Constants struct {
-	Regex Regex `json:"regex"`
-}
+const (
+	// EmailRegex is used to export regular expression for email
+	EmailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$"
 
-//Regex struct stores all the required regex expressions
-type Regex struct {
-	Email    string `json:"email"`
-}
+	// Authorization is the header type for authorization token
+	Authorization = "Authorization"
+
+	// SystemAdminRole defines the role value for system admin in the database
+	SystemAdminRole = 2
+
+	// AdminRole defines the role value for system admin in the database
+	AdminRole = 1
+)
