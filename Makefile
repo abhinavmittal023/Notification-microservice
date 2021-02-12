@@ -2,16 +2,18 @@ define GetFromConfig
 $(shell node -p "require('./configuration/config.json').$(1)")
 endef
 
+.PHONY: all
+
 all: 
 	@echo "Run (make setup) for first run or (make run) to run the server"
 
 down: 
 	@echo "Migrating Down"
-	./goose -dir ./db/migrations/ postgres "user=$(call GetFromConfig,database.user) password=$(call GetFromConfig,database.password) dbname=$(call GetFromConfig,database.dbname) sslmode=$(call GetFromConfig,database.sslmode)" down
+	./goose -dir ./db/migrations/ postgres "$(call GetFromConfig,database.dbstring)" down
 
 up:
 	@echo "Migrating Up"
-	./goose -dir ./db/migrations/ postgres "user=$(call GetFromConfig,database.user) password=$(call GetFromConfig,database.password) dbname=$(call GetFromConfig,database.dbname) sslmode=$(call GetFromConfig,database.sslmode)" up
+	./goose -dir ./db/migrations/ postgres "$(call GetFromConfig,database.dbstring)" up
 
 build_goose:
 	@echo "Building goose binary"
@@ -20,6 +22,9 @@ build_goose:
 build_main:
 	@echo "Building main.go"
 	go build main.go
+
+golangci-lint:
+	golangci-lint run
 
 run:
 	go run main.go
