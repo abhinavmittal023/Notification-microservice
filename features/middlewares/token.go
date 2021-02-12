@@ -13,11 +13,16 @@ import (
 func AuthorizeJWT() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
+		if c.Request.Method == "OPTIONS" {
+			c.Next() //Preflight Request
+			return
+		}
 		authHeader := c.GetHeader("Authorization")
 		headerPrefix := configuration.GetResp().Token.HeaderPrefix
 
 		if len(authHeader) < (len(headerPrefix)+2) || authHeader[:len(headerPrefix)] != headerPrefix {
 			c.AbortWithStatus(http.StatusUnauthorized)
+			return
 		}
 
 		tokenString := authHeader[len(headerPrefix)+1:]
