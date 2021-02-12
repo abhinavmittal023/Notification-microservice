@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
@@ -17,6 +19,7 @@ import (
 // SignInRoute is used to sign in users
 func SignInRoute(router *gin.RouterGroup) {
 	router.POST("/", SignIn)
+	router.OPTIONS("/", preflight.Preflight)
 }
 
 // SignIn Controller for /signin route
@@ -26,6 +29,7 @@ func SignIn(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password are required"})
 		return
 	}
+	info.Email = strings.ToLower(info.Email)
 
 	er := serializers.EmailRegexCheck(info.Email)
 
@@ -41,11 +45,17 @@ func SignIn(c *gin.Context) {
 
 	user,err := users.GetUserWithEmail(info.Email)
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId not in database"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error":"EmailId or Passwords mismatch"})
 		return
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Get user with email error")
+		return
+	}
+
+	if !hash.Validate(info.Password,user.Password,configuration.GetResp().PasswordHash){
+		c.JSON(http.StatusUnauthorized, gin.H{"error":"EmailId or Passwords mismatch"})
 		return
 	}
 
@@ -54,24 +64,22 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	if !hash.Validate(info.Password, user.Password, configuration.GetResp().PasswordHash) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Passwords mismatch"})
-		return
-	}
-
 	info.FirstName = user.FirstName
 	info.LastName = user.LastName
 	info.Password = ""
+	info.Role = user.Role
 	var token serializers.RefreshToken
 
 	token.AccessToken, err = auth.GenerateAccessToken(uint64(user.ID), user.Role, configuration.GetResp().Token.ExpiryTime.AccessToken)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Access Token not generated"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Access Token not generated")
 		return
 	}
 	token.RefreshToken, err = auth.GenerateRefreshToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.RefreshToken)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Refresh Token not generated"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Refresh Token not generated")
 		return
 	}
 
@@ -81,7 +89,8 @@ func SignIn(c *gin.Context) {
 	})
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "JSON marshalling error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("JSON marshalling error")
 		return
 	}
 	c.Data(http.StatusOK, "application/json", js)

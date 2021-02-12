@@ -3,6 +3,7 @@ package api
 import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/auth"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/authorization"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/middlewares"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,15 @@ func InitServer() error {
 
 	loginGroup := v1.Group("/login", middlewares.CheckIfLogged())
 	authorization.SignInRoute(loginGroup)
+
+	userGroup := v1.Group("/users",middlewares.AuthorizeJWT())
+	users.AddUserRoute(userGroup)
+	users.ChangeUserEmailRoute(userGroup)
+	users.ChangeUserRoleRoute(userGroup)
+	users.ChangeUserPasswordRoute(userGroup)
+	users.DeleteUserRoute(userGroup)
+	users.GetUserRoute(userGroup)
+	users.GetAllUsersRoute(userGroup)
 
 	err := router.Run(":" + configuration.GetResp().Server.Port)
 	return errors.Wrap(err, "Unable to run server")

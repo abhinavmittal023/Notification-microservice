@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/authservice"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
@@ -13,6 +14,7 @@ import (
 // RefreshAccessTokenRoute is used to sign in users
 func RefreshAccessTokenRoute(router *gin.RouterGroup) {
 	router.POST("/token", RefreshAccessToken)
+	router.OPTIONS("/token", preflight.Preflight)
 }
 
 // RefreshAccessToken Provides a new access token given a valid refresh token

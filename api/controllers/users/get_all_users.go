@@ -5,10 +5,17 @@ import (
 	"log"
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/features/serializers"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/features/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"github.com/gin-gonic/gin"
 )
+
+//GetAllUsersRoute is used to get all users from database
+func GetAllUsersRoute(router *gin.RouterGroup) {
+	router.GET("/get", GetAllUsers)
+	router.OPTIONS("/get", preflight.Preflight)
+}
 
 //GetAllUsers Controller for /users/get route
 func GetAllUsers(c *gin.Context){
@@ -20,7 +27,7 @@ func GetAllUsers(c *gin.Context){
 
 	usersArray,err := users.GetAllUsers()
 	if err != nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
 		log.Println("find all users query error")
 		return
 	}
@@ -35,7 +42,7 @@ func GetAllUsers(c *gin.Context){
 
 	js, err := json.Marshal(&infoArray)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"internal_server_error":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
 		log.Println("JSON marshalling error")
 		return
 	}

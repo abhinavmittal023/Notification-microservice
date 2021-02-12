@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/authservice"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,7 @@ import (
 // ValidateEmailRoute is used to sign in users
 func ValidateEmailRoute(router *gin.RouterGroup) {
 	router.GET("/token/:token", ValidateEmail)
+	router.OPTIONS("/token/:token", preflight.Preflight)
 }
 
 // ValidateEmail Controller verifies the email after checking the token
