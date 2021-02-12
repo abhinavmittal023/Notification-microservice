@@ -5,18 +5,20 @@ import (
 	"net/http"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"github.com/gin-gonic/gin"
 )
 
-//AuthorizeJWT validates and authorizes the requests
+// AuthorizeJWT validates and authorizes the requests
 func AuthorizeJWT() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
+		authHeader := c.GetHeader(constants.Authorization)
 		headerPrefix := configuration.GetResp().Token.HeaderPrefix
+		headerCheck := len(authHeader) < (len(headerPrefix)+2) || authHeader[:len(headerPrefix)] != headerPrefix
 
-		if len(authHeader) < (len(headerPrefix)+2) || authHeader[:len(headerPrefix)] != headerPrefix {
+		if headerCheck {
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
 
@@ -35,6 +37,5 @@ func AuthorizeJWT() gin.HandlerFunc {
 		} else {
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
-
 	}
 }

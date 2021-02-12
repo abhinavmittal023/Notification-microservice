@@ -1,38 +1,42 @@
-package signup
+package authorization
 
 import (
 	"log"
 	"net/http"
-	"regexp"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/features/serializers"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/features/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
 )
 
-//SignUp Controller for /signup route
+// SignUpRoute is used to sign up users
+func SignUpRoute(router *gin.RouterGroup) {
+	router.POST("/", SignUp)
+}
+
+// SignUp Controller for /signup route
 func SignUp(c *gin.Context) {
 	var info serializers.SignupInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"required": "Email,Password,FirstName are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password,FirstName are required"})
 		return
 	}
-	info.Role = 2 //signup user will always be system admin
+	info.Role = constants.SystemAdminRole // signup user will always be system admin
 
-	match, err := regexp.MatchString(constants.GetConstants().Regex.Email, info.Email)
+	er := serializers.EmailRegexCheck(info.Email)
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"internal_error": "Internal Server Error"})
+	if er == "internal_server_error" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("Internal Server Error due to email regex")
 		return
 	}
-	if !match {
-		c.JSON(http.StatusBadRequest, gin.H{"email_invalid": "Email is invalid"})
+	if er == "bad_request" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
 		return
 	}
 
@@ -41,9 +45,9 @@ func SignUp(c *gin.Context) {
 	var user models.User
 
 	serializers.SignupInfoToUserModel(info, &user)
-	err = users.CreateUser(&user)
+	err := users.CreateUser(&user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"user_not_created": "User not created Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User not created Error"})
 		return
 	}
 	to := []string{
@@ -51,7 +55,7 @@ func SignUp(c *gin.Context) {
 	}
 	err = auth.SendValidationEmail(to, uint64(user.ID))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"smtp_error": "Email couldn't be sent"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email couldn't be sent"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})

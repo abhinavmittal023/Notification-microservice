@@ -4,7 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//Channel model to create 'channels' table in the database
+// Channel model to create 'channels' table in the database
 type Channel struct {
 	gorm.Model
 	Name             string `gorm:"not null;type:varchar(255)"`

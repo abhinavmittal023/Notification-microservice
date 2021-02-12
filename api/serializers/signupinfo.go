@@ -2,7 +2,7 @@ package serializers
 
 import "code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 
-//SignupInfo serializer to bind request data
+// SignupInfo serializer to bind request data
 type SignupInfo struct {
 	FirstName string `json:"first_name" binding:"required"`
 	LastName  string `json:"last_name"`
@@ -11,7 +11,7 @@ type SignupInfo struct {
 	Role      int    `json:"role"`
 }
 
-//SignupInfoToUserModel converts SignupInfo serializer to User model
+// SignupInfoToUserModel converts SignupInfo serializer to User model
 func SignupInfoToUserModel(info SignupInfo, user *models.User) {
 	user.FirstName = info.FirstName
 	user.LastName = info.LastName

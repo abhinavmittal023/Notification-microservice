@@ -14,7 +14,7 @@ type Recipient struct {
 	PreferredChannelID uint64
 }
 
-//RecipientNotifications model to create 'recipientnotifications' table in the database
+// RecipientNotifications model to create 'recipientnotifications' table in the database
 type RecipientNotifications struct {
 	gorm.Model
 	Notification   Notification
