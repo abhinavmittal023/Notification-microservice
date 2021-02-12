@@ -20,7 +20,6 @@ func ChangeUserCredentialsRoute(router *gin.RouterGroup) {
 
 // ChangeCredentials Controller for /users/changeemail route
 func ChangeCredentials(c *gin.Context) {
-	userID, _ := c.Get("user_id")
 	var info serializers.ChangeCredentialsInfo
 	if c.BindJSON(&info) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Email, New Email are required"})
@@ -40,10 +39,13 @@ func ChangeCredentials(c *gin.Context) {
 		return
 	}
 
-	user, err := users.GetUserWithID(userID.(uint64))
+	user, err := users.GetUserWithEmail(info.Email)
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "EmailId not in database"})
 		return
+	}
+	if info.Role == 0{
+		info.Role = user.Role
 	}
 
 	serializers.ChangeCredentialsInfoToUserModel(&info, user)

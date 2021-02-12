@@ -5,7 +5,7 @@ import "code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 // ChangeCredentialsInfo serializer to bind request data
 type ChangeCredentialsInfo struct {
 	Email string `json:"email" binding:"required"`
-	Role  int    `json:"role" binding:"required"`
+	Role  int    `json:"role"`
 }
 
 // ChangePasswordInfo serializer to bind request data
