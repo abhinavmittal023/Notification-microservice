@@ -29,7 +29,7 @@ func RefreshAccessToken(c *gin.Context) {
 		return
 	}
 
-	userDetails, err := authservice.ValidateToken(refreshToken.RefreshToken,"refresh")
+	userDetails, err := authservice.ValidateToken(refreshToken.RefreshToken, "refresh")
 	if err == authservice.ErrInvalidToken {
 		log.Println(err.Error())
 		c.AbortWithStatus(http.StatusUnauthorized)

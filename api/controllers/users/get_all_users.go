@@ -18,16 +18,16 @@ func GetAllUsersRoute(router *gin.RouterGroup) {
 }
 
 //GetAllUsers Controller for /users/get route
-func GetAllUsers(c *gin.Context){
-	val,_ := c.Get("role")
-	if val != 2{
+func GetAllUsers(c *gin.Context) {
+	val, _ := c.Get("role")
+	if val != 2 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	usersArray,err := users.GetAllUsers()
-	if err != nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+	usersArray, err := users.GetAllUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("find all users query error")
 		return
 	}
@@ -37,12 +37,12 @@ func GetAllUsers(c *gin.Context){
 
 	for _, user := range usersArray {
 		serializers.UserModelToUserInfo(&info, &user)
-        infoArray = append(infoArray, info)
+		infoArray = append(infoArray, info)
 	}
 
 	js, err := json.Marshal(&infoArray)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("JSON marshalling error")
 		return
 	}

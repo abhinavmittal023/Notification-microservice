@@ -58,17 +58,17 @@ func SignUp(c *gin.Context) {
 	to := []string{
 		info.Email,
 	}
-	err = auth.SendValidationEmail(to,uint64(user.ID))
-	if err!= nil{
+	err = auth.SendValidationEmail(to, uint64(user.ID))
+	if err != nil {
 		err = users.DeleteUserPermanently(&user)
-		if err!= nil{
-			c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 			log.Println("Delete User Service Error")
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("SMTP Error")
 		return
 	}
-	c.JSON(http.StatusOK,gin.H{"status":"ok"})
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

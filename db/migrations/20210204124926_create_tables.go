@@ -16,7 +16,7 @@ func init() {
 func upCreateTables(tx *sql.Tx) error {
 	dbG := db.Get()
 
-	err := dbG.AutoMigrate(&models.User{},&models.Recipient{},&models.Notification{},&models.Organisation{},&models.Channel{},&models.RecipientNotifications{}).Error
+	err := dbG.AutoMigrate(&models.User{}, &models.Recipient{}, &models.Notification{}, &models.Organisation{}, &models.Channel{}, &models.RecipientNotifications{}).Error
 	if err != nil {
 		return errors.Wrap(err, "Unable to create models")
 	}
@@ -37,7 +37,7 @@ func downCreateTables(tx *sql.Tx) error {
 		return errors.Wrap(err, "Unable to remove unique index from user model")
 	}
 
-	err = dbG.DropTable(&models.User{},&models.Recipient{},&models.Notification{},&models.Organisation{},&models.Channel{},&models.RecipientNotifications{}).Error
+	err = dbG.DropTable(&models.User{}, &models.Recipient{}, &models.Notification{}, &models.Organisation{}, &models.Channel{}, &models.RecipientNotifications{}).Error
 	if err != nil {
 		return errors.Wrap(err, "Unable to remove models")
 	}

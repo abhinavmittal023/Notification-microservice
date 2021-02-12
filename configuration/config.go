@@ -26,7 +26,7 @@ type Token struct {
 
 // Database struct stores the database info
 type Database struct {
-	Dbstring     string `json:"dbstring"`
+	Dbstring string `json:"dbstring"`
 }
 
 // EmailNotification struct stores the validation email id info

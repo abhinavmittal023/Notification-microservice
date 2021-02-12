@@ -37,7 +37,7 @@ func InitServer() error {
 	loginGroup := v1.Group("/login", middlewares.CheckIfLogged())
 	authorization.SignInRoute(loginGroup)
 
-	userGroup := v1.Group("/users",middlewares.AuthorizeJWT())
+	userGroup := v1.Group("/users", middlewares.AuthorizeJWT())
 	users.AddUserRoute(userGroup)
 	users.ChangeUserEmailRoute(userGroup)
 	users.ChangeUserRoleRoute(userGroup)

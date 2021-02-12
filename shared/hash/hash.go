@@ -9,7 +9,7 @@ import (
 // Message function takes in a message and a secret key to return the hashed version of the message
 func Message(message string, key string) string {
 	hash := hmac.New(sha256.New, []byte(key))
-	_,_ = hash.Write([]byte(message))
+	_, _ = hash.Write([]byte(message))
 	sha := hex.EncodeToString(hash.Sum(nil))
 	return sha
 }

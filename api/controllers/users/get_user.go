@@ -19,24 +19,23 @@ func GetUserRoute(router *gin.RouterGroup) {
 	router.OPTIONS("/get/:id", preflight.Preflight)
 }
 
-
 //GetUser Controller for /users/get/:id route
-func GetUser(c *gin.Context){
-	val,_ := c.Get("role")
-	if val != 2{
+func GetUser(c *gin.Context) {
+	val, _ := c.Get("role")
+	if val != 2 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	userID,err := strconv.Atoi(c.Param("id"))
-	if err != nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("String Conversion Error")
 		return
 	}
-	user,err := users.GetUserWithID(uint64(userID))
-	if err == gorm.ErrRecordNotFound{
-		c.JSON(http.StatusBadRequest, gin.H{"error":"Id not in database"})
+	user, err := users.GetUserWithID(uint64(userID))
+	if err == gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
 		return
 	}
 
@@ -46,7 +45,7 @@ func GetUser(c *gin.Context){
 	js, err := json.Marshal(&info)
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("JSON marshalling error")
 		return
 	}

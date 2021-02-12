@@ -22,15 +22,15 @@ func AddUserRoute(router *gin.RouterGroup) {
 }
 
 //AddUser Controller for /users/add route
-func AddUser(c *gin.Context){
-	val,_ := c.Get("role")
-	if val != 2{
+func AddUser(c *gin.Context) {
+	val, _ := c.Get("role")
+	if val != 2 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	var info serializers.AddUserInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest,gin.H{"error":"Email,Password,FirstName are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password,FirstName are required"})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)
@@ -46,36 +46,36 @@ func AddUser(c *gin.Context){
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
 		return
 	}
-	
-	info.Password = hash.Message(info.Password,configuration.GetResp().PasswordHash)
+
+	info.Password = hash.Message(info.Password, configuration.GetResp().PasswordHash)
 
 	user, err := users.GetUserWithEmail(info.Email)
-	if err != gorm.ErrRecordNotFound{
-		c.JSON(http.StatusBadRequest, gin.H{"error":"EmailId already in database"})
+	if err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "EmailId already in database"})
 		return
 	}
 
-	serializers.AddUserInfoToUserModel(&info,user)
+	serializers.AddUserInfoToUserModel(&info, user)
 	err = users.CreateUser(user)
-	if err!= nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("CreateUser service error")
 		return
 	}
 	to := []string{
 		info.Email,
 	}
-	err = auth.SendValidationEmail(to,uint64(user.ID))
-	if err!= nil{
+	err = auth.SendValidationEmail(to, uint64(user.ID))
+	if err != nil {
 		err = users.DeleteUserPermanently(user)
-		if err!= nil{
-			c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 			log.Println("Delete User Service Error")
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("SMTP Error")
 		return
 	}
-	c.JSON(http.StatusOK,gin.H{"status":"ok"})
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

@@ -20,7 +20,7 @@ func ValidateEmailRoute(router *gin.RouterGroup) {
 func ValidateEmail(c *gin.Context) {
 	tokenString := c.Param("token")
 
-	userDetails, err := authservice.ValidateToken(tokenString,"validation")
+	userDetails, err := authservice.ValidateToken(tokenString, "validation")
 	if err == authservice.ErrInvalidToken {
 		log.Println(err.Error())
 		c.AbortWithStatus(http.StatusUnauthorized)

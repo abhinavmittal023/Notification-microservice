@@ -13,7 +13,7 @@ type LoginInfo struct {
 	Password  string `json:"password,omitempty" binding:"required"`
 	FirstName string `json:"first_name,omitempty"`
 	LastName  string `json:"last_name,omitempty"`
-	Role		int			`json:"role"`
+	Role      int    `json:"role"`
 }
 
 // LoginResponse formats the userDetails and TokenDetails into one struct
@@ -29,7 +29,7 @@ func LoginInfoToUserModel(info LoginInfo, user *models.User) {
 }
 
 // EmailRegexCheck checks for email id in valid format
-func EmailRegexCheck(email string) string{
+func EmailRegexCheck(email string) string {
 	match, err := regexp.MatchString(constants.EmailRegex, email)
 	if err != nil {
 		return "internal_server_error"

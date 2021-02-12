@@ -18,30 +18,30 @@ func DeleteUserRoute(router *gin.RouterGroup) {
 }
 
 //DeleteUser Controller for /users/delete/:id route
-func DeleteUser(c *gin.Context){
-	val,_ := c.Get("role")
-	if val != 2{
+func DeleteUser(c *gin.Context) {
+	val, _ := c.Get("role")
+	if val != 2 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	userID,err := strconv.Atoi(c.Param("id"))
-	if err != nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("String Conversion Error")
 		return
 	}
-	user,err := users.GetUserWithID(uint64(userID))
-	if err == gorm.ErrRecordNotFound{
-		c.JSON(http.StatusBadRequest, gin.H{"error":"Id not in database"})
+	user, err := users.GetUserWithID(uint64(userID))
+	if err == gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
 		return
 	}
 
 	err = users.SoftDeleteUser(user)
-	if err!= nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("Delete User Service Error")
 		return
 	}
-	c.JSON(http.StatusOK,gin.H{"status":"ok"})
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

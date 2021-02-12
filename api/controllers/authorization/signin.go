@@ -43,9 +43,9 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	user,err := users.GetUserWithEmail(info.Email)
+	user, err := users.GetUserWithEmail(info.Email)
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusUnauthorized, gin.H{"error":"EmailId or Passwords mismatch"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId or Passwords mismatch"})
 		return
 	}
 	if err != nil {
@@ -54,8 +54,8 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	if !hash.Validate(info.Password,user.Password,configuration.GetResp().PasswordHash){
-		c.JSON(http.StatusUnauthorized, gin.H{"error":"EmailId or Passwords mismatch"})
+	if !hash.Validate(info.Password, user.Password, configuration.GetResp().PasswordHash) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId or Passwords mismatch"})
 		return
 	}
 

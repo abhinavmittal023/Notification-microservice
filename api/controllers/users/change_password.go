@@ -20,33 +20,33 @@ func ChangeUserPasswordRoute(router *gin.RouterGroup) {
 }
 
 //ChangePassword Controller for /users/changepassword route
-func ChangePassword(c *gin.Context){
-	userID,_ := c.Get("user_id")
+func ChangePassword(c *gin.Context) {
+	userID, _ := c.Get("user_id")
 	var info serializers.ChangePasswordInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest,gin.H{"error":"Email, Role are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email, Role are required"})
 		return
 	}
-	info.OldPassword = hash.Message(info.OldPassword,configuration.GetResp().PasswordHash)
-	info.NewPassword = hash.Message(info.NewPassword,configuration.GetResp().PasswordHash)
-	
-	user,err := users.GetUserWithID(userID.(uint64))
-	if err == gorm.ErrRecordNotFound{
-		c.JSON(http.StatusBadRequest, gin.H{"error":"Id not in database"})
+	info.OldPassword = hash.Message(info.OldPassword, configuration.GetResp().PasswordHash)
+	info.NewPassword = hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)
+
+	user, err := users.GetUserWithID(userID.(uint64))
+	if err == gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
 		return
 	}
 
-	if info.OldPassword != user.Password{
-		c.JSON(http.StatusBadRequest, gin.H{"error":"Old Password is incorrect"})
+	if info.OldPassword != user.Password {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Password is incorrect"})
 		return
 	}
 
-	serializers.ChangePasswordInfoToUserModel(&info,user)
+	serializers.ChangePasswordInfoToUserModel(&info, user)
 	err = users.PatchUser(user)
-	if err!= nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"error":"Internal Server Error"})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("Update User service error")
 		return
 	}
-	c.JSON(http.StatusOK,gin.H{"status":"ok"})
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

@@ -14,7 +14,7 @@ import (
 // CheckIfFirst middleware checks the if another user exists to avoid creation of other user directly
 func CheckIfFirst() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		_,err := users.GetFirstUser()
+		_, err := users.GetFirstUser()
 		if err == gorm.ErrRecordNotFound {
 			c.Next()
 			return

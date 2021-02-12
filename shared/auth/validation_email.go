@@ -17,7 +17,7 @@ func SendValidationEmail(to []string, userID uint64) error {
 	password := configuration.GetResp().EmailNotification.Password
 	smtpHost := configuration.GetResp().EmailNotification.SMTPHost
 	smtpPort := configuration.GetResp().EmailNotification.SMTPPort
-	addr := fmt.Sprintf("%s:%s", smtpHost, smtpPort) 
+	addr := fmt.Sprintf("%s:%s", smtpHost, smtpPort)
 
 	token, err := GenerateValidationToken(userID, configuration.GetResp().Token.ExpiryTime.ValidationToken)
 	if err != nil {
