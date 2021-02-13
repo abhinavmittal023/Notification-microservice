@@ -33,6 +33,7 @@ func InitServer() error {
 	authToken := v1.Group("/auth")
 	auth.RefreshAccessTokenRoute(authToken)
 	auth.ValidateEmailRoute(authToken)
+	auth.CheckIfFirstRoute(authToken)
 
 	loginGroup := v1.Group("/login", middlewares.CheckIfLogged())
 	authorization.SignInRoute(loginGroup)
