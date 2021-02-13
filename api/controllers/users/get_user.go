@@ -2,6 +2,7 @@ package users
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -26,6 +27,14 @@ func GetUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("String Conversion Error")
 		return
+	}
+	if userID == 0 {
+		userID, err = strconv.Atoi(fmt.Sprintf("%v", c.MustGet("user_id")))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			log.Println("String Conversion Error")
+			return
+		}
 	}
 	user, err := users.GetUserWithID(uint64(userID))
 	if err == gorm.ErrRecordNotFound {
