@@ -6,14 +6,14 @@ import (
 	"mime/multipart"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"github.com/pkg/errors"
 )
 
 // ReadCSV function reads the content of the CSV file into the recipient struct
-func ReadCSV(csvFile *multipart.FileHeader) (*[]models.Recipient, error) {
+func ReadCSV(csvFile *multipart.FileHeader) (*[]serializers.RecipientInfo, error) {
 	// Open the file
-	var recipients []models.Recipient
+	var recipients []serializers.RecipientInfo
 	recordFile, err := csvFile.Open()
 	if err != nil {
 		return nil, errors.Wrap(err, "Error opening file")
@@ -35,15 +35,19 @@ func ReadCSV(csvFile *multipart.FileHeader) (*[]models.Recipient, error) {
 		} else if err != nil {
 			return nil, errors.Wrap(err, "Error reading from file")
 		}
-		var id int
-		if record[3] != "" {
-			id, err = strconv.Atoi(record[3])
+		var channelID uint64
+		recipientID, err := strconv.ParseUint(record[0], 10, 64)
+		if err != nil {
+			return nil, errors.Wrap(err, "Error converting recipientID to unsigned int")
+		}
+		if record[4] != "" {
+			channelID, err = strconv.ParseUint(record[4], 10, 64)
 			if err != nil {
-				return nil, errors.Wrap(err, "Error converting id to int")
+				return nil, errors.Wrap(err, "Error converting channelID to int")
 			}
-			recipients = append(recipients, models.Recipient{Email: record[0], PushToken: record[1], WebToken: record[2], PreferredChannelID: uint64(id)})
+			recipients = append(recipients, serializers.RecipientInfo{ID: recipientID, Email: record[1], PushToken: record[2], WebToken: record[3], PreferredChannelID: uint64(channelID)})
 		} else {
-			recipients = append(recipients, models.Recipient{Email: record[0], PushToken: record[1], WebToken: record[2]})
+			recipients = append(recipients, serializers.RecipientInfo{ID: recipientID, Email: record[1], PushToken: record[2], WebToken: record[3]})
 		}
 	}
 	return &recipients, nil
