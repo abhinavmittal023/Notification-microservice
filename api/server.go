@@ -47,8 +47,10 @@ func InitServer() error {
 	users.GetUserRoute(userGroup)
 	users.GetAllUsersRoute(userGroup)
 
-	recipientGroup := v1.Group("/recipients")
+	recipientGroup := v1.Group("/recipients", middlewares.CheckIfSystemAdmin())
 	recipients.AddUpdateRecipientRoute(recipientGroup)
+	recipients.GetRecipientRoute(recipientGroup)
+	recipients.GetAllRecipientRoute(recipientGroup)
 
 	err := router.Run(":" + configuration.GetResp().Server.Port)
 	return errors.Wrap(err, "Unable to run server")
