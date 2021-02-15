@@ -19,24 +19,19 @@ import (
 func ChangeUserPasswordRoute(router *gin.RouterGroup) {
 	router.PUT("/changepassword/:id", ChangePassword)
 	router.OPTIONS("/changepassword/:id", preflight.Preflight)
+	router.PUT("/changepassword", ChangePassword)
+	router.OPTIONS("/changepassword", preflight.Preflight)
 }
 
 // ChangePassword Controller for /users/changepassword/:id route
 func ChangePassword(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("String Conversion Error")
-		return
+	var userID int;
+	if c.Param("id") == ""{
+		userID, _ = strconv.Atoi(fmt.Sprintf("%v", c.MustGet("user_id")))
+	}else{
+		userID, _ = strconv.Atoi(c.Param("id"))
 	}
-	if userID == 0 {
-		userID, err = strconv.Atoi(fmt.Sprintf("%v", c.MustGet("user_id")))
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			log.Println("String Conversion Error")
-			return
-		}
-	}
+	
 	var info serializers.ChangePasswordInfo
 	if c.BindJSON(&info) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "OldPassword, NewPassword are required"})
