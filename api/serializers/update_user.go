@@ -10,7 +10,7 @@ type ChangeCredentialsInfo struct {
 
 // ChangePasswordInfo serializer to bind request data
 type ChangePasswordInfo struct {
-	OldPassword string `json:"old_password" binding:"required"`
+	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password" binding:"required"`
 }
 
