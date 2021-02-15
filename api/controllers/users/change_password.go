@@ -1,8 +1,10 @@
 package users
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
@@ -15,28 +17,43 @@ import (
 
 // ChangeUserPasswordRoute is used to change users password in database
 func ChangeUserPasswordRoute(router *gin.RouterGroup) {
-	router.PUT("/changepassword", ChangePassword)
-	router.OPTIONS("/changepassword", preflight.Preflight)
+	router.PUT("/changepassword/:id", ChangePassword)
+	router.OPTIONS("/changepassword/:id", preflight.Preflight)
 }
 
-// ChangePassword Controller for /users/changepassword route
+// ChangePassword Controller for /users/changepassword/:id route
 func ChangePassword(c *gin.Context) {
-	userID, _ := c.Get("user_id")
-	var info serializers.ChangePasswordInfo
-	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email, Role are required"})
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("String Conversion Error")
 		return
 	}
-	info.OldPassword = hash.Message(info.OldPassword, configuration.GetResp().PasswordHash)
+	if userID == 0 {
+		userID, err = strconv.Atoi(fmt.Sprintf("%v", c.MustGet("user_id")))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			log.Println("String Conversion Error")
+			return
+		}
+	}
+	var info serializers.ChangePasswordInfo
+	if c.BindJSON(&info) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "OldPassword, NewPassword are required"})
+		return
+	}
+	if info.OldPassword != ""{
+		info.OldPassword = hash.Message(info.OldPassword, configuration.GetResp().PasswordHash)
+	}
 	info.NewPassword = hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)
 
-	user, err := users.GetUserWithID(userID.(uint64))
+	user, err := users.GetUserWithID(uint64(userID))
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
 		return
 	}
 
-	if info.OldPassword != user.Password {
+	if info.OldPassword != "" && info.OldPassword != user.Password {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Password is incorrect"})
 		return
 	}
