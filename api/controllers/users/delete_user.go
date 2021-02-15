@@ -19,9 +19,9 @@ func DeleteUserRoute(router *gin.RouterGroup) {
 
 // DeleteUser Controller for /users/delete/:id route
 func DeleteUser(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("id"))
+	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID should be a unsigned integer"})
 		log.Println("String Conversion Error")
 		return
 	}

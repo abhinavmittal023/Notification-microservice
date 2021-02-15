@@ -25,10 +25,10 @@ func ChangeUserPasswordRoute(router *gin.RouterGroup) {
 
 // ChangePassword Controller for /users/changepassword/:id route
 func ChangePassword(c *gin.Context) {
-	var userID int
+	var userID uint64
 	var err error
 	if c.Param("id") == "" {
-		userID, err = strconv.Atoi(fmt.Sprintf("%v", c.MustGet("user_id")))
+		userID, err = strconv.ParseUint(fmt.Sprintf("%v", c.MustGet("user_id")), 10, 64)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": "Error converting id to integer",
@@ -36,10 +36,10 @@ func ChangePassword(c *gin.Context) {
 			return
 		}
 	} else {
-		userID, err = strconv.Atoi(c.Param("id"))
+		userID, err = strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": "Error converting id to integer",
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": "ID should be a unsigned integer",
 			})
 			return
 		}

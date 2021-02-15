@@ -22,14 +22,16 @@ func GetUserRoute(router *gin.RouterGroup) {
 
 // GetUser Controller for /users/get/:id route
 func GetUser(c *gin.Context) {
-	userID, err := strconv.Atoi(c.Param("id"))
+	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "ID should be a unsigned integer",
+		})
 		log.Println("String Conversion Error")
 		return
 	}
 	if userID == 0 {
-		userID, err = strconv.Atoi(fmt.Sprintf("%v", c.MustGet("user_id")))
+		userID, err = strconv.ParseUint(fmt.Sprintf("%v", c.MustGet("user_id")), 10, 64)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 			log.Println("String Conversion Error")
