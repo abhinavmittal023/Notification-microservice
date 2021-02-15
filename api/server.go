@@ -3,6 +3,7 @@ package api
 import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/auth"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/authorization"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/recipients"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/middlewares"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
@@ -45,6 +46,9 @@ func InitServer() error {
 	users.DeleteUserRoute(userGroup)
 	users.GetUserRoute(userGroup)
 	users.GetAllUsersRoute(userGroup)
+
+	recipientGroup := v1.Group("/recipients")
+	recipients.AddUpdateRecipientRoute(recipientGroup)
 
 	err := router.Run(":" + configuration.GetResp().Server.Port)
 	return errors.Wrap(err, "Unable to run server")
