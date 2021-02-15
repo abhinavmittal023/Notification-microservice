@@ -27,12 +27,21 @@ func ChangeUserPasswordRoute(router *gin.RouterGroup) {
 func ChangePassword(c *gin.Context) {
 	var userID uint64
 	var err error
+	var info serializers.ChangePasswordInfo
+	if c.BindJSON(&info) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "NewPassword is required"})
+		return
+	}
 	if c.Param("id") == "" {
 		userID, err = strconv.ParseUint(fmt.Sprintf("%v", c.MustGet("user_id")), 10, 64)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": "Error converting id to integer",
 			})
+			return
+		}
+		if info.OldPassword == ""{
+			c.JSON(http.StatusBadRequest, gin.H{"error": "OldPassword is required"})
 			return
 		}
 	} else {
@@ -45,14 +54,6 @@ func ChangePassword(c *gin.Context) {
 		}
 	}
 
-	var info serializers.ChangePasswordInfo
-	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "NewPassword are required"})
-		return
-	}
-	if info.OldPassword != "" {
-		info.OldPassword = hash.Message(info.OldPassword, configuration.GetResp().PasswordHash)
-	}
 	info.NewPassword = hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)
 
 	user, err := users.GetUserWithID(uint64(userID))
@@ -61,7 +62,7 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	if info.OldPassword != "" && info.OldPassword != user.Password {
+	if info.OldPassword != "" && hash.Validate(info.OldPassword, user.Password, configuration.GetResp().PasswordHash){
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Password is incorrect"})
 		return
 	}
