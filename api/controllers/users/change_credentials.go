@@ -22,30 +22,34 @@ func ChangeUserCredentialsRoute(router *gin.RouterGroup) {
 func ChangeCredentials(c *gin.Context) {
 	var info serializers.ChangeCredentialsInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Email, New Email are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID is required"})
 		return
 	}
-	info.Email = strings.ToLower(info.Email)
+	if info.Email != ""{
+		info.Email = strings.ToLower(info.Email)
+		er := serializers.EmailRegexCheck(info.Email)
 
-	er := serializers.EmailRegexCheck(info.Email)
-
-	if er == "internal_server_error" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Internal Server Error due to email regex")
-		return
+		if er == "internal_server_error" {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			log.Println("Internal Server Error due to email regex")
+			return
+		}
+		if er == "bad_request" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
+			return
+		}
 	}
-	if er == "bad_request" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
-		return
-	}
 
-	user, err := users.GetUserWithEmail(info.Email)
+	user, err := users.GetUserWithID(uint64(info.ID))
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "EmailId not in database"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID not in database"})
 		return
 	}
 	if info.Role == 0{
 		info.Role = user.Role
+	}
+	if info.Email == ""{
+		info.Email = user.Email
 	}
 
 	serializers.ChangeCredentialsInfoToUserModel(&info, user)
