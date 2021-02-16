@@ -37,30 +37,33 @@ func AddUpdateRecipient(c *gin.Context) {
 		return
 	}
 
-	var errors []serializers.ErrorInfo
 	for _, recipientRecord := range *recipientRecords {
 
-		er := serializers.EmailRegexCheck(recipientRecord.Email)
+		if recipientRecord.Email != "" {
+			er := serializers.EmailRegexCheck(recipientRecord.Email)
 
-		if er == "internal_server_error" {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			log.Println("Internal Server Error due to email regex")
-			return
+			if er == "internal_server_error" {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+				log.Println("Internal Server Error due to email regex")
+				return
+			}
+			if er == "bad_request" {
+				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+					"error": fmt.Sprintf("Email of ID %v is invalid", recipientRecord.ID),
+				})
+				return
+			}
 		}
-		if er == "bad_request" {
-			errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Email of ID %v is invalid", recipientRecord.ID)})
-			continue
-		}
-		err = recipients.AddUpdateRecipientWithID(&recipientRecord)
+		status, err := recipients.AddUpdateRecipientWithID(&recipientRecord)
 		if err != nil {
 			log.Println(err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			if status == http.StatusInternalServerError {
+				c.AbortWithStatusJSON(status, gin.H{"error": "Internal Server Error"})
+			} else {
+				c.AbortWithStatusJSON(status, gin.H{"error": err.Error()})
+			}
 			return
 		}
-	}
-	if len(errors) > 0 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, errors)
-		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status": "OK",
