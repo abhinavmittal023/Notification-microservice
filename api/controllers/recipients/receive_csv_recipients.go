@@ -15,7 +15,7 @@ func AddUpdateRecipientRoute(router *gin.RouterGroup) {
 	router.OPTIONS("/csv", preflight.Preflight)
 }
 
-// AddUpdateRecipient controller for /csv route
+// AddUpdateRecipient controller for post /csv route
 func AddUpdateRecipient(c *gin.Context) {
 
 	rFile, err := c.FormFile("recipients")
@@ -27,12 +27,12 @@ func AddUpdateRecipient(c *gin.Context) {
 		})
 		return
 	}
-	recipients, err := recipients.ReadCSV(rFile)
+	recipientRecords, err := recipients.ReadCSV(rFile)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid CSV file",
 		})
 		return
 	}
-	c.JSON(http.StatusOK, recipients)
+	c.JSON(http.StatusOK, recipientRecords)
 }
