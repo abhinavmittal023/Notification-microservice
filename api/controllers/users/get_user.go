@@ -1,7 +1,6 @@
 package users
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -47,12 +46,5 @@ func GetUser(c *gin.Context) {
 	var info serializers.UserInfo
 	serializers.UserModelToUserInfo(&info, user)
 
-	js, err := json.Marshal(&info)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("JSON marshalling error")
-		return
-	}
-	c.Data(http.StatusOK, "application/json", js)
+	c.JSON(http.StatusOK, info)
 }
