@@ -1,6 +1,8 @@
 package recipients
 
 import (
+	"strings"
+
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
@@ -15,11 +17,10 @@ func AddUpdateRecipientWithID(recipientInfo *serializers.RecipientInfo) error {
 	if err != nil {
 		return err
 	}
-	recipient.ID = uint(recipientInfo.ID)
 	recipient.PreferredChannelID = recipientInfo.PreferredChannelID
 	recipient.PushToken = recipientInfo.PushToken
 	recipient.WebToken = recipientInfo.WebToken
-	recipient.Email = recipientInfo.Email
+	recipient.Email = strings.ToLower(recipientInfo.Email)
 
 	return dbG.Save(&recipient).Error
 }
