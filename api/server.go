@@ -47,7 +47,7 @@ func InitServer() error {
 	users.GetUserRoute(userGroup)
 	users.GetAllUsersRoute(userGroup)
 
-	recipientGroup := v1.Group("/recipients", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())
+	recipientGroup := v1.Group("/recipients")
 	recipients.AddUpdateRecipientRoute(recipientGroup)
 	recipients.SendRecipientCSVRoute(recipientGroup)
 	recipients.GetRecipientRoute(recipientGroup)
