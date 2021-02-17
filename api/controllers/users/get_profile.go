@@ -15,8 +15,8 @@ import (
 
 // GetUserProfileRoute is used to get your own information
 func GetUserProfileRoute(router *gin.RouterGroup) {
-	router.GET("/", GetUserProfile)
-	router.OPTIONS("/", preflight.Preflight)
+	router.GET("", GetUserProfile)
+	router.OPTIONS("", preflight.Preflight)
 }
 
 // GetUserProfile Controller for get profile/ route

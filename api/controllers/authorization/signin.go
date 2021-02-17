@@ -18,8 +18,8 @@ import (
 
 // SignInRoute is used to sign in users
 func SignInRoute(router *gin.RouterGroup) {
-	router.POST("/", SignIn)
-	router.OPTIONS("/", preflight.Preflight)
+	router.POST("", SignIn)
+	router.OPTIONS("", preflight.Preflight)
 }
 
 // SignIn Controller for /signin route

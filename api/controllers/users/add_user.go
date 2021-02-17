@@ -17,8 +17,8 @@ import (
 
 // AddUserRoute is used to add users to database
 func AddUserRoute(router *gin.RouterGroup) {
-	router.POST("/", AddUser)
-	router.OPTIONS("/", preflight.Preflight)
+	router.POST("", AddUser)
+	router.OPTIONS("", preflight.Preflight)
 }
 
 // AddUser Controller for post /users/ route
