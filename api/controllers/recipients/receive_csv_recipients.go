@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/recipients"
 	"github.com/gin-gonic/gin"
@@ -14,10 +13,9 @@ import (
 // AddUpdateRecipientRoute is used to allow creation and updation of recipients from csv
 func AddUpdateRecipientRoute(router *gin.RouterGroup) {
 	router.POST("/csv", AddUpdateRecipient)
-	router.OPTIONS("/csv", preflight.Preflight)
 }
 
-// AddUpdateRecipient controller for post /csv route
+// AddUpdateRecipient controller for post /recipient/csv route
 func AddUpdateRecipient(c *gin.Context) {
 
 	rFile, err := c.FormFile("recipients")

@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-//  SendValidationEmail sends validation email to new
+// SendValidationEmail sends validation email to new
 func SendValidationEmail(to []string, userID uint64) error {
 	from := configuration.GetResp().EmailNotification.Email
 	password := configuration.GetResp().EmailNotification.Password

@@ -15,15 +15,19 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// ChangeUserPasswordRoute is used to change users password in database
-func ChangeUserPasswordRoute(router *gin.RouterGroup) {
-	router.PUT("/changepassword/:id", ChangePassword)
-	router.OPTIONS("/changepassword/:id", preflight.Preflight)
-	router.PUT("/changepassword", ChangePassword)
-	router.OPTIONS("/changepassword", preflight.Preflight)
+// ChangeDifferentUserPasswordRoute is used to change password of another user in database
+func ChangeDifferentUserPasswordRoute(router *gin.RouterGroup) {
+	router.PUT("/:id/password", ChangePassword)
+	router.OPTIONS("/:id/password", preflight.Preflight)
 }
 
-// ChangePassword Controller for /users/changepassword/:id route
+// ChangeOwnPasswordRoute is used to change your own password
+func ChangeOwnPasswordRoute(router *gin.RouterGroup) {
+	router.PUT("/password", ChangePassword)
+	router.OPTIONS("/password", preflight.Preflight)
+}
+
+// ChangePassword Controller for put /users/:id/password and put /profile/password routes
 func ChangePassword(c *gin.Context) {
 	var userID uint64
 	var err error
@@ -40,7 +44,7 @@ func ChangePassword(c *gin.Context) {
 			})
 			return
 		}
-		if info.OldPassword == ""{
+		if info.OldPassword == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "OldPassword is required"})
 			return
 		}
@@ -62,7 +66,7 @@ func ChangePassword(c *gin.Context) {
 		return
 	}
 
-	if info.OldPassword != "" && !hash.Validate(info.OldPassword, user.Password, configuration.GetResp().PasswordHash){
+	if info.OldPassword != "" && !hash.Validate(info.OldPassword, user.Password, configuration.GetResp().PasswordHash) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Password is incorrect"})
 		return
 	}

@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -13,11 +12,10 @@ import (
 
 // DeleteUserRoute is used to delete users from database
 func DeleteUserRoute(router *gin.RouterGroup) {
-	router.DELETE("/delete/:id", DeleteUser)
-	router.OPTIONS("/delete/:id", preflight.Preflight)
+	router.DELETE("/:id", DeleteUser)
 }
 
-// DeleteUser Controller for /users/delete/:id route
+// DeleteUser Controller for delete /users/:id route
 func DeleteUser(c *gin.Context) {
 	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
