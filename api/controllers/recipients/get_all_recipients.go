@@ -12,8 +12,8 @@ import (
 
 // GetAllRecipientRoute is used to get recipients from database
 func GetAllRecipientRoute(router *gin.RouterGroup) {
-	router.GET("/", GetAllRecipient)
-	router.OPTIONS("/", preflight.Preflight)
+	router.GET("", GetAllRecipient)
+	router.OPTIONS("", preflight.Preflight)
 }
 
 // GetAllRecipient Controller for get /recipient route
