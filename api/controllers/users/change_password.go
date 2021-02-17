@@ -17,17 +17,17 @@ import (
 
 // ChangeDifferentUserPasswordRoute is used to change password of another user in database
 func ChangeDifferentUserPasswordRoute(router *gin.RouterGroup) {
-	router.PUT("/:id/changepassword", ChangePassword)
-	router.OPTIONS("/:id/changepassword", preflight.Preflight)
+	router.PUT("/:id/password", ChangePassword)
+	router.OPTIONS("/:id/password", preflight.Preflight)
 }
 
 // ChangeOwnPasswordRoute is used to change your own password
 func ChangeOwnPasswordRoute(router *gin.RouterGroup) {
-	router.PUT("/changepassword", ChangePassword)
-	router.OPTIONS("/changepassword", preflight.Preflight)
+	router.PUT("/password", ChangePassword)
+	router.OPTIONS("/password", preflight.Preflight)
 }
 
-// ChangePassword Controller for put /users/:id/changepassword and put /profile/changepassword routes
+// ChangePassword Controller for put /users/:id/password and put /profile/password routes
 func ChangePassword(c *gin.Context) {
 	var userID uint64
 	var err error
