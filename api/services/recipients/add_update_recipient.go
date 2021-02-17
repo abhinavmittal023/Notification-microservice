@@ -23,26 +23,26 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 		}
 	}()
 
-	for _, recipientRecord := range *recipientRecords {
+	for index, recipientRecord := range *recipientRecords {
 
 		if recipientRecord.Email != "" {
 			er := serializers.EmailRegexCheck(recipientRecord.Email)
 
 			if er == "internal_server_error" {
 				log.Println("Error Due to Regex")
-				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error at id %v", recipientRecord.ID)})
+				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error at %v", index+2)})
 				tx.Rollback()
 				return http.StatusInternalServerError, &errors
 			}
 			if er == "bad_request" {
-				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Email of ID %v is invalid", recipientRecord.ID)})
+				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Email at %v is invalid", index+2)})
 				continue
 			}
 		}
 		status, err := AddUpdateRecipientWithID(&recipientRecord, tx)
 		if err != nil {
 			if status == http.StatusInternalServerError {
-				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error at id %v", recipientRecord.ID)})
+				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error id %v", index+2)})
 				tx.Rollback()
 				return http.StatusInternalServerError, &errors
 			}
@@ -64,24 +64,12 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 // AddUpdateRecipientWithID creates or updates the recipient given recipient details
 func AddUpdateRecipientWithID(recipientInfo *serializers.RecipientInfo, tx *gorm.DB) (int, error) {
 
-	var lastRecipient models.Recipient
-	var lastID uint
-	err := tx.Last(&lastRecipient).Error
-	if err == gorm.ErrRecordNotFound {
-		lastID = 0
-	} else if err != nil {
-		return http.StatusInternalServerError, err
-	} else {
-		lastID = lastRecipient.ID
-	}
-	if lastID+1 < uint(recipientInfo.ID) {
-		return http.StatusBadRequest, (fmt.Errorf("There cannot be any gap in ids as in %v can have max value as %v", recipientInfo.ID, lastID+1))
-	}
 	var recipient models.Recipient
-	err = tx.Model(&models.Recipient{}).Where(recipientInfo.ID).FirstOrCreate(&recipient).Error
+	err := tx.Model(&models.Recipient{}).Where("recipient_uuid = ?", recipientInfo.RecipientUUID).FirstOrCreate(&recipient).Error
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
+	recipient.RecipientUUID = recipientInfo.RecipientUUID
 	recipient.PreferredChannelID = recipientInfo.PreferredChannelID
 	recipient.PushToken = recipientInfo.PushToken
 	recipient.WebToken = recipientInfo.WebToken

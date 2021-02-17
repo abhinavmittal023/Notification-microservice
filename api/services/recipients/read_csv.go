@@ -36,18 +36,14 @@ func ReadCSV(csvFile *multipart.FileHeader) (*[]serializers.RecipientInfo, error
 			return nil, errors.Wrap(err, "Error reading from file")
 		}
 		var channelID uint64
-		recipientID, err := strconv.ParseUint(record[0], 10, 64)
-		if err != nil {
-			return nil, errors.Wrap(err, "Error converting recipientID to unsigned int")
-		}
 		if record[4] != "" {
 			channelID, err = strconv.ParseUint(record[4], 10, 64)
 			if err != nil {
 				return nil, errors.Wrap(err, "Error converting channelID to int")
 			}
-			recipients = append(recipients, serializers.RecipientInfo{ID: recipientID, Email: record[1], PushToken: record[2], WebToken: record[3], PreferredChannelID: uint64(channelID)})
+			recipients = append(recipients, serializers.RecipientInfo{RecipientUUID: record[0], Email: record[1], PushToken: record[2], WebToken: record[3], PreferredChannelID: uint64(channelID)})
 		} else {
-			recipients = append(recipients, serializers.RecipientInfo{ID: recipientID, Email: record[1], PushToken: record[2], WebToken: record[3]})
+			recipients = append(recipients, serializers.RecipientInfo{RecipientUUID: record[0], Email: record[1], PushToken: record[2], WebToken: record[3]})
 		}
 	}
 	return &recipients, nil
