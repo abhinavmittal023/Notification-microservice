@@ -44,12 +44,12 @@ func InitServer() error {
 	users.GetUserProfileRoute(ownInfoGroup)
 
 	userGroup := v1.Group("/users", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())
+	users.GetAllUsersRoute(userGroup)
 	users.AddUserRoute(userGroup)
-	users.ChangeUserCredentialsRoute(userGroup)
-	users.ChangeDifferentUserPasswordRoute(userGroup)
 	users.DeleteUserRoute(userGroup)
 	users.GetUserRoute(userGroup)
-	users.GetAllUsersRoute(userGroup)
+	users.ChangeUserCredentialsRoute(userGroup)
+	users.ChangeDifferentUserPasswordRoute(userGroup)
 
 	recipientGroup := v1.Group("/recipients", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())
 	recipients.AddUpdateRecipientRoute(recipientGroup)

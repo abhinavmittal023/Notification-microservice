@@ -17,8 +17,8 @@ import (
 
 // ChangeDifferentUserPasswordRoute is used to change password of another user in database
 func ChangeDifferentUserPasswordRoute(router *gin.RouterGroup) {
-	router.PUT("/changepassword/:id", ChangePassword)
-	router.OPTIONS("/changepassword/:id", preflight.Preflight)
+	router.PUT("/:id/changepassword", ChangePassword)
+	router.OPTIONS("/:id/changepassword", preflight.Preflight)
 }
 
 // ChangeOwnPasswordRoute is used to change your own password

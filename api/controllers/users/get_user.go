@@ -14,8 +14,8 @@ import (
 
 // GetUserRoute is used to get users from database
 func GetUserRoute(router *gin.RouterGroup) {
-	router.GET("/get/:id", GetUser)
-	router.OPTIONS("/get/:id", preflight.Preflight)
+	router.GET("/:id", GetUser)
+	router.OPTIONS("/:id", preflight.Preflight)
 }
 
 // GetUser Controller for /users/get/:id route

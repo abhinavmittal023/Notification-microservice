@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"github.com/gin-gonic/gin"
@@ -12,8 +11,7 @@ import (
 
 // GetAllUsersRoute is used to get all users from database
 func GetAllUsersRoute(router *gin.RouterGroup) {
-	router.GET("/get", GetAllUsers)
-	router.OPTIONS("/get", preflight.Preflight)
+	router.GET("", GetAllUsers)
 }
 
 // GetAllUsers Controller for /users/get route

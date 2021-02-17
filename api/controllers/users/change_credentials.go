@@ -3,6 +3,7 @@ package users
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
@@ -14,18 +15,27 @@ import (
 
 // ChangeUserCredentialsRoute is used to change users email in database
 func ChangeUserCredentialsRoute(router *gin.RouterGroup) {
-	router.PUT("/changecredentials", ChangeCredentials)
-	router.OPTIONS("/changecredentials", preflight.Preflight)
+	router.PUT("/:id/changecredentials", ChangeCredentials)
+	router.OPTIONS("/:id/changecredentials", preflight.Preflight)
 }
 
 // ChangeCredentials Controller for /users/changeemail route
 func ChangeCredentials(c *gin.Context) {
 	var info serializers.ChangeCredentialsInfo
-	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID is required"})
+	var err error
+	if err = c.BindJSON(&info); err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	if info.Email != ""{
+	info.ID, err = strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "ID should be a unsigned integer",
+		})
+		return
+	}
+	if info.Email != "" {
 		info.Email = strings.ToLower(info.Email)
 		er := serializers.EmailRegexCheck(info.Email)
 
@@ -45,10 +55,10 @@ func ChangeCredentials(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID not in database"})
 		return
 	}
-	if info.Role == 0{
+	if info.Role == 0 {
 		info.Role = user.Role
 	}
-	if info.Email == ""{
+	if info.Email == "" {
 		info.Email = user.Email
 	}
 
