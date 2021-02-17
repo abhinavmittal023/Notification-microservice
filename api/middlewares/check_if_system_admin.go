@@ -14,10 +14,6 @@ func CheckIfSystemAdmin() gin.HandlerFunc {
 			c.Next() // Preflight Request
 			return
 		}
-		if c.FullPath() == "/api/v1/users/changepassword"{
-			c.Next()
-			return
-		}
 		role, _ := c.Get("role")
 		if role != constants.SystemAdminRole {
 			c.AbortWithStatus(http.StatusUnauthorized)

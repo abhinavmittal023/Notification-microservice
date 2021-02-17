@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,19 +13,18 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// GetUserRoute is used to get users from database
-func GetUserRoute(router *gin.RouterGroup) {
-	router.GET("/get/:id", GetUser)
-	router.OPTIONS("/get/:id", preflight.Preflight)
+// GetUserProfileRoute is used to get your own information
+func GetUserProfileRoute(router *gin.RouterGroup) {
+	router.GET("", GetUserProfile)
+	router.OPTIONS("", preflight.Preflight)
 }
 
-// GetUser Controller for /users/get/:id route
-func GetUser(c *gin.Context) {
-	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+// GetUserProfile Controller for get profile/ route
+func GetUserProfile(c *gin.Context) {
+
+	userID, err := strconv.ParseUint(fmt.Sprintf("%v", c.MustGet("user_id")), 10, 64)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "ID should be a unsigned integer",
-		})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("String Conversion Error")
 		return
 	}
