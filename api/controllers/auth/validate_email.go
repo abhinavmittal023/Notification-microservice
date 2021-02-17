@@ -3,6 +3,7 @@ package auth
 import (
 	"log"
 	"net/http"
+	"net/url"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/authservice"
@@ -39,5 +40,6 @@ func ValidateEmail(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"email_id_verified": "your email id was verified"})
+	location := url.URL{Path: "http://localhost:4200/users/login"}
+	c.Redirect(http.StatusFound, location.RequestURI())
 }
