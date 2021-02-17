@@ -20,9 +20,9 @@ func GetRecipientRoute(router *gin.RouterGroup) {
 
 // GetRecipient Controller for get /recipient/:id route
 func GetRecipient(c *gin.Context) {
-	recipientID, err := strconv.Atoi(c.Param("id"))
+	recipientID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID should be a unigned integer"})
 		log.Println("String Conversion Error")
 		return
 	}
