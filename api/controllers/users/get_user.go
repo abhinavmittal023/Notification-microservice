@@ -18,7 +18,7 @@ func GetUserRoute(router *gin.RouterGroup) {
 	router.OPTIONS("/:id", preflight.Preflight)
 }
 
-// GetUser Controller for /users/get/:id route
+// GetUser Controller for get /users/:id route
 func GetUser(c *gin.Context) {
 	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {

@@ -14,11 +14,11 @@ import (
 
 // GetRecipientRoute is used to get recipients from database
 func GetRecipientRoute(router *gin.RouterGroup) {
-	router.GET("/get/:id", GetRecipient)
-	router.OPTIONS("/get/:id", preflight.Preflight)
+	router.GET("/:id", GetRecipient)
+	router.OPTIONS("/:id", preflight.Preflight)
 }
 
-// GetRecipient Controller for /recipient/get/:id route
+// GetRecipient Controller for get /recipient/:id route
 func GetRecipient(c *gin.Context) {
 	recipientID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

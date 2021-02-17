@@ -15,7 +15,7 @@ func DeleteUserRoute(router *gin.RouterGroup) {
 	router.DELETE("/:id", DeleteUser)
 }
 
-// DeleteUser Controller for /users/delete/:id route
+// DeleteUser Controller for delete /users/:id route
 func DeleteUser(c *gin.Context) {
 	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {

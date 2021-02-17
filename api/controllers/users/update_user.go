@@ -13,14 +13,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// ChangeUserCredentialsRoute is used to change users email in database
-func ChangeUserCredentialsRoute(router *gin.RouterGroup) {
-	router.PUT("/:id/changecredentials", ChangeCredentials)
-	router.OPTIONS("/:id/changecredentials", preflight.Preflight)
+// UpdateUserRoute is used to change users email in database
+func UpdateUserRoute(router *gin.RouterGroup) {
+	router.PUT("/:id/update", UpdateUser)
+	router.OPTIONS("/:id/update", preflight.Preflight)
 }
 
-// ChangeCredentials Controller for /users/changeemail route
-func ChangeCredentials(c *gin.Context) {
+// UpdateUser Controller for put /users/:id/update route
+func UpdateUser(c *gin.Context) {
 	var info serializers.ChangeCredentialsInfo
 	var err error
 	if err = c.BindJSON(&info); err != nil {

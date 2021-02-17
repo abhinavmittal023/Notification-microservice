@@ -27,7 +27,7 @@ func ChangeOwnPasswordRoute(router *gin.RouterGroup) {
 	router.OPTIONS("/changepassword", preflight.Preflight)
 }
 
-// ChangePassword Controller for /users/changepassword/:id route
+// ChangePassword Controller for put /users/:id/changepassword and put /profile/changepassword routes
 func ChangePassword(c *gin.Context) {
 	var userID uint64
 	var err error

@@ -12,11 +12,11 @@ import (
 
 // GetAllRecipientRoute is used to get recipients from database
 func GetAllRecipientRoute(router *gin.RouterGroup) {
-	router.GET("/get", GetAllRecipient)
-	router.OPTIONS("/get", preflight.Preflight)
+	router.GET("/", GetAllRecipient)
+	router.OPTIONS("/", preflight.Preflight)
 }
 
-// GetAllRecipient Controller for /recipient/get route
+// GetAllRecipient Controller for get /recipient route
 func GetAllRecipient(c *gin.Context) {
 
 	recipientArray, err := recipients.GetAllRecipients()

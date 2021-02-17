@@ -11,10 +11,10 @@ import (
 
 // GetAllUsersRoute is used to get all users from database
 func GetAllUsersRoute(router *gin.RouterGroup) {
-	router.GET("", GetAllUsers)
+	router.GET("/", GetAllUsers)
 }
 
-// GetAllUsers Controller for /users/get route
+// GetAllUsers Controller for get /users/ route
 func GetAllUsers(c *gin.Context) {
 	usersArray, err := users.GetAllUsers()
 	if err != nil {
