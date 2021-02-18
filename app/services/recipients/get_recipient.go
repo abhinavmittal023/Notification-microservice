@@ -1,6 +1,8 @@
 package recipients
 
 import (
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 )
@@ -13,9 +15,34 @@ func GetRecipientWithID(recipientID uint64) (*models.Recipient, error) {
 }
 
 // GetAllRecipients gets all Recipients from the database and returns []models.Recipient,err
-func GetAllRecipients() ([]models.Recipient, error) {
+func GetAllRecipients(pagination serializers.Pagination, recipientFilter filter.Recipient) ([]models.Recipient, error) {
+
 	var recipients []models.Recipient
 	dbg := db.Get()
-	res := dbg.Find(&recipients)
+	tx := dbg.Model(&models.Recipient{})
+
+	if recipientFilter.RecipientUUID != "" {
+		tx = tx.Where("recipient_uuid = ?", recipientFilter.RecipientUUID)
+	}
+	if recipientFilter.PreferredChannelID != 0 {
+		tx = tx.Where("preferred_channel_id = ?", recipientFilter.PreferredChannelID)
+	}
+	if recipientFilter.Email > 0 {
+		tx = tx.Not("email", "")
+	} else if recipientFilter.Email < 0 {
+		tx = tx.Where("email = ?", "")
+	}
+	if recipientFilter.PushToken > 0 {
+		tx = tx.Not("push_token", "")
+	} else if recipientFilter.PushToken < 0 {
+		tx = tx.Where("push_token = ?", "")
+	}
+	if recipientFilter.WebToken > 0 {
+		tx = tx.Not("web_token", "")
+	} else if recipientFilter.WebToken < 0 {
+		tx = tx.Where("web_token = ?", "")
+	}
+
+	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Find(&recipients)
 	return recipients, res.Error
 }

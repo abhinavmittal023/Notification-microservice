@@ -1,6 +1,8 @@
 package channels
 
 import (
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 )
@@ -13,8 +15,25 @@ func GetChannelWithID(id uint) (*models.Channel, error) {
 }
 
 // GetAllChannels gets all the channels from the database and returns []models.Channel,err
-func GetAllChannels() ([]models.Channel, error) {
+func GetAllChannels(pagination serializers.Pagination, channelFilter filter.Channel) ([]models.Channel, error) {
+
 	var channels []models.Channel
-	res := db.Get().Find(&channels)
+	dbG := db.Get()
+	tx := dbG.Model(&models.Channel{})
+
+	if channelFilter.ID != 0 {
+		tx = tx.Where("id = ?", channelFilter.ID)
+	}
+	if channelFilter.Name != "" {
+		tx = tx.Where("name = ?", channelFilter.Name)
+	}
+	if channelFilter.Type != 0 {
+		tx = tx.Where("type = ?", channelFilter.Type)
+	}
+	if channelFilter.Priority != 0 {
+		tx = tx.Where("priority = ?", channelFilter.Priority)
+	}
+
+	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Find(&channels)
 	return channels, res.Error
 }
