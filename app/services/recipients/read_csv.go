@@ -6,7 +6,7 @@ import (
 	"mime/multipart"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"github.com/pkg/errors"
 )
 

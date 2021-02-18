@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"net/url"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/authservice"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/authservice"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"github.com/gin-gonic/gin"
 )
 

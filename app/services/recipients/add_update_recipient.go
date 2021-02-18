@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/jinzhu/gorm"

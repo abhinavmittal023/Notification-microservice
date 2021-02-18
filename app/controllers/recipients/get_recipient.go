@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/recipients"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )

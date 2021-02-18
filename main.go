@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 )
@@ -24,7 +24,7 @@ func main() {
 
 	dbG := db.Get()
 	defer dbG.Close()
-	err = api.InitServer()
+	err = app.InitServer()
 	if err != nil {
 		log.Println("Error connecting to Server")
 		return
