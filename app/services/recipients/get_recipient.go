@@ -13,9 +13,9 @@ func GetRecipientWithID(recipientID uint64) (*models.Recipient, error) {
 }
 
 // GetAllRecipients gets all Recipients from the database and returns []models.Recipient,err
-func GetAllRecipients() ([]models.Recipient, error) {
+func GetAllRecipients(limit uint64, offset uint64) ([]models.Recipient, error) {
 	var recipients []models.Recipient
 	dbg := db.Get()
-	res := dbg.Find(&recipients)
+	res := dbg.Offset(offset).Limit(limit).Find(&recipients)
 	return recipients, res.Error
 }

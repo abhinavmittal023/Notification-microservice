@@ -13,8 +13,8 @@ func GetChannelWithID(id uint) (*models.Channel, error) {
 }
 
 // GetAllChannels gets all the channels from the database and returns []models.Channel,err
-func GetAllChannels() ([]models.Channel, error) {
+func GetAllChannels(limit uint64, offset uint64) ([]models.Channel, error) {
 	var channels []models.Channel
-	res := db.Get().Find(&channels)
+	res := db.Get().Offset(offset).Limit(limit).Find(&channels)
 	return channels, res.Error
 }

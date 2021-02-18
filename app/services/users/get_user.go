@@ -27,9 +27,9 @@ func GetUserWithEmail(email string) (*models.User, error) {
 }
 
 // GetAllUsers gets all users from the database and returns []models.User,err
-func GetAllUsers() ([]models.User, error) {
+func GetAllUsers(limit uint64, offset uint64) ([]models.User, error) {
 	var users []models.User
 	dbg := db.Get()
-	res := dbg.Find(&users)
+	res := dbg.Offset(offset).Limit(limit).Find(&users)
 	return users, res.Error
 }
