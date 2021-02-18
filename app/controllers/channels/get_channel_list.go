@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"github.com/gin-gonic/gin"
 )
@@ -28,7 +29,17 @@ func GetAllChannels(c *gin.Context) {
 		return
 	}
 
-	channelList, err := channels.GetAllChannels(pagination)
+	var channelFilter filter.Channel
+	err = c.BindQuery(&channelFilter)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid filter Parameters",
+		})
+		return
+	}
+
+	channelList, err := channels.GetAllChannels(pagination, channelFilter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("find all channels query error")

@@ -6,6 +6,7 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -25,14 +26,23 @@ func GetAllRecipient(c *gin.Context) {
 	var pagination serializers.Pagination
 	err = c.BindQuery(&pagination)
 	if err != nil {
-		log.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid limit and offset",
 		})
 		return
 	}
 
-	recipientArray, err := recipients.GetAllRecipients(pagination)
+	var recipientFilter filter.Recipient
+	err = c.BindQuery(&recipientFilter)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid filter Parameters",
+		})
+		return
+	}
+
+	recipientArray, err := recipients.GetAllRecipients(pagination, recipientFilter)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
