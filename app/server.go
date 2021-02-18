@@ -57,7 +57,7 @@ func InitServer() error {
 	recipients.GetRecipientRoute(recipientGroup)
 	recipients.GetAllRecipientRoute(recipientGroup)
 
-	channelGroup := v1.Group("/channels")
+	channelGroup := v1.Group("/channels", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())
 	channels.AddChannelRoute(channelGroup)
 	channels.GetAllChannelsRoute(channelGroup)
 	channels.UpdateChannelRoute(channelGroup)
