@@ -1,6 +1,7 @@
 package users
 
 import (
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 )
@@ -27,9 +28,9 @@ func GetUserWithEmail(email string) (*models.User, error) {
 }
 
 // GetAllUsers gets all users from the database and returns []models.User,err
-func GetAllUsers(limit uint64, offset uint64) ([]models.User, error) {
+func GetAllUsers(pagination serializers.Pagination) ([]models.User, error) {
 	var users []models.User
 	dbg := db.Get()
-	res := dbg.Offset(offset).Limit(limit).Find(&users)
+	res := dbg.Offset(pagination.Offset).Limit(pagination.Limit).Find(&users)
 	return users, res.Error
 }

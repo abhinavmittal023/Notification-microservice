@@ -1,6 +1,7 @@
 package recipients
 
 import (
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 )
@@ -13,9 +14,9 @@ func GetRecipientWithID(recipientID uint64) (*models.Recipient, error) {
 }
 
 // GetAllRecipients gets all Recipients from the database and returns []models.Recipient,err
-func GetAllRecipients(limit uint64, offset uint64) ([]models.Recipient, error) {
+func GetAllRecipients(pagination serializers.Pagination) ([]models.Recipient, error) {
 	var recipients []models.Recipient
 	dbg := db.Get()
-	res := dbg.Offset(offset).Limit(limit).Find(&recipients)
+	res := dbg.Offset(pagination.Offset).Limit(pagination.Limit).Find(&recipients)
 	return recipients, res.Error
 }

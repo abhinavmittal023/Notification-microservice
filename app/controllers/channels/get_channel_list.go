@@ -3,11 +3,9 @@ package channels
 import (
 	"log"
 	"net/http"
-	"strconv"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,37 +17,18 @@ func GetAllChannelsRoute(router *gin.RouterGroup) {
 // GetAllChannels function is a controller for the get channels/ route
 func GetAllChannels(c *gin.Context) {
 
-	var limit uint64
 	var err error
-	var offset uint64
-	limitString := c.Query("limit")
-	offsetString := c.Query("offset")
-
-	if limitString != "" {
-		limit, err = strconv.ParseUint(limitString, 10, 64)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": "limit should be a unsigned integer",
-			})
-			return
-		}
-	} else {
-		limit = constants.DefaultLimit
+	var pagination serializers.Pagination
+	err = c.BindQuery(&pagination)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid limit and offset",
+		})
+		return
 	}
 
-	if offsetString != "" {
-		offset, err = strconv.ParseUint(offsetString, 10, 64)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": "offset should be a unsigned integer",
-			})
-			return
-		}
-	} else {
-		offset = constants.DefaultOffset
-	}
-
-	channelList, err := channels.GetAllChannels(limit, offset)
+	channelList, err := channels.GetAllChannels(pagination)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("find all channels query error")

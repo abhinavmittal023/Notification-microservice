@@ -3,11 +3,9 @@ package users
 import (
 	"log"
 	"net/http"
-	"strconv"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,37 +17,18 @@ func GetAllUsersRoute(router *gin.RouterGroup) {
 // GetAllUsers Controller for get /users/ route
 func GetAllUsers(c *gin.Context) {
 
-	var limit uint64
 	var err error
-	var offset uint64
-	limitString := c.Query("limit")
-	offsetString := c.Query("offset")
-
-	if limitString != "" {
-		limit, err = strconv.ParseUint(limitString, 10, 64)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": "limit should be a unsigned integer",
-			})
-			return
-		}
-	} else {
-		limit = constants.DefaultLimit
+	var pagination serializers.Pagination
+	err = c.BindQuery(&pagination)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid limit and offset",
+		})
+		return
 	}
 
-	if offsetString != "" {
-		offset, err = strconv.ParseUint(offsetString, 10, 64)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": "offset should be a unsigned integer",
-			})
-			return
-		}
-	} else {
-		offset = constants.DefaultOffset
-	}
-
-	usersArray, err := users.GetAllUsers(limit, offset)
+	usersArray, err := users.GetAllUsers(pagination)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("find all users query error")
