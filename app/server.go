@@ -59,7 +59,10 @@ func InitServer() error {
 
 	channelGroup := v1.Group("/channels")
 	channels.AddChannelRoute(channelGroup)
+	channels.GetAllChannelsRoute(channelGroup)
 	channels.UpdateChannelRoute(channelGroup)
+	channels.DeleteChannelRoute(channelGroup)
+	channels.GetChannelRoute(channelGroup)
 
 	err := router.Run(":" + configuration.GetResp().Server.Port)
 	return errors.Wrap(err, "Unable to run server")
