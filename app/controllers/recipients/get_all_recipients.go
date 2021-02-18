@@ -7,6 +7,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -35,7 +36,7 @@ func GetAllRecipient(c *gin.Context) {
 			return
 		}
 	} else {
-		limit = 20
+		limit = constants.DefaultLimit
 	}
 
 	if offsetString != "" {
@@ -47,7 +48,7 @@ func GetAllRecipient(c *gin.Context) {
 			return
 		}
 	} else {
-		offset = 0
+		offset = constants.DefaultOffset
 	}
 
 	recipientArray, err := recipients.GetAllRecipients(limit, offset)

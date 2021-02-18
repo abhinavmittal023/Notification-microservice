@@ -12,4 +12,10 @@ const (
 
 	// AdminRole defines the role value for system admin in the database
 	AdminRole = 1
+
+	// DefaultLimit is the Default value for the limit parameter used in the pagination
+	DefaultLimit = 20
+
+	// DefaultOffset is the Default value for the offset parameter used in the pagination
+	DefaultOffset = 0
 )

@@ -7,6 +7,7 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,7 +34,7 @@ func GetAllChannels(c *gin.Context) {
 			return
 		}
 	} else {
-		limit = 20
+		limit = constants.DefaultLimit
 	}
 
 	if offsetString != "" {
@@ -45,7 +46,7 @@ func GetAllChannels(c *gin.Context) {
 			return
 		}
 	} else {
-		offset = 0
+		offset = constants.DefaultOffset
 	}
 
 	channelList, err := channels.GetAllChannels(limit, offset)

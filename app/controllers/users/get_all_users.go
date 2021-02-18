@@ -7,6 +7,7 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,7 +34,7 @@ func GetAllUsers(c *gin.Context) {
 			return
 		}
 	} else {
-		limit = 20
+		limit = constants.DefaultLimit
 	}
 
 	if offsetString != "" {
@@ -45,7 +46,7 @@ func GetAllUsers(c *gin.Context) {
 			return
 		}
 	} else {
-		offset = 0
+		offset = constants.DefaultOffset
 	}
 
 	usersArray, err := users.GetAllUsers(limit, offset)
