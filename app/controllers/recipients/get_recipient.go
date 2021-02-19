@@ -7,6 +7,7 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -30,9 +31,30 @@ func GetRecipient(c *gin.Context) {
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
 		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
 	}
+
 	var info serializers.RecipientInfo
 	serializers.RecipientModelToRecipientInfo(&info, recipient)
 
-	c.JSON(http.StatusOK, info)
+	if info.PreferredChannelID != 0 {
+		var channelInfo serializers.ChannelInfo
+		channel, err := channels.GetChannelWithID(uint(info.PreferredChannelID))
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			return
+		}
+		serializers.ChannelModelToChannelInfo(&channelInfo, channel)
+		c.JSON(http.StatusOK, gin.H{
+			"recipient_details": info,
+			"preferred_channel": channelInfo,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"recipient_details": info,
+	})
 }
