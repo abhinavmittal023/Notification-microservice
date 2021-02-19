@@ -6,7 +6,7 @@ import "code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 type ChangeCredentialsInfo struct {
 	ID    uint64 `json:"-"`
 	Email string `json:"email"`
-	Role  int    `json:"role"`
+	Role  uint   `json:"role"`
 }
 
 // ChangePasswordInfo serializer to bind request data
@@ -18,7 +18,7 @@ type ChangePasswordInfo struct {
 // ChangeCredentialsInfoToUserModel converts ChangeEmailInfo serializer to User model
 func ChangeCredentialsInfoToUserModel(info *ChangeCredentialsInfo, user *models.User) {
 	user.Email = info.Email
-	user.Role = info.Role
+	user.Role = int(info.Role)
 }
 
 // ChangePasswordInfoToUserModel converts ChangePasswordInfo serializer to User model

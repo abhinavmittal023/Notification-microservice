@@ -12,6 +12,7 @@ type RecipientInfo struct {
 	PushToken          string `json:"push_token,omitempty"`
 	WebToken           string `json:"web_token,omitempty"`
 	PreferredChannelID uint64 `json:"preferred_channel_id,omitempty"`
+	ChannelType        uint   `json:"channel_type,omitempty"`
 }
 
 // RecipientModelToRecipientInfo converts the Recipient model to RecipientInfo struct

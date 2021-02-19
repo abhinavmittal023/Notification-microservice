@@ -9,6 +9,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -56,7 +57,10 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 	if info.Role == 0 {
-		info.Role = user.Role
+		info.Role = uint(user.Role)
+	} else if info.Role > constants.SystemAdminRole {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid User Role provided"})
+		return
 	}
 	if info.Email == "" {
 		info.Email = user.Email

@@ -7,9 +7,9 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 // GetAllRecipientRoute is used to get recipients from database
@@ -43,16 +43,24 @@ func GetAllRecipient(c *gin.Context) {
 	}
 
 	recipientArray, err := recipients.GetAllRecipients(pagination, recipientFilter)
-	if err != nil && err != gorm.ErrRecordNotFound {
+	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
 
-	var info serializers.RecipientInfo
 	var infoArray []serializers.RecipientInfo
 
 	for _, recipient := range recipientArray {
+		var info serializers.RecipientInfo
 		serializers.RecipientModelToRecipientInfo(&info, &recipient)
+		if info.PreferredChannelID != 0 {
+			channel, err := channels.GetChannelWithID(uint(info.PreferredChannelID))
+			if err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+				return
+			}
+			info.ChannelType = uint(channel.Type)
+		}
 		infoArray = append(infoArray, info)
 	}
 

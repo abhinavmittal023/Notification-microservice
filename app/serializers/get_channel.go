@@ -7,7 +7,7 @@ type ChannelInfo struct {
 	ID               uint   `json:"id"`
 	Name             string `json:"name" binding:"required"`
 	ShortDescription string `json:"short_description,omitempty"`
-	Type             int    `json:"type" binding:"required"`
+	Type             uint   `json:"type" binding:"required"`
 	Priority         int    `json:"priority" binding:"required"`
 	Configuration    string `json:"configuration,omitempty"`
 }
@@ -16,7 +16,7 @@ type ChannelInfo struct {
 func ChannelInfoToChannelModel(channelInfo *ChannelInfo, channelModel *models.Channel) {
 	channelModel.Name = channelInfo.Name
 	channelModel.ShortDescription = channelInfo.ShortDescription
-	channelModel.Type = channelInfo.Type
+	channelModel.Type = int(channelInfo.Type)
 	channelModel.Priority = channelInfo.Priority
 	channelModel.Configuration = channelInfo.Configuration
 }
@@ -26,7 +26,7 @@ func ChannelModelToChannelInfo(channelInfo *ChannelInfo, channelModel *models.Ch
 	channelInfo.ID = channelModel.ID
 	channelInfo.Name = channelModel.Name
 	channelInfo.ShortDescription = channelModel.ShortDescription
-	channelInfo.Type = channelModel.Type
+	channelInfo.Type = uint(channelModel.Type)
 	channelInfo.Priority = channelModel.Priority
 	channelInfo.Configuration = channelModel.Configuration
 }
