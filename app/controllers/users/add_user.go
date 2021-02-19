@@ -9,6 +9,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
@@ -25,7 +26,11 @@ func AddUserRoute(router *gin.RouterGroup) {
 func AddUser(c *gin.Context) {
 	var info serializers.AddUserInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password,FirstName are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Valid Role, Email,Password,FirstName are required"})
+		return
+	}
+	if info.Role > constants.SystemAdminRole {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid User Role provided"})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)

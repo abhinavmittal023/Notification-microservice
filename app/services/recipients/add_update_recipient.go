@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/jinzhu/gorm"
@@ -39,6 +41,34 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 				continue
 			}
 		}
+
+		if recipientRecord.PreferredChannelID != 0 {
+			channel, err := channels.GetChannelWithID(uint(recipientRecord.PreferredChannelID))
+			if err == gorm.ErrRecordNotFound {
+				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannelID at %v is not in the database", index+2)})
+				continue
+			} else if err != nil {
+				log.Println(err)
+				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error at %v", index+2)})
+				return http.StatusInternalServerError, &errors
+			}
+			channelType := constants.ChannelType(uint(channel.Type))
+
+			if channelType == "Email" && recipientRecord.Email == "" {
+				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannel %s cannot be empty at %v", channelType, index+2)})
+				continue
+			} else if channelType == "Web" && recipientRecord.WebToken == "" {
+				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannel %s cannot be empty at %v", channelType, index+2)})
+				continue
+			} else if channelType == "Push" && recipientRecord.PushToken == "" {
+				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannel %s cannot be empty at %v", channelType, index+2)})
+				continue
+			} else if channelType == "" {
+				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannel at %v is invalid", index+2)})
+				continue
+			}
+		}
+
 		status, err := AddUpdateRecipientWithID(&recipientRecord, tx)
 		if err != nil {
 			if status == http.StatusInternalServerError {

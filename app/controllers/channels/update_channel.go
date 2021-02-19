@@ -8,6 +8,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -22,7 +23,11 @@ func UpdateChannelRoute(router *gin.RouterGroup) {
 func UpdateChannel(c *gin.Context) {
 	var info serializers.ChannelInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "name, type and priority are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "valid name, type and priority are required"})
+		return
+	}
+	if info.Type > constants.MaxType {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Type provided"})
 		return
 	}
 
