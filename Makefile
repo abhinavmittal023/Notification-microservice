@@ -32,3 +32,7 @@ run:
 setup: build_goose up run
 
 refresh_database: down setup
+
+run_mail_catcher:
+	@echo "Go to http://localhost:1080/ on your browser to quit or monitor"
+	mailcatcher --ip 0.0.0.0

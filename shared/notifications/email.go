@@ -36,7 +36,6 @@ func (email *Email) SendNotification() error {
 	//  Sending email.
 	err := smtp.SendMail(addr, auth, from, email.to, msg)
 	if err != nil {
-		log.Println("Unable to send email")
 		return errors.Wrap(err, "Unable to send email")
 	}
 	log.Println("Email Sent Successfully!")

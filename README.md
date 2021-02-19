@@ -30,6 +30,21 @@ go get -u github.com/pkg/errors
 go get -u github.com/pressly/goose
 ```
 
+## MailCatcher is used as a fake SMTP server:
+### Step 1: Install MailCatcher and its dependencies
+
+```
+apt install build-essential libsqlite3-dev ruby-dev
+```
+
+```
+gem install mailcatcher
+```
+
+### Step 2: Running MailCatcher
+
+run `make run_mail_catcher` to start the smtp server and go to the directed url on browser
+
 ## Building the server
 
 run `make setup` for setting up the server for the first time.

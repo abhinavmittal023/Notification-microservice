@@ -18,8 +18,8 @@
   "email_notification": {
     "email": "<email_id>",
     "password": "<password>",
-    "smtp_host": "smtp.gmail.com",
-    "smtp_port": "587"
+    "smtp_host": "127.0.0.1",
+    "smtp_port": "1025"
   },
   "password_hash": "<hash_key>"
 }
