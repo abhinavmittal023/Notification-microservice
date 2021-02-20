@@ -1,7 +1,6 @@
 package authorization
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
@@ -45,7 +44,7 @@ func SignIn(c *gin.Context) {
 
 	user, err := users.GetUserWithEmail(info.Email)
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId or Passwords mismatch"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid EmailId or Password"})
 		return
 	}
 	if err != nil {
@@ -60,7 +59,7 @@ func SignIn(c *gin.Context) {
 	}
 
 	if !user.Verified {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId not verified"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Verify your EmailId First"})
 		return
 	}
 
@@ -83,15 +82,9 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	js, err := json.Marshal(&serializers.LoginResponse{
+	loginResponse := serializers.LoginResponse{
 		LoginInfo:    info,
 		RefreshToken: token,
-	})
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("JSON marshalling error")
-		return
 	}
-	c.Data(http.StatusOK, "application/json", js)
+	c.JSON(http.StatusOK, loginResponse)
 }

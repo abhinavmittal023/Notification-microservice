@@ -9,6 +9,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/authservice"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 // ValidateEmailRoute is used to sign in users
@@ -26,8 +27,12 @@ func ValidateEmail(c *gin.Context) {
 		log.Println(err.Error())
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
-	}
-	if err != nil {
+	} else if err == gorm.ErrRecordNotFound {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "User Not Found in the Database",
+		})
+		return
+	} else if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return

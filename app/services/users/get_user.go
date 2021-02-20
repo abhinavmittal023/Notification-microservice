@@ -1,10 +1,14 @@
 package users
 
 import (
+	"time"
+
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	"github.com/jinzhu/gorm"
 )
 
 // GetUserWithID gets the user with specified ID from the database, and returns error/nil
@@ -15,9 +19,16 @@ func GetUserWithID(userID uint64) (*models.User, error) {
 }
 
 // GetFirstUser gets the details of the first user in the database
+// Use with signup guards only
 func GetFirstUser() (*models.User, error) {
 	var user models.User
 	res := db.Get().First(&user)
+	if res.Error == nil && !user.Verified && time.Duration((time.Now().Unix()-user.CreatedAt.Unix()))-3600*configuration.GetResp().Token.ExpiryTime.ValidationToken > 0 {
+		if err := SoftDeleteUser(&user); err != nil {
+			return nil, err
+		}
+		return nil, gorm.ErrRecordNotFound
+	}
 	return &user, res.Error
 }
 
