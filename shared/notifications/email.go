@@ -23,18 +23,14 @@ type Email struct {
 // SendNotification method send email notifications
 func (email *Email) SendNotification() error {
 	from := configuration.GetResp().EmailNotification.Email
-	password := configuration.GetResp().EmailNotification.Password
 	smtpHost := configuration.GetResp().EmailNotification.SMTPHost
 	smtpPort := configuration.GetResp().EmailNotification.SMTPPort
 	addr := smtpHost + ":" + smtpPort
 	msg := []byte("Subject: " + email.subject + "\r\n" +
 		"\r\n" + email.message + "\r\n")
 
-	//  Authentication.
-	auth := smtp.PlainAuth("", from, password, smtpHost)
-
 	//  Sending email.
-	err := smtp.SendMail(addr, auth, from, email.to, msg)
+	err := smtp.SendMail(addr, nil, from, email.to, msg)
 	if err != nil {
 		return errors.Wrap(err, "Unable to send email")
 	}
