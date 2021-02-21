@@ -9,8 +9,6 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// TODO: Handle case when first user fails to validate the emailID
-
 // CheckIfFirst middleware checks if another user exists to avoid creation of other user directly
 func CheckIfFirst() gin.HandlerFunc {
 	return func(c *gin.Context) {

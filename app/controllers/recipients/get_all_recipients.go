@@ -10,6 +10,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 // GetAllRecipientRoute is used to get recipients from database
@@ -49,13 +50,20 @@ func GetAllRecipient(c *gin.Context) {
 	}
 
 	var infoArray []serializers.RecipientInfo
+	warning := ""
 
 	for _, recipient := range recipientArray {
 		var info serializers.RecipientInfo
 		serializers.RecipientModelToRecipientInfo(&info, &recipient)
 		if info.PreferredChannelID != 0 {
 			channel, err := channels.GetChannelWithID(uint(info.PreferredChannelID))
-			if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				// TODO: Should the PreferredChannelID field be cleared or just hidden
+				// when channel is corresponding deleted
+				warning = "Some Preferred Channels were Deleted"
+				channel.Type = 0
+				info.PreferredChannelID = 0
+			} else if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 				return
 			}
@@ -64,5 +72,12 @@ func GetAllRecipient(c *gin.Context) {
 		infoArray = append(infoArray, info)
 	}
 
-	c.JSON(http.StatusOK, infoArray)
+	if warning != "" {
+		c.JSON(http.StatusOK, gin.H{
+			"recipient_records": infoArray,
+			"warning":           warning})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"recipient_records": infoArray})
+	}
 }

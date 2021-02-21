@@ -55,6 +55,10 @@ func UpdateUser(c *gin.Context) {
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID not in database"})
 		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Get user with id query error")
+		return
 	}
 	if info.Role == 0 {
 		info.Role = uint(user.Role)
