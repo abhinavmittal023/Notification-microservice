@@ -30,5 +30,5 @@ func ValidateToken(tokenString string, tokenType string) (*models.User, error) {
 		}
 		return userDetails, nil
 	}
-	return &models.User{}, ErrInvalidToken
+	return nil, ErrInvalidToken
 }
