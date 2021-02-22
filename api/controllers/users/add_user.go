@@ -47,7 +47,14 @@ func AddUser(c *gin.Context) {
 		return
 	}
 
-	info.Password = hash.Message(info.Password, configuration.GetResp().PasswordHash)
+	var err error
+
+	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Error while hashing the password")
+		return
+	}
 
 	user, err := users.GetUserWithEmail(info.Email)
 	if err != gorm.ErrRecordNotFound {

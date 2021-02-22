@@ -27,8 +27,20 @@ func ChangePassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email, Role are required"})
 		return
 	}
-	info.OldPassword = hash.Message(info.OldPassword, configuration.GetResp().PasswordHash)
-	info.NewPassword = hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)
+
+	var err error
+	info.OldPassword, err = hash.Message(info.OldPassword, configuration.GetResp().PasswordHash)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Hashing error for old password")
+		return
+	}
+	info.NewPassword, err = hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Hashing error for new password")
+		return
+	}
 
 	user, err := users.GetUserWithID(userID.(uint64))
 	if err == gorm.ErrRecordNotFound {

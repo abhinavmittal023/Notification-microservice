@@ -54,7 +54,14 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	if !hash.Validate(info.Password, user.Password, configuration.GetResp().PasswordHash) {
+	match, err := hash.Validate(info.Password, user.Password, configuration.GetResp().PasswordHash)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Error while validating the password")
+		return
+	}
+
+	if !match {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId or Passwords mismatch"})
 		return
 	}

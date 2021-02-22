@@ -43,13 +43,19 @@ func SignUp(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
 		return
 	}
+	var err error
 
-	info.Password = hash.Message(info.Password, configuration.GetResp().PasswordHash)
+	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Error while hashing the password")
+		return
+	}
 
 	var user models.User
 
 	serializers.SignupInfoToUserModel(&info, &user)
-	err := users.CreateUser(&user)
+	err = users.CreateUser(&user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("CreateUser service error")
