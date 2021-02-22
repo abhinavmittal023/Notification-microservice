@@ -26,6 +26,12 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 	}()
 
 	for index, recipientRecord := range *recipientRecords {
+		invalid := false
+
+		if recipientRecord.RecipientUUID == "" {
+			errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Recipient ID should not be empty at %v", index+2)})
+			invalid = true
+		}
 
 		if recipientRecord.Email != "" {
 			er := serializers.EmailRegexCheck(recipientRecord.Email)
@@ -38,7 +44,7 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 			}
 			if er == "bad_request" {
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Email at %v is invalid", index+2)})
-				continue
+				invalid = true
 			}
 		}
 
@@ -46,7 +52,7 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 			channel, err := channels.GetChannelWithID(uint(recipientRecord.PreferredChannelID))
 			if err == gorm.ErrRecordNotFound {
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannelID at %v is not in the database", index+2)})
-				continue
+				invalid = true
 			} else if err != nil {
 				log.Println(err)
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error at %v", index+2)})
@@ -56,17 +62,21 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 
 			if channelType == "Email" && recipientRecord.Email == "" {
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannel %s cannot be empty at %v", channelType, index+2)})
-				continue
+				invalid = true
 			} else if channelType == "Web" && recipientRecord.WebToken == "" {
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannel %s cannot be empty at %v", channelType, index+2)})
-				continue
+				invalid = true
 			} else if channelType == "Push" && recipientRecord.PushToken == "" {
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannel %s cannot be empty at %v", channelType, index+2)})
-				continue
+				invalid = true
 			} else if channelType == "" {
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannel at %v is invalid", index+2)})
-				continue
+				invalid = true
 			}
+		}
+
+		if invalid {
+			continue
 		}
 
 		status, err := AddUpdateRecipientWithID(&recipientRecord, tx)
