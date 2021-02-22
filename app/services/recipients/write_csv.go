@@ -24,7 +24,7 @@ func CreateCSV(recipients *[]serializers.RecipientInfo) (*bytes.Buffer, error) {
 		record = append(record, recipient.Email)
 		record = append(record, recipient.PushToken)
 		record = append(record, recipient.WebToken)
-		record = append(record, strconv.FormatUint(recipient.PreferredChannelID, 10))
+		record = append(record, strconv.FormatUint(uint64(recipient.PreferredChannelType), 10))
 		if err := fileWriter.Write(record); err != nil {
 			return nil, errors.Wrap(err, "error writing record to csv")
 		}

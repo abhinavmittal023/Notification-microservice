@@ -55,14 +55,14 @@ func GetAllRecipient(c *gin.Context) {
 	for _, recipient := range recipientArray {
 		var info serializers.RecipientInfo
 		serializers.RecipientModelToRecipientInfo(&info, &recipient)
-		if info.PreferredChannelID != 0 {
-			channel, err := channels.GetChannelWithID(uint(info.PreferredChannelID))
+		if info.PreferredChannelType != 0 {
+			channel, err := channels.GetChannelWithType(uint(info.PreferredChannelType))
 			if err == gorm.ErrRecordNotFound {
 				// TODO: Should the PreferredChannelID field be cleared or just hidden
 				// when channel is corresponding deleted
 				warning = "Some Preferred Channels were Deleted"
 				channel.Type = 0
-				info.PreferredChannelID = 0
+				info.PreferredChannelType = 0
 			} else if err != nil {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 				return

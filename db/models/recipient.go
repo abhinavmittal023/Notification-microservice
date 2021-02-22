@@ -7,12 +7,12 @@ import (
 // Recipient model to create 'recipients' table in the database
 type Recipient struct {
 	gorm.Model
-	RecipientUUID      string `gorm:"type:varchar(100);not null"`
-	Email              string
-	PushToken          string
-	WebToken           string
-	PreferredChannel   Channel
-	PreferredChannelID uint64
+	RecipientUUID        string `gorm:"type:varchar(100);not null"`
+	Email                string
+	PushToken            string
+	WebToken             string
+	PreferredChannel     Channel
+	PreferredChannelType uint
 }
 
 // RecipientNotifications model to create 'recipientnotifications' table in the database

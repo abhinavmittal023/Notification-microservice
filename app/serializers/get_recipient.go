@@ -6,13 +6,13 @@ import (
 
 // RecipientInfo serializer to bind request data
 type RecipientInfo struct {
-	ID                 uint64 `json:"recipient_id"`
-	RecipientUUID      string `json:"recipient_uuid"`
-	Email              string `json:"email,omitempty"`
-	PushToken          string `json:"push_token,omitempty"`
-	WebToken           string `json:"web_token,omitempty"`
-	PreferredChannelID uint64 `json:"preferred_channel_id,omitempty"`
-	ChannelType        uint   `json:"channel_type,omitempty"`
+	ID                   uint64 `json:"recipient_id"`
+	RecipientUUID        string `json:"recipient_uuid"`
+	Email                string `json:"email,omitempty"`
+	PushToken            string `json:"push_token,omitempty"`
+	WebToken             string `json:"web_token,omitempty"`
+	PreferredChannelType uint   `json:"preferred_channel_type,omitempty"`
+	ChannelType          uint   `json:"channel_type,omitempty"`
 }
 
 // RecipientModelToRecipientInfo converts the Recipient model to RecipientInfo struct
@@ -22,5 +22,5 @@ func RecipientModelToRecipientInfo(info *RecipientInfo, recipient *models.Recipi
 	info.Email = recipient.Email
 	info.PushToken = recipient.PushToken
 	info.WebToken = recipient.WebToken
-	info.PreferredChannelID = recipient.PreferredChannelID
+	info.PreferredChannelType = recipient.PreferredChannelType
 }
