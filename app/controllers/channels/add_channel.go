@@ -10,6 +10,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 // AddChannelRoute is used to add channels to database
@@ -33,7 +34,13 @@ func AddChannel(c *gin.Context) {
 	var channel models.Channel
 	serializers.ChannelInfoToChannelModel(&info, &channel)
 
-	err := channels.AddChannel(&channel)
+	_, err := channels.GetChannelWithType(info.Type)
+	if err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Channel with provided type already exists"})
+		return
+	}
+
+	err = channels.AddChannel(&channel)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("AddChannel service error")

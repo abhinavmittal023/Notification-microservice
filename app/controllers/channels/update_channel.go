@@ -50,6 +50,12 @@ func UpdateChannel(c *gin.Context) {
 		return
 	}
 
+	_, err = channels.GetChannelWithType(info.Type)
+	if err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Channel with provided type already exists"})
+		return
+	}
+
 	serializers.ChannelInfoToChannelModel(&info, channel)
 
 	err = channels.PatchChannel(channel)
