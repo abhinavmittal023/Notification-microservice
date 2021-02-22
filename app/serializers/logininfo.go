@@ -9,6 +9,7 @@ import (
 
 // LoginInfo serializer to bind request data
 type LoginInfo struct {
+	ID        uint   `json:"user_id"`
 	Email     string `json:"email" binding:"required"`
 	Password  string `json:"password,omitempty" binding:"required"`
 	FirstName string `json:"first_name,omitempty"`

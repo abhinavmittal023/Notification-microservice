@@ -54,7 +54,7 @@ func SignIn(c *gin.Context) {
 	}
 
 	if !hash.Validate(info.Password, user.Password, configuration.GetResp().PasswordHash) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId or Passwords mismatch"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid EmailId or Password"})
 		return
 	}
 
@@ -63,6 +63,7 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
+	info.ID = user.ID
 	info.FirstName = user.FirstName
 	info.LastName = user.LastName
 	info.Password = ""
