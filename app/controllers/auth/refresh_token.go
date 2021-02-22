@@ -9,6 +9,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/authservice"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 // RefreshAccessTokenRoute is used to sign in users
@@ -34,8 +35,10 @@ func RefreshAccessToken(c *gin.Context) {
 		log.Println(err.Error())
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
-	}
-	if err != nil {
+	} else if err == gorm.ErrRecordNotFound {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	} else if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return

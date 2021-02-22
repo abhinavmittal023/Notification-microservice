@@ -37,7 +37,8 @@ func AddUpdateRecipient(c *gin.Context) {
 
 	if status == http.StatusOK {
 		c.JSON(http.StatusOK, gin.H{
-			"status": "OK",
+			"status":           "OK",
+			"records_affected": len(*recipientRecords),
 		})
 	} else {
 		c.AbortWithStatusJSON(status, errors)

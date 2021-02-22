@@ -10,6 +10,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -40,17 +41,17 @@ func GetRecipient(c *gin.Context) {
 	var info serializers.RecipientInfo
 	serializers.RecipientModelToRecipientInfo(&info, recipient)
 
-	if info.PreferredChannelID != 0 {
+	if info.PreferredChannelType != 0 {
 		var channelInfo serializers.ChannelInfo
-		channel, err := channels.GetChannelWithID(uint(info.PreferredChannelID))
+		channel, err := channels.GetChannelWithType(uint(info.PreferredChannelType))
 		if err == gorm.ErrRecordNotFound {
 			// TODO: Should the PreferredChannelID field be cleared or just hidden
 			// when channel is corresponding deleted
-			channelID := info.PreferredChannelID
-			info.PreferredChannelID = 0
+			channelType := info.PreferredChannelType
+			info.PreferredChannelType = 0
 			c.JSON(http.StatusOK, gin.H{
 				"recipient_details": info,
-				"warning":           fmt.Sprintf("Preferred Channel %v was Deleted", channelID),
+				"warning":           fmt.Sprintf("Preferred Channel %s was Deleted", constants.ChannelType(channelType)),
 			})
 			return
 		} else if err != nil {
