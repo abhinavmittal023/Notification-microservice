@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"github.com/pkg/errors"
 )
 
 // PushNotification function sends a push notification to the specified deviceToken given the server key and title, body of the notification
@@ -37,7 +38,10 @@ func PushNotification(deviceToken string, serverKey string, title string, notifi
 	if resp.Status != "200 OK" {
 		return false, fmt.Errorf("Non 200 status received")
 	}
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, errors.Wrap(err, "Error REading Response")
+	}
 
 	// Unmarshal or Decode the JSON to the interface.
 	json.Unmarshal(body, &result)
