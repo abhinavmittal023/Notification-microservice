@@ -41,9 +41,9 @@ func ReadCSV(csvFile *multipart.FileHeader) (*[]serializers.RecipientInfo, error
 			if err != nil {
 				return nil, errors.Wrap(err, "Error converting channel type to int")
 			}
-			recipients = append(recipients, serializers.RecipientInfo{RecipientUUID: record[0], Email: record[1], PushToken: record[2], WebToken: record[3], ChannelType: uint(channelType)})
+			recipients = append(recipients, serializers.RecipientInfo{RecipientID: record[0], Email: record[1], PushToken: record[2], WebToken: record[3], ChannelType: uint(channelType)})
 		} else {
-			recipients = append(recipients, serializers.RecipientInfo{RecipientUUID: record[0], Email: record[1], PushToken: record[2], WebToken: record[3]})
+			recipients = append(recipients, serializers.RecipientInfo{RecipientID: record[0], Email: record[1], PushToken: record[2], WebToken: record[3]})
 		}
 	}
 	return &recipients, nil

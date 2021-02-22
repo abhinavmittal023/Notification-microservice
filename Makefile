@@ -11,6 +11,9 @@ down:
 	@echo "Migrating Down"
 	./goose -dir ./db/migrations/ postgres "$(call GetFromConfig,database.dbstring)" down
 
+down_all:
+	@echo "Migrating Down to Empty"
+	./goose -dir ./db/migrations/ postgres "$(call GetFromConfig,database.dbstring)" down-to 0
 up:
 	@echo "Migrating Up"
 	./goose -dir ./db/migrations/ postgres "$(call GetFromConfig,database.dbstring)" up
@@ -18,6 +21,9 @@ up:
 build_goose:
 	@echo "Building goose binary"
 	go build -o goose db/cmd/main.go
+
+database_version:
+	./goose -dir ./db/migrations/ postgres "$(call GetFromConfig,database.dbstring)" version
 
 build_main:
 	@echo "Building main.go"
@@ -31,7 +37,7 @@ run:
 
 setup: build_goose up run
 
-refresh_database: down setup
+refresh_database: down_all setup
 
 run_mail_catcher:
 	@echo "Go to http://localhost:1080/ on your browser to quit or monitor"

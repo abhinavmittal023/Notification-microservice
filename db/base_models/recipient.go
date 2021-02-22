@@ -7,7 +7,7 @@ import (
 // Recipient model to create 'recipients' table in the database
 type Recipient struct {
 	gorm.Model
-	RecipientID          string `gorm:"type:varchar(100);not null"`
+	RecipientUUID        string `gorm:"type:varchar(100);not null"`
 	Email                string
 	PushToken            string
 	WebToken             string

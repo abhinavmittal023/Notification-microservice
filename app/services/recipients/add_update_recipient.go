@@ -36,7 +36,7 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *s
 		invalid := false
 		var errorMap []string
 
-		if recipientRecord.RecipientUUID == "" {
+		if recipientRecord.RecipientID == "" {
 			errorMap = append(errorMap, "Recipient ID should not be empty")
 			invalid = true
 		}
@@ -118,11 +118,11 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *s
 func AddUpdateRecipientWithID(recipientInfo *serializers.RecipientInfo, tx *gorm.DB) (int, error) {
 
 	var recipient models.Recipient
-	err := tx.Model(&models.Recipient{}).Where("recipient_uuid = ?", recipientInfo.RecipientUUID).FirstOrCreate(&recipient).Error
+	err := tx.Model(&models.Recipient{}).Where("recipient_id = ?", recipientInfo.RecipientID).FirstOrCreate(&recipient).Error
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
-	recipient.RecipientUUID = recipientInfo.RecipientUUID
+	recipient.RecipientID = recipientInfo.RecipientID
 	recipient.PreferredChannelType = recipientInfo.ChannelType
 	recipient.PushToken = recipientInfo.PushToken
 	recipient.WebToken = recipientInfo.WebToken

@@ -21,11 +21,11 @@ func GetAllRecipients(pagination serializers.Pagination, recipientFilter filter.
 	dbg := db.Get()
 	tx := dbg.Model(&models.Recipient{})
 
-	if recipientFilter.RecipientUUID != "" {
-		tx = tx.Where("recipient_uuid = ?", recipientFilter.RecipientUUID)
+	if recipientFilter.RecipientID != "" {
+		tx = tx.Where("recipient_id = ?", recipientFilter.RecipientID)
 	}
-	if recipientFilter.PreferredChannelID != 0 {
-		tx = tx.Where("preferred_channel_id = ?", recipientFilter.PreferredChannelID)
+	if recipientFilter.PreferredChannelType != 0 {
+		tx = tx.Where("preferred_channel_type = ?", recipientFilter.PreferredChannelType)
 	}
 	if recipientFilter.Email > 0 {
 		tx = tx.Not("email", "")

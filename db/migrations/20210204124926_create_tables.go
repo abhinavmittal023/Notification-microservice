@@ -4,7 +4,7 @@ import (
 	"database/sql"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	models "code.jtg.tools/ayush.singhal/notifications-microservice/db/base_models"
 	"github.com/pkg/errors"
 	"github.com/pressly/goose"
 )
