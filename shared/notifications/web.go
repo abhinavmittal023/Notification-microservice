@@ -40,7 +40,7 @@ func PushNotification(deviceToken string, serverKey string, title string, notifi
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return false, errors.Wrap(err, "Error REading Response")
+		return false, errors.Wrap(err, "Error Reading Response")
 	}
 
 	// Unmarshal or Decode the JSON to the interface.
