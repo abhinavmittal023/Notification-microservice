@@ -40,7 +40,7 @@ func GetUserWithEmail(email string) (*models.User, error) {
 }
 
 // GetAllUsers gets all users from the database and returns []models.User,err
-func GetAllUsers(pagination serializers.Pagination, userFilter filter.User) ([]models.User, error) {
+func GetAllUsers(pagination *serializers.Pagination, userFilter *filter.User) ([]models.User, error) {
 
 	var users []models.User
 	dbg := db.Get()

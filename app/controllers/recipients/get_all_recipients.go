@@ -42,8 +42,9 @@ func GetAllRecipient(c *gin.Context) {
 		})
 		return
 	}
+	filter.ConvertRecipientStringToLower(&recipientFilter)
 
-	recipientArray, err := recipients.GetAllRecipients(pagination, recipientFilter)
+	recipientArray, err := recipients.GetAllRecipients(&pagination, &recipientFilter)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return

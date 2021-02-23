@@ -1,6 +1,10 @@
 package serializers
 
-import "code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+import (
+	"strings"
+
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+)
 
 // ChannelInfo serializer to get and show channel information
 type ChannelInfo struct {
@@ -14,11 +18,11 @@ type ChannelInfo struct {
 
 // ChannelInfoToChannelModel function copies the data from channel serializer to channel model
 func ChannelInfoToChannelModel(channelInfo *ChannelInfo, channelModel *models.Channel) {
-	channelModel.Name = channelInfo.Name
-	channelModel.ShortDescription = channelInfo.ShortDescription
+	channelModel.Name = strings.ToLower(channelInfo.Name)
+	channelModel.ShortDescription = strings.ToLower(channelInfo.ShortDescription)
 	channelModel.Type = int(channelInfo.Type)
 	channelModel.Priority = channelInfo.Priority
-	channelModel.Configuration = channelInfo.Configuration
+	channelModel.Configuration = strings.ToLower(channelInfo.Configuration)
 }
 
 // ChannelModelToChannelInfo function copies the data from channel model to channel serializer

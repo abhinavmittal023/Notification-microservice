@@ -1,6 +1,10 @@
 package serializers
 
-import "code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+import (
+	"strings"
+
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+)
 
 // ChangeCredentialsInfo serializer to bind request data
 type ChangeCredentialsInfo struct {
@@ -17,7 +21,7 @@ type ChangePasswordInfo struct {
 
 // ChangeCredentialsInfoToUserModel converts ChangeEmailInfo serializer to User model
 func ChangeCredentialsInfoToUserModel(info *ChangeCredentialsInfo, user *models.User) {
-	user.Email = info.Email
+	user.Email = strings.ToLower(info.Email)
 	user.Role = int(info.Role)
 }
 
