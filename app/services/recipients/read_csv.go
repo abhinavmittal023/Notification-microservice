@@ -4,9 +4,9 @@ import (
 	"encoding/csv"
 	"io"
 	"mime/multipart"
-	"strconv"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/pkg/errors"
 )
 
@@ -35,13 +35,13 @@ func ReadCSV(csvFile *multipart.FileHeader) (*[]serializers.RecipientInfo, error
 		} else if err != nil {
 			return nil, errors.Wrap(err, "Error reading from file")
 		}
-		var channelType uint64
 		if record[4] != "" {
-			channelType, err = strconv.ParseUint(record[4], 10, 64)
-			if err != nil {
-				return nil, errors.Wrap(err, "Error converting channel type to int")
+			channelType := record[4]
+			channelTypeInt := constants.ChannelTypeToInt(channelType)
+			if channelTypeInt == 0{
+				return nil, errors.New("Error converting channel type to int")
 			}
-			recipients = append(recipients, serializers.RecipientInfo{RecipientID: record[0], Email: record[1], PushToken: record[2], WebToken: record[3], ChannelType: uint(channelType)})
+			recipients = append(recipients, serializers.RecipientInfo{RecipientID: record[0], Email: record[1], PushToken: record[2], WebToken: record[3], ChannelType: channelTypeInt})
 		} else {
 			recipients = append(recipients, serializers.RecipientInfo{RecipientID: record[0], Email: record[1], PushToken: record[2], WebToken: record[3]})
 		}

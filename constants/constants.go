@@ -17,11 +17,23 @@ const (
 	MaxType = 3
 )
 
-// ChannelType is an function mapping type field of channel to its string counterpart.
+// ChannelType is a function mapping type field of channel to its string counterpart.
 // We are using a function as golang doesn't allow complex types to be constants
 func ChannelType(index uint) string {
 	if index < 1 || index > MaxType {
 		return ""
 	}
 	return []string{"Email", "Push", "Web"}[int(index-1)]
+}
+
+// ChannelTypeToInt converts channel type to its uint counterpart
+func ChannelTypeToInt(channel string) uint{
+	if(channel == "Email"){
+		return 1
+	}else if(channel == "Push"){
+		return 2
+	}else if(channel == "Web"){
+		return 3
+	}
+	return 0
 }
