@@ -49,6 +49,12 @@ func UpdateUser(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
 			return
 		}
+
+		testUser, err := users.GetUserWithEmail(info.Email)
+		if uint64(testUser.ID) != info.ID && err != gorm.ErrRecordNotFound {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Email Id already in database"})
+			return
+		}
 	}
 
 	user, err := users.GetUserWithID(uint64(info.ID))
