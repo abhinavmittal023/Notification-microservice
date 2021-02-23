@@ -15,7 +15,7 @@ func GetRecipientWithID(recipientID uint64) (*models.Recipient, error) {
 }
 
 // GetAllRecipients gets all Recipients from the database and returns []models.Recipient,err
-func GetAllRecipients(pagination serializers.Pagination, recipientFilter filter.Recipient) ([]models.Recipient, error) {
+func GetAllRecipients(pagination *serializers.Pagination, recipientFilter *filter.Recipient) ([]models.Recipient, error) {
 
 	var recipients []models.Recipient
 	dbg := db.Get()

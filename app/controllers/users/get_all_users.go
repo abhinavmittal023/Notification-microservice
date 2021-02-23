@@ -38,8 +38,9 @@ func GetAllUsers(c *gin.Context) {
 		})
 		return
 	}
+	filter.ConvertUserStringToLower(&userFilter)
 
-	usersArray, err := users.GetAllUsers(pagination, userFilter)
+	usersArray, err := users.GetAllUsers(&pagination, &userFilter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("find all users query error")

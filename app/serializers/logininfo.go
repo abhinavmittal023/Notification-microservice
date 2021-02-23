@@ -2,6 +2,7 @@ package serializers
 
 import (
 	"regexp"
+	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
@@ -25,7 +26,7 @@ type LoginResponse struct {
 
 // LoginInfoToUserModel converts LoginInfo serializer to User model
 func LoginInfoToUserModel(info LoginInfo, user *models.User) {
-	user.Email = info.Email
+	user.Email = strings.ToLower(info.Email)
 	user.Password = info.Password
 }
 

@@ -22,7 +22,7 @@ func GetChannelWithType(channelType uint) (*models.Channel, error) {
 }
 
 // GetAllChannels gets all the channels from the database and returns []models.Channel,err
-func GetAllChannels(pagination serializers.Pagination, channelFilter filter.Channel) ([]models.Channel, error) {
+func GetAllChannels(pagination *serializers.Pagination, channelFilter *filter.Channel) ([]models.Channel, error) {
 
 	var channels []models.Channel
 	dbG := db.Get()

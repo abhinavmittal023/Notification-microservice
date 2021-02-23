@@ -38,8 +38,9 @@ func GetAllChannels(c *gin.Context) {
 		})
 		return
 	}
+	filter.ConvertChannelStringToLower(&channelFilter)
 
-	channelList, err := channels.GetAllChannels(pagination, channelFilter)
+	channelList, err := channels.GetAllChannels(&pagination, &channelFilter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("find all channels query error")
