@@ -1,7 +1,6 @@
 package notifications
 
 import (
-	"log"
 	"net/smtp"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
@@ -15,7 +14,7 @@ type Notifications interface {
 
 // Email struct implements Notifications interface
 type Email struct {
-	to      []string
+	to      string
 	subject string
 	message string
 }
@@ -30,10 +29,9 @@ func (email *Email) SendNotification() error {
 		"\r\n" + email.message + "\r\n")
 
 	//  Sending email.
-	err := smtp.SendMail(addr, nil, from, email.to, msg)
+	err := smtp.SendMail(addr, nil, from, []string{email.to}, msg)
 	if err != nil {
 		return errors.Wrap(err, "Unable to send email")
 	}
-	log.Println("Email Sent Successfully!")
 	return nil
 }

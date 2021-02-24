@@ -13,7 +13,7 @@ type User struct {
 }
 
 // ConvertUserStringToLower converts string values to lower case
-func ConvertUserStringToLower(user *User){
+func ConvertUserStringToLower(user *User) {
 	user.FirstName = strings.ToLower(user.FirstName)
 	user.LastName = strings.ToLower(user.LastName)
 	user.Email = strings.ToLower(user.Email)

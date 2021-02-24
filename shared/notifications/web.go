@@ -11,24 +11,31 @@ import (
 	"github.com/pkg/errors"
 )
 
-// PushNotification function sends a push notification to the specified deviceToken given the server key and title, body of the notification
-func PushNotification(deviceToken string, serverKey string, title string, notificationBody string) (bool, error) {
-	url := configuration.GetResp().PushNotification.URL
+// Web struct implements Notifications interface
+type Web struct {
+	to    string
+	title string
+	body  string
+}
+
+// SendNotification function sends a web notification to the specified deviceToken given the server key and title, body of the notification
+func (web *Web) SendNotification() error {
+	url := configuration.GetResp().WebNotification.URL
 
 	var jsonStr = []byte(fmt.Sprintf(`{"notification": {
 		"title": "%s", 
 		"body": "%s"
 		},
-		"to" : "%s"}`, title, notificationBody, deviceToken))
+		"to" : "%s"}`, web.title, web.body, web.to))
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	req.Header.Set("Authorization", fmt.Sprintf("key=%s", serverKey))
+	req.Header.Set("Authorization", fmt.Sprintf("key=%s", configuration.GetResp().WebNotification.ServerKey))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false, err
+		return err
 	}
 	defer resp.Body.Close()
 
@@ -36,18 +43,18 @@ func PushNotification(deviceToken string, serverKey string, title string, notifi
 	var result map[string]interface{}
 
 	if resp.Status != "200 OK" {
-		return false, fmt.Errorf("Non 200 status received")
+		return errors.New("Non 200 status received")
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return false, errors.Wrap(err, "Error Reading Response")
+		return errors.Wrap(err, "Error Reading Response")
 	}
 
 	// Unmarshal or Decode the JSON to the interface.
 	json.Unmarshal(body, &result)
 
 	if result["success"] != 1.0 {
-		return false, nil
+		return errors.New("Notification Sending failed")
 	}
-	return true, nil
+	return nil
 }

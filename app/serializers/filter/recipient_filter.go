@@ -12,6 +12,6 @@ type Recipient struct {
 }
 
 // ConvertRecipientStringToLower converts string values to lower case
-func ConvertRecipientStringToLower(recipient *Recipient){
+func ConvertRecipientStringToLower(recipient *Recipient) {
 	recipient.RecipientID = strings.ToLower(recipient.RecipientID)
 }

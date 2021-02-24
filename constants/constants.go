@@ -15,6 +15,9 @@ const (
 
 	// MaxType Defines the maximum types of notifications supported by the service
 	MaxType = 3
+
+	// APIKeyLength is the length of API Key
+	APIKeyLength = 64
 )
 
 // ChannelType is a function mapping type field of channel to its string counterpart.
@@ -27,12 +30,12 @@ func ChannelType(index uint) string {
 }
 
 // ChannelTypeToInt converts channel type to its uint counterpart
-func ChannelTypeToInt(channel string) uint{
-	if(channel == "Email"){
+func ChannelTypeToInt(channel string) uint {
+	if channel == "Email" {
 		return 1
-	}else if(channel == "Push"){
+	} else if channel == "Push" {
 		return 2
-	}else if(channel == "Web"){
+	} else if channel == "Web" {
 		return 3
 	}
 	return 0

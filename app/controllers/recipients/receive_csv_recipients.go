@@ -26,7 +26,7 @@ func AddUpdateRecipient(c *gin.Context) {
 		return
 	}
 	recipientRecords, err := recipients.ReadCSV(rFile)
-	log.Println(recipientRecords,err)
+	log.Println(recipientRecords, err)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid CSV file",
