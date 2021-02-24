@@ -25,7 +25,8 @@ func SignUpRoute(router *gin.RouterGroup) {
 // SignUp Controller for /signup route
 func SignUp(c *gin.Context) {
 	var info serializers.SignupInfo
-	if c.BindJSON(&info) != nil {
+	if err := c.BindJSON(&info); err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password,FirstName are required"})
 		return
 	}
