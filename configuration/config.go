@@ -9,11 +9,18 @@ type Configuration struct {
 	Token             Token             `json:"token"`
 	EmailNotification EmailNotification `json:"email_notification"`
 	PasswordHash      string            `json:"password_hash"`
+	APIHash           string            `json:"api_hash"`
 	PushNotification  PushNotification  `json:"push_notification"`
+	WebNotification   WebNotification   `json:"web_notification"`
 }
 
-// PushNotification stores the required info for sending web notifications
+// PushNotification stores the required info for sending android notifications
 type PushNotification struct {
+	ServerKey string `json:"server_key"`
+}
+
+// WebNotification stores the required info for sending web notifications
+type WebNotification struct {
 	ServerKey string `json:"server_key"`
 	URL       string `json:"url"`
 }

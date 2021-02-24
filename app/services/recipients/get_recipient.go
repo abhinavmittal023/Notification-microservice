@@ -46,3 +46,10 @@ func GetAllRecipients(pagination *serializers.Pagination, recipientFilter *filte
 	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Find(&recipients)
 	return recipients, res.Error
 }
+
+// GetRecipientWithRecipientID gets the recipient with specified ID from the database, and returns error/nil
+func GetRecipientWithRecipientID(recipientID string) (*models.Recipient, error) {
+	var recipient models.Recipient
+	res := db.Get().Model(&recipient).Where("recipient_id = ?", recipientID).First(&recipient)
+	return &recipient, res.Error
+}

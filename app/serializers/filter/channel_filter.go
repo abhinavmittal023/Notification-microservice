@@ -11,6 +11,6 @@ type Channel struct {
 }
 
 // ConvertChannelStringToLower converts string values to lower case
-func ConvertChannelStringToLower(channel *Channel){
+func ConvertChannelStringToLower(channel *Channel) {
 	channel.Name = strings.ToLower(channel.Name)
 }
