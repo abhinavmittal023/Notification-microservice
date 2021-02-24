@@ -5,6 +5,7 @@
   },
   "database": {
     "dbstring": "user=<username> password=<password> dbname=<database_name> sslmode=disable"
+    "dbstring_test": "user=<username> password=<password> dbname=<test_database_name> sslmode=disable"
   },
   "token": {
     "secret_key": "<secret_key>",

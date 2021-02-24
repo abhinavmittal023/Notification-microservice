@@ -2,8 +2,11 @@ package configuration
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -18,7 +21,15 @@ func GetResp() Configuration {
 // Init Function unmarshalls the config.json into the struct
 func Init() error {
 
-	file, err := os.Open("./configuration/config.json") // opening json file
+	cwd, err := os.Getwd()
+	if err != nil {
+		return errors.Wrap(err, "Unable to get working directory")
+	}
+
+	for ; strings.Split(cwd, "/")[len(strings.Split(cwd, "/"))-1] != "notifications-microservice"; cwd = filepath.Dir(cwd) {
+	}
+
+	file, err := os.Open(fmt.Sprintf("%s/configuration/config.json", cwd)) // opening json file
 	if err != nil {
 		return errors.Wrap(err, "Unable to open the config file")
 	}

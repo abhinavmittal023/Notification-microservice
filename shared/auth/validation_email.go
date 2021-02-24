@@ -6,6 +6,9 @@ import (
 	"html/template"
 	"log"
 	"net/smtp"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"github.com/pkg/errors"
@@ -26,7 +29,15 @@ func SendValidationEmail(to []string, userID uint64) error {
 
 	link := fmt.Sprintf("http://%s:%s/api/v1/auth/token/%s", configuration.GetResp().Server.Domain, configuration.GetResp().Server.Port, token)
 
-	t, err := template.ParseFiles("./shared/auth/validation_email.html")
+	cwd, err := os.Getwd()
+	if err != nil {
+		return errors.Wrap(err, "Unable to get working directory")
+	}
+
+	for ; strings.Split(cwd, "/")[len(strings.Split(cwd, "/"))-1] != "notifications-microservice"; cwd = filepath.Dir(cwd) {
+	}
+
+	t, err := template.ParseFiles(fmt.Sprintf("%s/shared/auth/validation_email.html", cwd))
 	if err != nil {
 		log.Println("Template File can't be opened")
 		return errors.Wrap(err, "Unable to open template file")
