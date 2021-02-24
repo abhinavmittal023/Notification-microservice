@@ -71,7 +71,7 @@ func ChangePassword(c *gin.Context) {
 	}
 
 	if info.OldPassword != "" && !hash.Validate(info.OldPassword, user.Password, configuration.GetResp().PasswordHash) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Password is incorrect"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Old Password is incorrect"})
 		return
 	}
 
