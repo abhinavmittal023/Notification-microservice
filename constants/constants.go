@@ -1,5 +1,10 @@
 package constants
 
+import (
+	"log"
+	"strings"
+)
+
 const (
 	// EmailRegex is used to export regular expression for email
 	EmailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$"
@@ -18,6 +23,15 @@ const (
 
 	// APIKeyLength is the length of API Key
 	APIKeyLength = 64
+
+	// Pending for notification status
+	Pending = 1
+
+	// Success for notification status
+	Success = 2
+
+	// Failure for notification status
+	Failure = 3
 )
 
 // ChannelType is a function mapping type field of channel to its string counterpart.
@@ -31,11 +45,26 @@ func ChannelType(index uint) string {
 
 // ChannelTypeToInt converts channel type to its uint counterpart
 func ChannelTypeToInt(channel string) uint {
-	if channel == "Email" {
+	channel = strings.ToLower(channel)
+	log.Println(channel)
+	if channel == "email" {
 		return 1
-	} else if channel == "Push" {
+	} else if channel == "push" {
 		return 2
-	} else if channel == "Web" {
+	} else if channel == "web" {
+		return 3
+	}
+	return 0
+}
+
+// PriorityTypeToInt converts priority to respective int
+func PriorityTypeToInt(priority string) int {
+	priority = strings.ToLower(priority)
+	if priority == "high" {
+		return 1
+	} else if priority == "medium" {
+		return 2
+	} else if priority == "low" {
 		return 3
 	}
 	return 0

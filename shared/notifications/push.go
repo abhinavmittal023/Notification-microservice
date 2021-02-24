@@ -8,24 +8,26 @@ import (
 
 // Push struct implements Notifications interface
 type Push struct {
-	to    string
-	title string
-	body  string
+	To    string
+	Title string
+	Body  string
 }
 
 // SendNotification method send push notifications
 func (push *Push) SendNotification() error {
 	var NP fcm.NotificationPayload
-	NP.Title = push.title
-	NP.Body = push.body
+	NP.Title = push.Title
+	NP.Body = push.Body
 
 	data := map[string]string{}
 
 	c := fcm.NewFcmClient(configuration.GetResp().PushNotification.ServerKey)
-	c.NewFcmRegIdsMsg([]string{push.to}, data)
+	c.NewFcmRegIdsMsg([]string{push.To}, data)
 	c.SetNotificationPayload(&NP)
 	status, err := c.Send()
-	if status.Success != 1 || err != nil {
+	if status.Success != 1 {
+		return errors.New("Couldn't deliver the notification")
+	} else if err != nil {
 		return errors.Wrap(err, "Send Push Notification Error")
 	}
 	return nil

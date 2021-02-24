@@ -68,6 +68,8 @@ func InitServer() error {
 	channels.GetChannelRoute(channelGroup)
 
 	notificationGroup := v1.Group("/notification")
+	notificationOpenAPI := notificationGroup.Group("", middlewares.APIKeyAuth())
+	notifications.PostSendNotificationsRoute(notificationOpenAPI)
 	apiKeyGroup := notificationGroup.Group("/api_key", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())
 	notifications.GetAPILastRoute(apiKeyGroup)
 	notifications.PostAPIKeyRoute(apiKeyGroup)

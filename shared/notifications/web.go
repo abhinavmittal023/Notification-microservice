@@ -13,9 +13,9 @@ import (
 
 // Web struct implements Notifications interface
 type Web struct {
-	to    string
-	title string
-	body  string
+	To    string
+	Title string
+	Body  string
 }
 
 // SendNotification function sends a web notification to the specified deviceToken given the server key and title, body of the notification
@@ -26,7 +26,7 @@ func (web *Web) SendNotification() error {
 		"title": "%s", 
 		"body": "%s"
 		},
-		"to" : "%s"}`, web.title, web.body, web.to))
+		"to" : "%s"}`, web.Title, web.Body, web.To))
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Authorization", fmt.Sprintf("key=%s", configuration.GetResp().WebNotification.ServerKey))

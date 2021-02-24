@@ -14,14 +14,19 @@ import (
 func PostAPIKey() (string, error) {
 	var organisation models.Organisation
 	err := db.Get().First(&organisation).Error
-	if err != gorm.ErrRecordNotFound {
-		er := db.Get().Delete(&organisation).Error
-		if er != nil {
-			return "", errors.Wrap(err, "Delete Previous API Key Error")
-		}
-	}
 	apiKey := hash.GenerateSecureToken(constants.APIKeyLength)
 	apiLast := apiKey[len(apiKey)-8:]
+	if err != gorm.ErrRecordNotFound && err != nil {
+		return "", errors.Wrap(err, "Get API Key error")
+	} else if err != gorm.ErrRecordNotFound {
+		organisation.APIKey = hash.Message(apiKey, configuration.GetResp().APIHash)
+		organisation.APILast = apiLast
+		err = db.Get().Save(&organisation).Error
+		if err != nil {
+			return "", errors.Wrap(err, "Updating API Key error")
+		}
+		return apiKey, nil
+	}
 
 	organisation = models.Organisation{}
 
