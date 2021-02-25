@@ -310,5 +310,7 @@ func TestCreateUser(t *testing.T) {
 	gotError := users.CreateUser(&user)
 	assert.Equal(t, gotError, nil)
 	assert.Equal(t, user.ID, uint(1))
+	assert.Equal(t, user.Email, "test1@test.com")
+	assert.Equal(t, user.Verified, true)
 
 }
