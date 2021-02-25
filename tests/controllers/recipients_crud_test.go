@@ -247,6 +247,88 @@ func TestGetAllRecipients(t *testing.T) {
 	}
 }
 
+func TestGetAllRecipientsPagination(t *testing.T) {
+	if err := RefreshAllTables(); err != nil {
+		t.Fail()
+	}
+
+	recipientsList := []models.Recipient{
+		{
+			RecipientID: "abcd1",
+			Email:       "abcd@gmail.com",
+			PushToken:   "abcd",
+		},
+		{
+			RecipientID: "abcd2",
+			Email:       "abcd1@gmail.com",
+			PushToken:   "abcd",
+		},
+		{
+			RecipientID: "abcd3",
+			Email:       "abcd2@gmail.com",
+			PushToken:   "abcd",
+		},
+	}
+
+	err := SeedRecipients(&recipientsList)
+	if err != nil {
+		t.Fail()
+	}
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, err := http.NewRequest("GET", "?offset=0&limit=1", nil)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
+	req.Header.Set("Content-Type", "application/json")
+	c.Request = req
+	recipients.GetAllRecipient(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var got gin.H
+	err = json.Unmarshal(w.Body.Bytes(), &got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recipientRecords := got["recipient_records"].([]interface{})
+	assert.Equal(t, len(got), 1)
+	assert.Equal(t, float64(recipientsList[len(recipientsList)-1].ID), recipientRecords[0].(map[string]interface{})["id"])
+	assert.Equal(t, recipientsList[len(recipientsList)-1].RecipientID, recipientRecords[0].(map[string]interface{})["recipient_id"])
+	assert.Equal(t, (recipientsList[len(recipientsList)-1].Email), recipientRecords[0].(map[string]interface{})["email"])
+	assert.Equal(t, (recipientsList[len(recipientsList)-1].PushToken), recipientRecords[0].(map[string]interface{})["push_token"])
+
+	w = httptest.NewRecorder()
+	c, _ = gin.CreateTestContext(w)
+
+	req, err = http.NewRequest("GET", "?offset=1&limit=1", nil)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
+	req.Header.Set("Content-Type", "application/json")
+	c.Request = req
+	recipients.GetAllRecipient(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	got = gin.H{}
+	err = json.Unmarshal(w.Body.Bytes(), &got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recipientRecords = got["recipient_records"].([]interface{})
+	assert.Equal(t, len(got), 1)
+	assert.Equal(t, float64(recipientsList[len(recipientsList)-2].ID), recipientRecords[0].(map[string]interface{})["id"])
+	assert.Equal(t, recipientsList[len(recipientsList)-2].RecipientID, recipientRecords[0].(map[string]interface{})["recipient_id"])
+	assert.Equal(t, (recipientsList[len(recipientsList)-2].Email), recipientRecords[0].(map[string]interface{})["email"])
+	assert.Equal(t, (recipientsList[len(recipientsList)-2].PushToken), recipientRecords[0].(map[string]interface{})["push_token"])
+}
+
+
 func TestAddUpdateRecipient(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()

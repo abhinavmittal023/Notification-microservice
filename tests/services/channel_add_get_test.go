@@ -151,3 +151,53 @@ func TestGetAllChannels(t *testing.T) {
 		assert.Equal(t, (channelsList[len(channelsList)-1-i].Priority), gotChannel[i].Priority)
 	}
 }
+
+func TestGetAllChannelsFilters(t *testing.T) {
+
+	if err := RefreshAllTables(); err != nil {
+		t.Fail()
+	}
+
+	channelsList := []models.Channel{
+		{
+			Name:     "email",
+			Type:     1,
+			Priority: 1,
+		},
+		{
+			Name:     "web",
+			Type:     2,
+			Priority: 2,
+		},
+		{
+			Name:     "push",
+			Type:     3,
+			Priority: 3,
+		},
+	}
+	err := SeedChannels(&channelsList)
+	if err != nil {
+		t.Fail()
+	}
+
+	pagination := serializers.Pagination{
+		Limit:  3,
+		Offset: 0,
+	}
+
+	filter := filter.Channel{
+		ID:       0,
+		Name:     "",
+		Type:     1,
+		Priority: 0,
+	}
+
+	gotChannel, gotError := channels.GetAllChannels(&pagination, &filter)
+	assert.Equal(t, gotError, nil)
+	assert.Equal(t, len(gotChannel), 1)
+
+	assert.Equal(t, channelsList[0].ID, gotChannel[0].ID)
+	assert.Equal(t, channelsList[0].Name, gotChannel[0].Name)
+	assert.Equal(t, channelsList[0].Type, gotChannel[0].Type)
+	assert.Equal(t, channelsList[0].Priority, gotChannel[0].Priority)
+}

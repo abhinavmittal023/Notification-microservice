@@ -15,7 +15,6 @@ import (
 )
 
 func TestGetUserWithID(t *testing.T) {
-
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}

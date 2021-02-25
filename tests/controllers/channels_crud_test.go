@@ -68,6 +68,85 @@ func TestGetAllChannels(t *testing.T) {
 	}
 }
 
+func TestGetAllChannelsPagination(t *testing.T) {
+
+	if err := RefreshAllTables(); err != nil {
+		t.Fail()
+	}
+
+	channelsList := []models.Channel{
+		{
+			Name:     "email",
+			Type:     1,
+			Priority: 1,
+		},
+		{
+			Name:     "web",
+			Type:     2,
+			Priority: 2,
+		},
+		{
+			Name:     "push",
+			Type:     3,
+			Priority: 3,
+		},
+	}
+	err := SeedChannels(&channelsList)
+	if err != nil {
+		t.Fail()
+	}
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, err := http.NewRequest("GET", "?offset=0&limit=1", nil)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
+	req.Header.Set("Content-Type", "application/json")
+	c.Request = req
+	channels.GetAllChannels(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var got []gin.H
+	err = json.Unmarshal(w.Body.Bytes(), &got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, len(got), 1)
+	assert.Equal(t, float64(channelsList[len(channelsList)-1].ID), got[0]["id"])
+	assert.Equal(t, (channelsList[len(channelsList)-1].Name), got[0]["name"])
+	assert.Equal(t, float64(channelsList[len(channelsList)-1].Type), got[0]["type"])
+	assert.Equal(t, float64(channelsList[len(channelsList)-1].Priority), got[0]["priority"])
+
+	w = httptest.NewRecorder()
+	c, _ = gin.CreateTestContext(w)
+
+	req, err = http.NewRequest("GET", "?offset=1&limit=1", nil)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
+	req.Header.Set("Content-Type", "application/json")
+	c.Request = req
+	channels.GetAllChannels(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	got = []gin.H{}
+	err = json.Unmarshal(w.Body.Bytes(), &got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, len(got), 1)
+	assert.Equal(t, float64(channelsList[len(channelsList)-2].ID), got[0]["id"])
+	assert.Equal(t, (channelsList[len(channelsList)-2].Name), got[0]["name"])
+	assert.Equal(t, float64(channelsList[len(channelsList)-2].Type), got[0]["type"])
+	assert.Equal(t, float64(channelsList[len(channelsList)-2].Priority), got[0]["priority"])
+}
+
 func TestAddChannel(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()

@@ -25,7 +25,7 @@ func PostSendNotificationsRoute(router *gin.RouterGroup) {
 func PostSendNotifications(c *gin.Context) {
 	var info serializers.SendNotifications
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "APIKey, Notifications info are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Notifications info is required"})
 		return
 	}
 	var notification models.Notification
