@@ -18,14 +18,14 @@ import (
 	"github.com/go-playground/assert/v2"
 )
 
-func TestRefeshTokenInvalid(t *testing.T){
+func TestRefeshTokenInvalid(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	data := []byte(`{"refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjEsIlJvbGUiOjAsIlRva2VuVHlwZSI6InJlZnJlc2giLCJleHAiOjE2MTQyMjk4NzYsImlhdCI6MTYxNDIxOTA3NiwiaXNzIjoibm90aWZpY2F0aW9uLW1pY3Jvc2VydmljZSJ9.tqv61EE5rwSi0gA2pMQe-TMhqYk3GUPB76vmaXaGHdo"}`)
-	req, err := http.NewRequest("POST","",bytes.NewReader(data))
+	req, err := http.NewRequest("POST", "", bytes.NewReader(data))
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -34,10 +34,10 @@ func TestRefeshTokenInvalid(t *testing.T){
 	c.Request = req
 
 	auth.RefreshAccessToken(c)
-	assert.Equal(t,http.StatusUnauthorized,w.Code)
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
 
-func TestRefreshToken(t *testing.T){
+func TestRefreshToken(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
@@ -56,14 +56,14 @@ func TestRefreshToken(t *testing.T){
 		t.Fail()
 	}
 
-	refreshToken, err := sharedAuth.GenerateRefreshToken(uint64(user.ID),configuration.GetResp().Token.ExpiryTime.RefreshToken)
+	refreshToken, err := sharedAuth.GenerateRefreshToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.RefreshToken)
 	if err != nil {
 		t.Fatal(err)
 	}
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	data := []byte(fmt.Sprintf(`{"refresh_token":"%s"}`,refreshToken))
-	req, err := http.NewRequest("POST","",bytes.NewReader(data))
+	data := []byte(fmt.Sprintf(`{"refresh_token":"%s"}`, refreshToken))
+	req, err := http.NewRequest("POST", "", bytes.NewReader(data))
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -72,7 +72,7 @@ func TestRefreshToken(t *testing.T){
 	c.Request = req
 
 	auth.RefreshAccessToken(c)
-	assert.Equal(t,http.StatusOK,w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 
 	got := gin.H{}
 
@@ -81,7 +81,7 @@ func TestRefreshToken(t *testing.T){
 		t.Fatal(err)
 	}
 
-	_,err = sharedAuth.ValidateToken(got["access_token"].(string))
+	_, err = sharedAuth.ValidateToken(got["access_token"].(string))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -15,25 +15,25 @@ import (
 	"github.com/go-playground/assert/v2"
 )
 
-func TestGetAllChannels(t *testing.T){
+func TestGetAllChannels(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
 
 	channelsList := []models.Channel{
 		{
-			Name: "email",
-			Type: 1,
+			Name:     "email",
+			Type:     1,
 			Priority: 1,
 		},
 		{
-			Name: "web",
-			Type: 2,
+			Name:     "web",
+			Type:     2,
 			Priority: 2,
 		},
 		{
-			Name: "push",
-			Type: 3,
+			Name:     "push",
+			Type:     3,
 			Priority: 3,
 		},
 	}
@@ -68,7 +68,7 @@ func TestGetAllChannels(t *testing.T){
 	}
 }
 
-func TestAddChannel(t *testing.T){
+func TestAddChannel(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
@@ -95,14 +95,14 @@ func TestAddChannel(t *testing.T){
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
-func TestAddChannelInvalid(t *testing.T){
+func TestAddChannelInvalid(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
 
 	// request format doesn't contain 'name' required field
 	w := httptest.NewRecorder()
-	c,_ := gin.CreateTestContext(w)
+	c, _ := gin.CreateTestContext(w)
 	data := []byte(`{"type": 1,"priority": 1}`)
 	req, err := http.NewRequest("POST", "", bytes.NewReader(data))
 	if err != nil {
@@ -116,7 +116,7 @@ func TestAddChannelInvalid(t *testing.T){
 
 	// type format incorrect
 	w = httptest.NewRecorder()
-	c,_ = gin.CreateTestContext(w)
+	c, _ = gin.CreateTestContext(w)
 	data = []byte(`{"name":"email","type": "1","priority": 1}`)
 	req, err = http.NewRequest("POST", "", bytes.NewReader(data))
 	if err != nil {
@@ -130,7 +130,7 @@ func TestAddChannelInvalid(t *testing.T){
 
 	// type greater than maximum type allowed
 	w = httptest.NewRecorder()
-	c,_ = gin.CreateTestContext(w)
+	c, _ = gin.CreateTestContext(w)
 	data = []byte(`{"name":"email","type": 4,"priority": 1}`)
 	req, err = http.NewRequest("POST", "", bytes.NewReader(data))
 	if err != nil {
@@ -144,7 +144,7 @@ func TestAddChannelInvalid(t *testing.T){
 
 	// type equal to 0 not
 	w = httptest.NewRecorder()
-	c,_ = gin.CreateTestContext(w)
+	c, _ = gin.CreateTestContext(w)
 	data = []byte(`{"name":"email","type": 0,"priority": 1}`)
 	req, err = http.NewRequest("POST", "", bytes.NewReader(data))
 	if err != nil {
@@ -157,15 +157,15 @@ func TestAddChannelInvalid(t *testing.T){
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
-func TestDeleteChannel(t *testing.T){
+func TestDeleteChannel(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
 
 	channel := models.Channel{
-			Name: "email",
-			Type: 1,
-			Priority: 1,
+		Name:     "email",
+		Type:     1,
+		Priority: 1,
 	}
 	if err := SeedOneChannel(&channel); err != nil {
 		log.Println(err)
@@ -173,8 +173,8 @@ func TestDeleteChannel(t *testing.T){
 	}
 
 	w := httptest.NewRecorder()
-	c,_ := gin.CreateTestContext(w)
-	req,err := http.NewRequest("Delete","",nil)
+	c, _ := gin.CreateTestContext(w)
+	req, err := http.NewRequest("Delete", "", nil)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -185,30 +185,30 @@ func TestDeleteChannel(t *testing.T){
 		Value: fmt.Sprintf("%v", channel.ID),
 	})
 	channels.DeleteChannel(c)
-	assert.Equal(t,http.StatusOK,w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 
 	// Try deleting already deleted channel
 
 	w = httptest.NewRecorder()
-	c,_ = gin.CreateTestContext(w)
+	c, _ = gin.CreateTestContext(w)
 	c.Request = req
 	c.Params = append(c.Params, gin.Param{
 		Key:   "id",
 		Value: fmt.Sprintf("%v", channel.ID),
 	})
 	channels.DeleteChannel(c)
-	assert.Equal(t,http.StatusBadRequest,w.Code)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
-func TestDeleteChannelInvalid(t *testing.T){
+func TestDeleteChannelInvalid(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
 
 	channel := models.Channel{
-			Name: "email",
-			Type: 1,
-			Priority: 1,
+		Name:     "email",
+		Type:     1,
+		Priority: 1,
 	}
 	if err := SeedOneChannel(&channel); err != nil {
 		log.Println(err)
@@ -216,8 +216,8 @@ func TestDeleteChannelInvalid(t *testing.T){
 	}
 
 	w := httptest.NewRecorder()
-	c,_ := gin.CreateTestContext(w)
-	req,err := http.NewRequest("Delete","",nil)
+	c, _ := gin.CreateTestContext(w)
+	req, err := http.NewRequest("Delete", "", nil)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -228,41 +228,41 @@ func TestDeleteChannelInvalid(t *testing.T){
 		Value: fmt.Sprintf("%v", channel.ID+1),
 	})
 	channels.DeleteChannel(c)
-	assert.Equal(t,http.StatusBadRequest,w.Code)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 
 	// Delete channel without id param
 
 	w = httptest.NewRecorder()
-	c,_ = gin.CreateTestContext(w)
-	req,err = http.NewRequest("Delete","",nil)
+	c, _ = gin.CreateTestContext(w)
+	req, err = http.NewRequest("Delete", "", nil)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
 	}
 	c.Request = req
 	channels.DeleteChannel(c)
-	assert.Equal(t,http.StatusBadRequest,w.Code)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
-func TestGetChannel(t *testing.T){
+func TestGetChannel(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
 
 	channelsList := []models.Channel{
 		{
-			Name: "email",
-			Type: 1,
+			Name:     "email",
+			Type:     1,
 			Priority: 1,
 		},
 		{
-			Name: "web",
-			Type: 2,
+			Name:     "web",
+			Type:     2,
 			Priority: 2,
 		},
 		{
-			Name: "push",
-			Type: 3,
+			Name:     "push",
+			Type:     3,
 			Priority: 3,
 		},
 	}
@@ -292,10 +292,10 @@ func TestGetChannel(t *testing.T){
 		t.Fatal(err)
 	}
 
-	assert.Equal(t,float64(channelsList[0].ID),got["id"])
-	assert.Equal(t,channelsList[0].Name,got["name"])
-	assert.Equal(t,float64(channelsList[0].Priority),got["priority"])
-	assert.Equal(t,float64(channelsList[0].Type),got["type"])
+	assert.Equal(t, float64(channelsList[0].ID), got["id"])
+	assert.Equal(t, channelsList[0].Name, got["name"])
+	assert.Equal(t, float64(channelsList[0].Priority), got["priority"])
+	assert.Equal(t, float64(channelsList[0].Type), got["type"])
 
 	// Checking with invalid id
 	w = httptest.NewRecorder()
@@ -330,15 +330,15 @@ func TestGetChannel(t *testing.T){
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
-func TestUpdateChannel(t *testing.T){
+func TestUpdateChannel(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
 
 	channel := models.Channel{
-			Name: "email",
-			Type: 1,
-			Priority: 1,
+		Name:     "email",
+		Type:     1,
+		Priority: 1,
 	}
 	if err := SeedOneChannel(&channel); err != nil {
 		log.Println(err)
@@ -346,9 +346,9 @@ func TestUpdateChannel(t *testing.T){
 	}
 
 	w := httptest.NewRecorder()
-	c,_ := gin.CreateTestContext(w)
+	c, _ := gin.CreateTestContext(w)
 	data := []byte(`{"name": "email","type": 2, "priority": 1}`)
-	req,err := http.NewRequest("Put","",bytes.NewReader(data))
+	req, err := http.NewRequest("Put", "", bytes.NewReader(data))
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -359,7 +359,7 @@ func TestUpdateChannel(t *testing.T){
 		Value: fmt.Sprintf("%v", channel.ID),
 	})
 	channels.UpdateChannel(c)
-	assert.Equal(t,http.StatusOK,w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 
 	w = httptest.NewRecorder()
 	c, _ = gin.CreateTestContext(w)
@@ -372,14 +372,14 @@ func TestUpdateChannel(t *testing.T){
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
 
-func TestUpdateChannelInvalid(t *testing.T){
+func TestUpdateChannelInvalid(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
 
 	channel := models.Channel{
-		Name: "email",
-		Type: 1,
+		Name:     "email",
+		Type:     1,
 		Priority: 1,
 	}
 	if err := SeedOneChannel(&channel); err != nil {
@@ -389,9 +389,9 @@ func TestUpdateChannelInvalid(t *testing.T){
 
 	// type greater than max value
 	w := httptest.NewRecorder()
-	c,_ := gin.CreateTestContext(w)
+	c, _ := gin.CreateTestContext(w)
 	data := []byte(`{"name": "email","type": 4, "priority": 1}`)
-	req,err := http.NewRequest("Put","",bytes.NewReader(data))
+	req, err := http.NewRequest("Put", "", bytes.NewReader(data))
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -406,9 +406,9 @@ func TestUpdateChannelInvalid(t *testing.T){
 
 	// priority greater than max value
 	w = httptest.NewRecorder()
-	c,_ = gin.CreateTestContext(w)
+	c, _ = gin.CreateTestContext(w)
 	data = []byte(`{"name": "email","type": 2, "priority": 4}`)
-	req,err = http.NewRequest("Put","",bytes.NewReader(data))
+	req, err = http.NewRequest("Put", "", bytes.NewReader(data))
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()

@@ -16,7 +16,7 @@ import (
 	"github.com/go-playground/assert/v2"
 )
 
-func TestValidateEmail(t *testing.T){
+func TestValidateEmail(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
@@ -34,7 +34,7 @@ func TestValidateEmail(t *testing.T){
 		t.Fail()
 	}
 
-	tokenString, err := sharedAuth.GenerateValidationToken(uint64(user.ID),configuration.GetResp().Token.ExpiryTime.ValidationToken)
+	tokenString, err := sharedAuth.GenerateValidationToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.ValidationToken)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -52,10 +52,10 @@ func TestValidateEmail(t *testing.T){
 	c.Request = req
 	c.Params = append(c.Params, gin.Param{
 		Key:   "token",
-		Value: fmt.Sprintf("%s",tokenString),
+		Value: fmt.Sprintf("%s", tokenString),
 	})
 	auth.ValidateEmail(c)
-	assert.Equal(t,http.StatusFound,w.Code)
+	assert.Equal(t, http.StatusFound, w.Code)
 
 	tokenString = tokenString[:len(tokenString)-1]
 
@@ -71,12 +71,12 @@ func TestValidateEmail(t *testing.T){
 	c.Request = req
 	c.Params = append(c.Params, gin.Param{
 		Key:   "token",
-		Value: fmt.Sprintf("%s",tokenString),
+		Value: fmt.Sprintf("%s", tokenString),
 	})
 	auth.ValidateEmail(c)
-	assert.Equal(t,http.StatusUnauthorized,w.Code)
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
 
-	tokenString, err = sharedAuth.GenerateValidationToken(uint64(user.ID)+1,configuration.GetResp().Token.ExpiryTime.ValidationToken)
+	tokenString, err = sharedAuth.GenerateValidationToken(uint64(user.ID)+1, configuration.GetResp().Token.ExpiryTime.ValidationToken)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -94,8 +94,8 @@ func TestValidateEmail(t *testing.T){
 	c.Request = req
 	c.Params = append(c.Params, gin.Param{
 		Key:   "token",
-		Value: fmt.Sprintf("%s",tokenString),
+		Value: fmt.Sprintf("%s", tokenString),
 	})
 	auth.ValidateEmail(c)
-	assert.Equal(t,http.StatusBadRequest,w.Code)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }

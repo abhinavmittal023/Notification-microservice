@@ -42,7 +42,7 @@ func AddChannel(c *gin.Context) {
 	if err != gorm.ErrRecordNotFound && err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
-	}else if err != gorm.ErrRecordNotFound {
+	} else if err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Channel with provided type already exists"})
 		return
 	}
