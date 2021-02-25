@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
@@ -14,13 +13,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//GetUserRoute is used to get users from database
+// GetUserRoute is used to get users from database
 func GetUserRoute(router *gin.RouterGroup) {
 	router.GET("/get/:id", GetUser)
-	router.OPTIONS("/get/:id", preflight.Preflight)
 }
 
-//GetUser Controller for /users/get/:id route
+// GetUser Controller for /users/get/:id route
 func GetUser(c *gin.Context) {
 	val, _ := c.Get(constants.Role)
 	if val != 2 {

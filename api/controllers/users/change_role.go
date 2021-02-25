@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
@@ -13,13 +12,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//ChangeUserRoleRoute is used to change users role in database
+// ChangeUserRoleRoute is used to change users role in database
 func ChangeUserRoleRoute(router *gin.RouterGroup) {
 	router.PUT("/changerole", ChangeRole)
-	router.OPTIONS("/changerole", preflight.Preflight)
 }
 
-//ChangeRole Controller for /users/changerole route
+// ChangeRole Controller for /users/changerole route
 func ChangeRole(c *gin.Context) {
 	val, _ := c.Get(constants.Role)
 	if val != 2 {

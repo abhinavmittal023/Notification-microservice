@@ -6,7 +6,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 )
 
-//UserInfo serializer to bind request data
+// UserInfo serializer to bind request data
 type UserInfo struct {
 	ID        uint      `json:"user_id"`
 	FirstName string    `json:"first_name"`
@@ -18,7 +18,7 @@ type UserInfo struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-//UserModelToUserInfo converts the user model to UserInfo struct
+// UserModelToUserInfo converts the user model to UserInfo struct
 func UserModelToUserInfo(info *UserInfo, user *models.User) {
 	info.ID = user.ID
 	info.FirstName = user.FirstName

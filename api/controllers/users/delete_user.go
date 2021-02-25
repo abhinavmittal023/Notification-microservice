@@ -5,20 +5,18 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
 
-//DeleteUserRoute is used to delete users from database
+// DeleteUserRoute is used to delete users from database
 func DeleteUserRoute(router *gin.RouterGroup) {
 	router.DELETE("/delete/:id", DeleteUser)
-	router.OPTIONS("/delete/:id", preflight.Preflight)
 }
 
-//DeleteUser Controller for /users/delete/:id route
+// DeleteUser Controller for /users/delete/:id route
 func DeleteUser(c *gin.Context) {
 	val, _ := c.Get(constants.Role)
 	if val != 2 {

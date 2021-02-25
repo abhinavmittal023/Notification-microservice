@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
@@ -14,13 +13,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//ChangeUserPasswordRoute is used to change users password in database
+// ChangeUserPasswordRoute is used to change users password in database
 func ChangeUserPasswordRoute(router *gin.RouterGroup) {
 	router.PUT("/changepassword", ChangePassword)
-	router.OPTIONS("/changepassword", preflight.Preflight)
 }
 
-//ChangePassword Controller for /users/changepassword route
+// ChangePassword Controller for /users/changepassword route
 func ChangePassword(c *gin.Context) {
 	userID, _ := c.Get(constants.ID)
 	var info serializers.ChangePasswordInfo

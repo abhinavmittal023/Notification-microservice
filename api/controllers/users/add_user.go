@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
@@ -16,13 +15,12 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-//AddUserRoute is used to add users to database
+// AddUserRoute is used to add users to database
 func AddUserRoute(router *gin.RouterGroup) {
 	router.POST("/add", AddUser)
-	router.OPTIONS("/add", preflight.Preflight)
 }
 
-//AddUser Controller for /users/add route
+// AddUser Controller for /users/add route
 func AddUser(c *gin.Context) {
 	val, _ := c.Get(constants.Role)
 	if val != 2 {

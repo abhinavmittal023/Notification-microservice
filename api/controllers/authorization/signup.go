@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
@@ -19,7 +18,6 @@ import (
 // SignUpRoute is used to sign up users
 func SignUpRoute(router *gin.RouterGroup) {
 	router.POST("/", SignUp)
-	router.OPTIONS("/", preflight.Preflight)
 }
 
 // SignUp Controller for /signup route

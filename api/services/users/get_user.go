@@ -26,7 +26,7 @@ func GetUserWithEmail(email string) (*models.User, error) {
 	return &user, res.Error
 }
 
-//GetAllUsers gets all users from the database and returns []models.User,err
+// GetAllUsers gets all users from the database and returns []models.User,err
 func GetAllUsers() ([]models.User, error) {
 	var users []models.User
 	dbg := db.Get()

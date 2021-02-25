@@ -46,7 +46,7 @@ func SendValidationEmail(to []string, userID uint64) error {
 		Link: link,
 	})
 
-	//  Sending email.
+	// Sending email.
 	err = smtp.SendMail(addr, auth, from, to, body.Bytes())
 	if err != nil {
 		log.Println("Unable to send email")
