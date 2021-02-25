@@ -41,6 +41,29 @@ func TestSignup(t *testing.T) {
 
 }
 
+func TestSignupInvalid(t *testing.T) {
+
+	if err := RefreshAllTables(); err != nil {
+		t.Fail()
+	}
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	data := []byte(`{"first_name": "test","last_name": "","email": "test@test","password": "test12--"}`)
+
+	req, err := http.NewRequest("POST", "", bytes.NewReader(data))
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
+	req.Header.Set("Content-Type", "application/json")
+	c.Request = req
+	authorization.SignUp(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+}
+
 func TestCheckIfFirst(t *testing.T) {
 
 	if err := RefreshAllTables(); err != nil {

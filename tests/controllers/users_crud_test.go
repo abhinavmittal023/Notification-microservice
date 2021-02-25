@@ -81,6 +81,92 @@ func TestGetAllUsers(t *testing.T) {
 	}
 }
 
+func TestGetAllUsersPagination(t *testing.T) {
+
+	if err := RefreshAllTables(); err != nil {
+		t.Fail()
+	}
+
+	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	usersList := []models.User{
+		{
+			FirstName: "test1",
+			Email:     "test1@test.com",
+			Password:  password,
+			Verified:  true,
+			Role:      2,
+		},
+		{
+			FirstName: "test2",
+			Email:     "test2@test.com",
+			Password:  password,
+			Verified:  true,
+			Role:      1,
+		},
+		{
+			FirstName: "test3",
+			Email:     "test3@test.com",
+			Password:  password,
+			Verified:  false,
+			Role:      1,
+		},
+	}
+
+	err := SeedUsers(&usersList)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	req, err := http.NewRequest("GET", "?offset=0&limit=1", nil)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
+	req.Header.Set("Content-Type", "application/json")
+	c.Request = req
+	users.GetAllUsers(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var got []gin.H
+	err = json.Unmarshal(w.Body.Bytes(), &got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, len(got), 1)
+	assert.Equal(t, float64(usersList[len(usersList)-1].ID), got[0]["user_id"])
+	assert.Equal(t, (usersList[len(usersList)-1].Email), got[0]["email"])
+	assert.Equal(t, (usersList[len(usersList)-1].FirstName), got[0]["first_name"])
+
+	w = httptest.NewRecorder()
+	c, _ = gin.CreateTestContext(w)
+
+	req, err = http.NewRequest("GET", "?offset=1&limit=1", nil)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
+	req.Header.Set("Content-Type", "application/json")
+	c.Request = req
+	users.GetAllUsers(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	got = []gin.H{}
+	err = json.Unmarshal(w.Body.Bytes(), &got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, len(got), 1)
+	assert.Equal(t, float64(usersList[len(usersList)-2].ID), got[0]["user_id"])
+	assert.Equal(t, (usersList[len(usersList)-2].Email), got[0]["email"])
+	assert.Equal(t, (usersList[len(usersList)-2].FirstName), got[0]["first_name"])
+}
+
 func TestAddUser(t *testing.T) {
 
 	if err := RefreshAllTables(); err != nil {
