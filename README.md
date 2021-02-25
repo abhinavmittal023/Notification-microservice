@@ -52,3 +52,7 @@ run `make setup` for setting up the server for the first time.
 ## Running the server
 
 run `make run` for running the server
+
+## Running the unit tests
+
+run `make run_unit_tests` for running all unit tests
