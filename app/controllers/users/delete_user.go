@@ -17,6 +17,7 @@ func DeleteUserRoute(router *gin.RouterGroup) {
 
 // DeleteUser Controller for delete /users/:id route
 func DeleteUser(c *gin.Context) {
+	log.Println(c.Params)
 	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID should be a unsigned integer"})

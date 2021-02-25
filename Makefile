@@ -42,3 +42,23 @@ refresh_database: down_all setup
 run_mail_catcher:
 	@echo "Go to http://localhost:1080/ on your browser to quit or monitor"
 	mailcatcher --ip 0.0.0.0
+
+run_controller_test:
+	@echo "Running all unit tests for controllers" 
+	go test ./tests/controllers/... 
+
+run_services_test:
+	@echo "Running all unit tests for services"
+	go test ./tests/services/...
+
+run_controller_test_verbose:
+	@echo "Running all unit tests for controllers with verbose" 
+	go test ./tests/controllers/... -v
+
+run_services_test_verbose:
+	@echo "Running all unit tests for services with verbose"
+	go test ./tests/services/... -v
+
+run_unit_tests_verbose: run_services_test_verbose run_controller_test_verbose 
+
+run_unit_tests: run_services_test run_controller_test
