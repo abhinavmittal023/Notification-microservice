@@ -8,6 +8,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -21,7 +22,7 @@ func ChangeUserPasswordRoute(router *gin.RouterGroup) {
 
 //ChangePassword Controller for /users/changepassword route
 func ChangePassword(c *gin.Context) {
-	userID, _ := c.Get("user_id")
+	userID, _ := c.Get(constants.ID)
 	var info serializers.ChangePasswordInfo
 	if c.BindJSON(&info) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email, Role are required"})

@@ -9,6 +9,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
@@ -23,7 +24,7 @@ func AddUserRoute(router *gin.RouterGroup) {
 
 //AddUser Controller for /users/add route
 func AddUser(c *gin.Context) {
-	val, _ := c.Get("role")
+	val, _ := c.Get(constants.Role)
 	if val != 2 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return

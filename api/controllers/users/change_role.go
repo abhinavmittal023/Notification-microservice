@@ -8,6 +8,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -20,7 +21,7 @@ func ChangeUserRoleRoute(router *gin.RouterGroup) {
 
 //ChangeRole Controller for /users/changerole route
 func ChangeRole(c *gin.Context) {
-	val, _ := c.Get("role")
+	val, _ := c.Get(constants.Role)
 	if val != 2 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return

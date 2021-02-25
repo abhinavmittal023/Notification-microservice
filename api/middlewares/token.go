@@ -32,8 +32,8 @@ func AuthorizeJWT() gin.HandlerFunc {
 
 		claims := token.Claims.(*auth.CustomClaims)
 		if token.Valid && claims.TokenType == "access" {
-			c.Set("user_id", claims.UserID)
-			c.Set("role", claims.Role)
+			c.Set(constants.ID, claims.UserID)
+			c.Set(constants.Role, claims.Role)
 		} else {
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
