@@ -35,33 +35,32 @@ func ChangeEmail(c *gin.Context) {
 	info.OldEmail = strings.ToLower(info.OldEmail)
 	info.NewEmail = strings.ToLower(info.NewEmail)
 
-	er := serializers.EmailRegexCheck(info.OldEmail)
+	status, message := serializers.EmailRegexCheck(info.OldEmail)
 
-	if er == "internal_server_error" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Internal Server Error due to email regex")
-		return
-	}
-	if er == "bad_request" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
+	if status != http.StatusOK {
+		c.JSON(status, gin.H{
+			"error": message,
+		})
 		return
 	}
 
-	er = serializers.EmailRegexCheck(info.NewEmail)
+	status, message = serializers.EmailRegexCheck(info.NewEmail)
 
-	if er == "internal_server_error" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Internal Server Error due to email regex")
-		return
-	}
-	if er == "bad_request" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
+	if status != http.StatusOK {
+		c.JSON(status, gin.H{
+			"error": message,
+		})
 		return
 	}
 
 	user, err := users.GetUserWithEmail(info.OldEmail)
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "EmailId not in database"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("GetUserWithEmail service error")
 		return
 	}
 

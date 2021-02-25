@@ -31,15 +31,12 @@ func SignIn(c *gin.Context) {
 	}
 	info.Email = strings.ToLower(info.Email)
 
-	er := serializers.EmailRegexCheck(info.Email)
+	status, message := serializers.EmailRegexCheck(info.Email)
 
-	if er == "internal_server_error" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Internal Server Error due to email regex")
-		return
-	}
-	if er == "bad_request" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
+	if status != http.StatusOK {
+		c.JSON(status, gin.H{
+			"error": message,
+		})
 		return
 	}
 

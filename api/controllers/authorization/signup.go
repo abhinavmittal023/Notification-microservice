@@ -32,17 +32,15 @@ func SignUp(c *gin.Context) {
 	info.Email = strings.ToLower(info.Email)
 	info.Role = constants.SystemAdminRole // signup user will always be system admin
 
-	er := serializers.EmailRegexCheck(info.Email)
+	status, message := serializers.EmailRegexCheck(info.Email)
 
-	if er == "internal_server_error" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Internal Server Error due to email regex")
+	if status != http.StatusOK {
+		c.JSON(status, gin.H{
+			"error": message,
+		})
 		return
 	}
-	if er == "bad_request" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
-		return
-	}
+
 	var err error
 
 	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)

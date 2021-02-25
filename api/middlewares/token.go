@@ -20,6 +20,7 @@ func AuthorizeJWT() gin.HandlerFunc {
 
 		if headerCheck {
 			c.AbortWithStatus(http.StatusUnauthorized)
+			return
 		}
 
 		tokenString := authHeader[len(headerPrefix)+1:]

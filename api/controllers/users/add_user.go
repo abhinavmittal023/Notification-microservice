@@ -31,20 +31,17 @@ func AddUser(c *gin.Context) {
 	}
 	var info serializers.AddUserInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password,FirstName are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email, Password, FirstName are required"})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)
 
-	er := serializers.EmailRegexCheck(info.Email)
+	status, message := serializers.EmailRegexCheck(info.Email)
 
-	if er == "internal_server_error" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Internal Server Error due to email regex")
-		return
-	}
-	if er == "bad_request" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
+	if status != http.StatusOK {
+		c.JSON(status, gin.H{
+			"error": message,
+		})
 		return
 	}
 
@@ -58,8 +55,13 @@ func AddUser(c *gin.Context) {
 	}
 
 	user, err := users.GetUserWithEmail(info.Email)
-	if err != gorm.ErrRecordNotFound {
+	if err == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "EmailId already in database"})
+		return
+	}
+	if err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("GetUserWithEmail service error")
 		return
 	}
 

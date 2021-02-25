@@ -48,6 +48,11 @@ func ChangePassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
 		return
 	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("GetUserWithID service error")
+		return
+	}
 
 	if info.OldPassword != user.Password {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Password is incorrect"})
