@@ -10,8 +10,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// PostAPIKey creates a new API Key
-func PostAPIKey() (string, error) {
+// GetAPIKey creates a new API Key and returns it
+func GetAPIKey() (string, error) {
 	var organisation models.Organisation
 	err := db.Get().First(&organisation).Error
 	apiKey := hash.GenerateSecureToken(constants.APIKeyLength)

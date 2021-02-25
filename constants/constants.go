@@ -21,6 +21,9 @@ const (
 	// MaxType Defines the maximum types of notifications supported by the service
 	MaxType = 3
 
+	// MaxPriority Defines the maximum priority of channel
+	MaxPriority = 3
+
 	// APIKeyLength is the length of API Key
 	APIKeyLength = 64
 
