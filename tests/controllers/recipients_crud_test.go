@@ -328,7 +328,6 @@ func TestGetAllRecipientsPagination(t *testing.T) {
 	assert.Equal(t, (recipientsList[len(recipientsList)-2].PushToken), recipientRecords[0].(map[string]interface{})["push_token"])
 }
 
-
 func TestAddUpdateRecipient(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()

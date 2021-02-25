@@ -12,7 +12,7 @@ import (
 	"github.com/go-playground/assert/v2"
 )
 
-func TestValidateToken(t *testing.T){
+func TestValidateToken(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
@@ -32,48 +32,48 @@ func TestValidateToken(t *testing.T){
 		t.Fail()
 	}
 
-	tokenString,err := auth.GenerateValidationToken(uint64(user.ID),configuration.GetResp().Token.ExpiryTime.ValidationToken)
+	tokenString, err := auth.GenerateValidationToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.ValidationToken)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
 	}
 
-	user1,err := authservice.ValidateToken(tokenString, "validation")
+	user1, err := authservice.ValidateToken(tokenString, "validation")
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
 	}
-	assert.Equal(t,user.ID,user1.ID)
+	assert.Equal(t, user.ID, user1.ID)
 
-	tokenString,err = auth.GenerateRefreshToken(uint64(user.ID),configuration.GetResp().Token.ExpiryTime.RefreshToken)
-	if err != nil {
-		log.Println(err.Error())
-		t.Fail()
-	}
-
-	user1,err = authservice.ValidateToken(tokenString, "refresh")
-	if err != nil {
-		log.Println(err.Error())
-		t.Fail()
-	}
-	assert.Equal(t,user.ID,user1.ID)
-
-	tokenString,err = auth.GenerateAccessToken(uint64(user.ID),user.Role,configuration.GetResp().Token.ExpiryTime.AccessToken)
+	tokenString, err = auth.GenerateRefreshToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.RefreshToken)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
 	}
 
-	user1,err = authservice.ValidateToken(tokenString, "access")
+	user1, err = authservice.ValidateToken(tokenString, "refresh")
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
 	}
-	assert.Equal(t,user.ID,user1.ID)
-	assert.Equal(t,user.Role,user1.Role)
+	assert.Equal(t, user.ID, user1.ID)
+
+	tokenString, err = auth.GenerateAccessToken(uint64(user.ID), user.Role, configuration.GetResp().Token.ExpiryTime.AccessToken)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
+
+	user1, err = authservice.ValidateToken(tokenString, "access")
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
+	assert.Equal(t, user.ID, user1.ID)
+	assert.Equal(t, user.Role, user1.Role)
 }
 
-func TestValidateTokenInvalid(t *testing.T){
+func TestValidateTokenInvalid(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
@@ -93,35 +93,34 @@ func TestValidateTokenInvalid(t *testing.T){
 		t.Fail()
 	}
 
-	tokenString,err := auth.GenerateValidationToken(uint64(user.ID),configuration.GetResp().Token.ExpiryTime.ValidationToken)
+	tokenString, err := auth.GenerateValidationToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.ValidationToken)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
 	}
 
-	user1,err := authservice.ValidateToken(tokenString, "refresh")
-	assert.Equal(t,err.Error(),"Invalid Token")
-	assert.NotEqual(t,user.ID,user1.ID)
+	user1, err := authservice.ValidateToken(tokenString, "refresh")
+	assert.Equal(t, err.Error(), "Invalid Token")
+	assert.NotEqual(t, user.ID, user1.ID)
 
-
-	tokenString,err = auth.GenerateRefreshToken(uint64(user.ID),configuration.GetResp().Token.ExpiryTime.RefreshToken)
+	tokenString, err = auth.GenerateRefreshToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.RefreshToken)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
 	}
 
-	user1,err = authservice.ValidateToken(tokenString, "access")
-	assert.Equal(t,err.Error(),"Invalid Token")
-	assert.NotEqual(t,user.ID,user1.ID)
+	user1, err = authservice.ValidateToken(tokenString, "access")
+	assert.Equal(t, err.Error(), "Invalid Token")
+	assert.NotEqual(t, user.ID, user1.ID)
 
-	tokenString,err = auth.GenerateAccessToken(uint64(user.ID),user.Role,configuration.GetResp().Token.ExpiryTime.AccessToken)
+	tokenString, err = auth.GenerateAccessToken(uint64(user.ID), user.Role, configuration.GetResp().Token.ExpiryTime.AccessToken)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
 	}
 
-	user1,err = authservice.ValidateToken(tokenString, "refresh")
-	assert.Equal(t,err.Error(),"Invalid Token")
-	assert.NotEqual(t,user.ID,user1.ID)
-	assert.NotEqual(t,user.Role,user1.Role)
+	user1, err = authservice.ValidateToken(tokenString, "refresh")
+	assert.Equal(t, err.Error(), "Invalid Token")
+	assert.NotEqual(t, user.ID, user1.ID)
+	assert.NotEqual(t, user.Role, user1.Role)
 }
