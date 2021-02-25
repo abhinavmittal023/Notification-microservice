@@ -7,14 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// PostAPIKeyRoute is used to make new API Key
-func PostAPIKeyRoute(router *gin.RouterGroup) {
-	router.POST("", PostAPIKey)
+// GetAPIKeyRoute is used to make new API Key
+func GetAPIKeyRoute(router *gin.RouterGroup) {
+	router.GET("", GetAPIKey)
 }
 
-// PostAPIKey function is a controller for post notifications/api_key route
-func PostAPIKey(c *gin.Context) {
-	apiKey, err := notifications.PostAPIKey()
+// GetAPIKey function is a controller for post notifications/api_key route
+func GetAPIKey(c *gin.Context) {
+	apiKey, err := notifications.GetAPIKey()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Internal Server Error",

@@ -7,6 +7,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/authservice"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -44,7 +45,7 @@ func RefreshAccessToken(c *gin.Context) {
 		return
 	}
 
-	refreshToken.AccessToken, err = auth.GenerateAccessToken(uint64(userDetails.ID), userDetails.Role, 3)
+	refreshToken.AccessToken, err = auth.GenerateAccessToken(uint64(userDetails.ID), userDetails.Role, configuration.GetResp().Token.ExpiryTime.AccessToken)
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
