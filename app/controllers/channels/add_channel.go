@@ -30,12 +30,19 @@ func AddChannel(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Type provided"})
 		return
 	}
+	if info.Priority > constants.MaxPriority {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Priority provided"})
+		return
+	}
 
 	var channel models.Channel
 	serializers.ChannelInfoToChannelModel(&info, &channel)
 
 	_, err := channels.GetChannelWithType(info.Type)
-	if err != gorm.ErrRecordNotFound {
+	if err != gorm.ErrRecordNotFound && err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}else if err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Channel with provided type already exists"})
 		return
 	}

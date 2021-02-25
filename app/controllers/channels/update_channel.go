@@ -30,6 +30,10 @@ func UpdateChannel(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Type provided"})
 		return
 	}
+	if info.Priority > constants.MaxPriority {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Priority provided"})
+		return
+	}
 
 	channelID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
