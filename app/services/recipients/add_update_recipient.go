@@ -60,7 +60,7 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *s
 		if recipientRecord.ChannelType != 0 {
 			_, err := channels.GetChannelWithType(uint(recipientRecord.ChannelType))
 			if err == gorm.ErrRecordNotFound {
-				errorMap = append(errorMap, "Preferred Channel is not in the database")
+				errorMap = append(errorMap, fmt.Sprintf("Preferred Channel %s is not in the database", constants.ChannelType(recipientRecord.ChannelType)))
 				invalid = true
 			} else if err != nil {
 				log.Println(err)
