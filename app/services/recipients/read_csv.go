@@ -2,6 +2,7 @@ package recipients
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"strings"
@@ -28,9 +29,24 @@ func ReadCSV(csvFile *multipart.FileHeader) (*[]serializers.RecipientInfo, error
 	if err != nil {
 		return nil, errors.Wrap(err, "Error reading from file")
 	}
-	if len(record) < 5 || record[0] != "ID" || record[1] != "Email" || record[2] != "PushToken" || record[3] != "WebToken" || record[4] != "PreferredChannelType" {
-		return nil, errors.New("Incorrect Headers Format")
+
+	if len(record) != len(constants.CSVHeaders()) {
+		return nil, errors.New("Invalid number of headers provided")
 	}
+
+	csvHeaders := map[string]int{}
+	for i, header := range constants.CSVHeaders() {
+		csvHeaders[header] = i
+	}
+
+	for i, gotHeader := range record {
+		_, present := csvHeaders[gotHeader]
+		if !present {
+			return nil, fmt.Errorf("Invalid Header %s", gotHeader)
+		}
+		csvHeaders[gotHeader] = i
+	}
+
 	for i := 0; ; i = i + 1 {
 		record, err = reader.Read()
 		if err == io.EOF {
@@ -38,15 +54,15 @@ func ReadCSV(csvFile *multipart.FileHeader) (*[]serializers.RecipientInfo, error
 		} else if err != nil {
 			return nil, errors.Wrap(err, "Error reading from file")
 		}
-		if record[4] != "" {
-			channelType := record[4]
+		if record[csvHeaders[constants.CSVHeaders()[4]]] != "" {
+			channelType := record[csvHeaders[constants.CSVHeaders()[4]]]
 			channelTypeInt := constants.ChannelTypeToInt(channelType)
 			if channelTypeInt == 0 {
-				return nil, errors.New("Error converting channel type to int")
+				return nil, fmt.Errorf("Invalid Channel type %s", channelType)
 			}
-			recipients = append(recipients, serializers.RecipientInfo{RecipientID: strings.ToLower(record[0]), Email: strings.ToLower(record[1]), PushToken: record[2], WebToken: record[3], ChannelType: channelTypeInt})
+			recipients = append(recipients, serializers.RecipientInfo{RecipientID: strings.ToLower(record[csvHeaders[constants.CSVHeaders()[0]]]), Email: strings.ToLower(record[csvHeaders[constants.CSVHeaders()[1]]]), PushToken: record[csvHeaders[constants.CSVHeaders()[2]]], WebToken: record[csvHeaders[constants.CSVHeaders()[3]]], ChannelType: channelTypeInt})
 		} else {
-			recipients = append(recipients, serializers.RecipientInfo{RecipientID: strings.ToLower(record[0]), Email: strings.ToLower(record[1]), PushToken: record[2], WebToken: record[3]})
+			recipients = append(recipients, serializers.RecipientInfo{RecipientID: strings.ToLower(record[csvHeaders[constants.CSVHeaders()[0]]]), Email: strings.ToLower(record[csvHeaders[constants.CSVHeaders()[1]]]), PushToken: record[csvHeaders[constants.CSVHeaders()[2]]], WebToken: record[csvHeaders[constants.CSVHeaders()[3]]]})
 		}
 	}
 	return &recipients, nil

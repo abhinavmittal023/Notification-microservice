@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"github.com/gin-gonic/gin"
 )
@@ -20,20 +21,24 @@ func AddUpdateRecipient(c *gin.Context) {
 
 	if err != nil {
 		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "File Format error",
-		})
+		var errorList serializers.ErrorInfo
+		errorList.Error = map[int][]string{
+			1: {"File Format error"},
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, errorList)
 		return
 	}
 	recipientRecords, err := recipients.ReadCSV(rFile)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid CSV file",
-		})
+		var errorList serializers.ErrorInfo
+		errorList.Error = map[int][]string{
+			1: {err.Error()},
+		}
+		c.AbortWithStatusJSON(http.StatusBadRequest, errorList)
 		return
 	}
 
-	status, errors := recipients.AddUpdateRecipients(recipientRecords)
+	status, errorList := recipients.AddUpdateRecipients(recipientRecords)
 
 	if status == http.StatusOK {
 		c.JSON(http.StatusOK, gin.H{
@@ -41,6 +46,6 @@ func AddUpdateRecipient(c *gin.Context) {
 			"records_affected": len(*recipientRecords),
 		})
 	} else {
-		c.AbortWithStatusJSON(status, errors)
+		c.AbortWithStatusJSON(status, errorList)
 	}
 }
