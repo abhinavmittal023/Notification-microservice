@@ -9,7 +9,7 @@ import (
 
 // GetAPIKeyRoute is used to make new API Key
 func GetAPIKeyRoute(router *gin.RouterGroup) {
-	router.GET("", GetAPIKey)
+	router.GET("/new", GetAPIKey)
 }
 
 // GetAPIKey function is a controller for post notifications/api_key route
