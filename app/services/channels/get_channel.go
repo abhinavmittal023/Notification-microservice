@@ -21,6 +21,13 @@ func GetChannelWithType(channelType uint) (*models.Channel, error) {
 	return &channel, res.Error
 }
 
+// GetChannelWithName gets the channel of specified name from the database, and returns error/nil
+func GetChannelWithName(channelName string) (*models.Channel, error) {
+	var channel models.Channel
+	res := db.Get().Model(&models.Channel{}).Where("name = ?", channelName).First(&channel)
+	return &channel, res.Error
+}
+
 // GetAllChannels gets all the channels from the database and returns []models.Channel,err
 func GetAllChannels(pagination *serializers.Pagination, channelFilter *filter.Channel) ([]models.Channel, error) {
 

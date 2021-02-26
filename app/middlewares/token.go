@@ -33,6 +33,7 @@ func AuthorizeJWT() gin.HandlerFunc {
 		if err != nil {
 			log.Println(err.Error())
 			c.AbortWithStatus(http.StatusUnauthorized)
+			return
 		}
 
 		claims := token.Claims.(*auth.CustomClaims)
