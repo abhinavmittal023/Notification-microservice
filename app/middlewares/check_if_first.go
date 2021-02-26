@@ -16,7 +16,7 @@ func CheckIfFirst() gin.HandlerFunc {
 			c.Next() // Preflight Request
 			return
 		}
-		_, err := users.GetFirstUser()
+		_, err := users.GetFirstUser(true)
 		if err == gorm.ErrRecordNotFound {
 			c.Next()
 			return

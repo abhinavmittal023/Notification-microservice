@@ -65,8 +65,26 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
+	firstRecord, err := users.GetFirstUser(false)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	prevAvail := firstRecord.ID != user.ID
+
+	lastRecord, err := users.GetLastUser()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	nextAvail := lastRecord.ID != user.ID
+
 	var info serializers.UserInfo
 	serializers.UserModelToUserInfo(&info, user)
 
-	c.JSON(http.StatusOK, info)
+	c.JSON(http.StatusOK, gin.H{
+		"user_details": info,
+		"next":         nextAvail,
+		"previous":     prevAvail,
+	})
 }

@@ -83,7 +83,7 @@ func TestGetFirstUser(t *testing.T) {
 		t.Fail()
 	}
 
-	gotUser, gotError := users.GetFirstUser()
+	gotUser, gotError := users.GetFirstUser(false)
 
 	assert.Equal(t, gotError, nil)
 	assert.Equal(t, usersList[0].ID, gotUser.ID)
@@ -94,7 +94,7 @@ func TestGetFirstUser(t *testing.T) {
 		t.Fail()
 	}
 
-	gotUser, gotError = users.GetFirstUser()
+	gotUser, gotError = users.GetFirstUser(false)
 
 	assert.Equal(t, gotError, gorm.ErrRecordNotFound)
 
@@ -112,7 +112,7 @@ func TestGetFirstUser(t *testing.T) {
 		t.Fail()
 	}
 
-	gotUser, gotError = users.GetFirstUser()
+	gotUser, gotError = users.GetFirstUser(false)
 
 	assert.Equal(t, gotError, nil)
 	assert.Equal(t, user.ID, gotUser.ID)

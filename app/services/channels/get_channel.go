@@ -14,6 +14,20 @@ func GetChannelWithID(id uint) (*models.Channel, error) {
 	return &channel, res.Error
 }
 
+// GetLastChannel function gets the information of last record of the table
+func GetLastChannel() (*models.Channel, error) {
+	var channel models.Channel
+	res := db.Get().Last(&channel)
+	return &channel, res.Error
+}
+
+// GetFirstChannel function gets the information of first record of the table
+func GetFirstChannel() (*models.Channel, error) {
+	var channel models.Channel
+	res := db.Get().First(&channel)
+	return &channel, res.Error
+}
+
 // GetNextChannelfromID function gives the details of the next channel and returns record not found
 // if the record is the last one
 func GetNextChannelfromID(channelID uint64) (*models.Channel, error) {

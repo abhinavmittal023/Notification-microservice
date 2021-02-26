@@ -19,7 +19,7 @@ func CheckIfFirstRoute(router *gin.RouterGroup) {
 
 // CheckIfFirst checks if another user exists to inform the front-end
 func CheckIfFirst(c *gin.Context) {
-	_, err := users.GetFirstUser()
+	_, err := users.GetFirstUser(true)
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusOK, gin.H{
 			"status": "ok",

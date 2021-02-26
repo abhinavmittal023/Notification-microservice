@@ -65,6 +65,20 @@ func GetRecipient(c *gin.Context) {
 		return
 	}
 
+	firstRecord, err := recipients.GetFirstRecipient()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	prevAvail := firstRecord.ID != recipient.ID
+
+	lastRecord, err := recipients.GetLastRecipient()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	nextAvail := lastRecord.ID != recipient.ID
+
 	var info serializers.RecipientInfo
 	serializers.RecipientModelToRecipientInfo(&info, recipient)
 
@@ -78,6 +92,8 @@ func GetRecipient(c *gin.Context) {
 			info.PreferredChannelType = 0
 			c.JSON(http.StatusOK, gin.H{
 				"recipient_details": info,
+				"next":              nextAvail,
+				"previous":          prevAvail,
 				"warning":           fmt.Sprintf("Preferred Channel %s was Deleted", constants.ChannelType(channelType)),
 			})
 			return
@@ -88,6 +104,8 @@ func GetRecipient(c *gin.Context) {
 		serializers.ChannelModelToChannelInfo(&channelInfo, channel)
 		c.JSON(http.StatusOK, gin.H{
 			"recipient_details": info,
+			"next":              nextAvail,
+			"previous":          prevAvail,
 			"preferred_channel": channelInfo,
 		})
 		return
@@ -95,5 +113,7 @@ func GetRecipient(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"recipient_details": info,
+		"next":              nextAvail,
+		"previous":          prevAvail,
 	})
 }

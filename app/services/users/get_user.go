@@ -35,16 +35,23 @@ func GetPreviousUserfromID(userID uint64) (*models.User, error) {
 }
 
 // GetFirstUser gets the details of the first user in the database
-// Use with signup guards only
-func GetFirstUser() (*models.User, error) {
+// provide checkVerified as true for signup guard to check and delete unverified user signup
+func GetFirstUser(checkVerified bool) (*models.User, error) {
 	var user models.User
 	res := db.Get().First(&user)
-	if res.Error == nil && !user.Verified && time.Duration((time.Now().Unix()-user.CreatedAt.Unix()))-3600*configuration.GetResp().Token.ExpiryTime.ValidationToken > 0 {
+	if checkVerified && res.Error == nil && !user.Verified && time.Duration((time.Now().Unix()-user.CreatedAt.Unix()))-3600*configuration.GetResp().Token.ExpiryTime.ValidationToken > 0 {
 		if err := SoftDeleteUser(&user); err != nil {
 			return nil, err
 		}
 		return nil, gorm.ErrRecordNotFound
 	}
+	return &user, res.Error
+}
+
+// GetLastUser function gets the information of last record of the table
+func GetLastUser() (*models.User, error) {
+	var user models.User
+	res := db.Get().Last(&user)
 	return &user, res.Error
 }
 

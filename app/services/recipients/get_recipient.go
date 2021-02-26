@@ -14,6 +14,20 @@ func GetRecipientWithID(recipientID uint64) (*models.Recipient, error) {
 	return &recipient, res.Error
 }
 
+// GetLastRecipient function gets the information of last record of the table
+func GetLastRecipient() (*models.Recipient, error) {
+	var recipient models.Recipient
+	res := db.Get().Last(&recipient)
+	return &recipient, res.Error
+}
+
+// GetFirstRecipient function gets the information of first record of the table
+func GetFirstRecipient() (*models.Recipient, error) {
+	var recipient models.Recipient
+	res := db.Get().First(&recipient)
+	return &recipient, res.Error
+}
+
 // GetNextRecipientfromID function gives the details of the next recipient and returns record not found
 // if the record is the last one
 func GetNextRecipientfromID(recipientID uint64) (*models.Recipient, error) {
