@@ -8,9 +8,11 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	miscquery "code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/misc_query"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -29,7 +31,32 @@ func GetRecipient(c *gin.Context) {
 		log.Println("String Conversion Error")
 		return
 	}
-	recipient, err := recipients.GetRecipientWithID(uint64(recipientID))
+
+	var iteratorInfo miscquery.Iterator
+	err = c.BindQuery(&iteratorInfo)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Non boolean next or prev provided",
+		})
+		return
+	}
+
+	if iteratorInfo.Next && iteratorInfo.Previous {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Provide either next or previous",
+		})
+		return
+	}
+
+	var recipient *models.Recipient
+	if iteratorInfo.Next {
+		recipient, err = recipients.GetNextRecipientfromID(uint64(recipientID))
+	} else if iteratorInfo.Previous {
+		recipient, err = recipients.GetPreviousRecipientfromID(uint64(recipientID))
+	} else {
+		recipient, err = recipients.GetRecipientWithID(uint64(recipientID))
+	}
+
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
 		return

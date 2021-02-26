@@ -14,6 +14,22 @@ func GetRecipientWithID(recipientID uint64) (*models.Recipient, error) {
 	return &recipient, res.Error
 }
 
+// GetNextRecipientfromID function gives the details of the next recipient and returns record not found
+// if the record is the last one
+func GetNextRecipientfromID(recipientID uint64) (*models.Recipient, error) {
+	var recipientDetails models.Recipient
+	res := db.Get().Model(&models.Recipient{}).Where("id > ?", recipientID).First(&recipientDetails)
+	return &recipientDetails, res.Error
+}
+
+// GetPreviousRecipientfromID function gives the details of the previous recipient and returns record not found
+// if the record is the first one
+func GetPreviousRecipientfromID(recipientID uint64) (*models.Recipient, error) {
+	var recipientDetails models.Recipient
+	res := db.Get().Model(&models.Recipient{}).Where("id < ?", recipientID).First(&recipientDetails)
+	return &recipientDetails, res.Error
+}
+
 // GetAllRecipients gets all Recipients from the database and returns []models.Recipient,err
 func GetAllRecipients(pagination *serializers.Pagination, recipientFilter *filter.Recipient) ([]models.Recipient, error) {
 

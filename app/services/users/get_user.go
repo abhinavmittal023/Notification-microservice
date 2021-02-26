@@ -18,6 +18,22 @@ func GetUserWithID(userID uint64) (*models.User, error) {
 	return &user, res.Error
 }
 
+// GetNextUserfromID function gives the details of the next user and returns record not found
+// if the record is the last one
+func GetNextUserfromID(userID uint64) (*models.User, error) {
+	var userDetails models.User
+	res := db.Get().Model(&models.User{}).Where("id > ?", userID).First(&userDetails)
+	return &userDetails, res.Error
+}
+
+// GetPreviousUserfromID function gives the details of the previous user and returns record not found
+// if the record is the first one
+func GetPreviousUserfromID(userID uint64) (*models.User, error) {
+	var userDetails models.User
+	res := db.Get().Model(&models.User{}).Where("id < ?", userID).First(&userDetails)
+	return &userDetails, res.Error
+}
+
 // GetFirstUser gets the details of the first user in the database
 // Use with signup guards only
 func GetFirstUser() (*models.User, error) {

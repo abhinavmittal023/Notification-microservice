@@ -12,6 +12,9 @@ import (
 // ErrInvalidToken is generated if token is invalid
 var ErrInvalidToken = errors.New("Invalid Token")
 
+// ErrAlreadyVerfied is generated if user clicks on validation link after being verification
+var ErrAlreadyVerfied = errors.New("User Already Verified")
+
 // ValidateToken function is used to check if token is valid, and return user model, if valid
 func ValidateToken(tokenString string, tokenType string) (*models.User, error) {
 	token, err := auth.ValidateToken(tokenString)
@@ -21,14 +24,20 @@ func ValidateToken(tokenString string, tokenType string) (*models.User, error) {
 
 	claims := token.Claims.(*auth.CustomClaims)
 
-	if token.Valid && claims.TokenType == tokenType {
+	if claims.TokenType == tokenType {
 
 		userDetails, err := users.GetUserWithID(claims.UserID)
 		if err != nil {
 			log.Println(err)
 			return &models.User{}, err
 		}
-		return userDetails, nil
+		if tokenType == "validation" && userDetails.Verified == true {
+			return userDetails, ErrAlreadyVerfied
+		}
+		if token.Valid {
+			return userDetails, nil
+		}
+		return nil, ErrInvalidToken
 	}
 	return &models.User{}, ErrInvalidToken
 }

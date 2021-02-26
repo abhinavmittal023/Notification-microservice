@@ -7,7 +7,9 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	miscquery "code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/misc_query"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -28,13 +30,38 @@ func GetUser(c *gin.Context) {
 		log.Println("String Conversion Error")
 		return
 	}
-	user, err := users.GetUserWithID(uint64(userID))
+
+	var iteratorInfo miscquery.Iterator
+	err = c.BindQuery(&iteratorInfo)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Non boolean next or prev provided",
+		})
+		return
+	}
+
+	if iteratorInfo.Next && iteratorInfo.Previous {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Provide either next or previous",
+		})
+		return
+	}
+
+	var user *models.User
+
+	if iteratorInfo.Next {
+		user, err = users.GetNextUserfromID(uint64(userID))
+	} else if iteratorInfo.Previous {
+		user, err = users.GetPreviousUserfromID(uint64(userID))
+	} else {
+		user, err = users.GetUserWithID(uint64(userID))
+	}
+
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
 		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Get user with id query error")
 		return
 	}
 
