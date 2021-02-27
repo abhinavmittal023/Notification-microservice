@@ -1,11 +1,10 @@
-package api
+package app
 
 import (
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/auth"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/authorization"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/users"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/middlewares"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/auth"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/authorization"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/middlewares"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -39,15 +38,16 @@ func InitServer() error {
 	loginGroup := v1.Group("/login", middlewares.CheckIfLogged())
 	authorization.SignInRoute(loginGroup)
 
-	userGroup := v1.Group("/users", middlewares.AuthorizeJWT())
-	users.AddUserRoute(userGroup)
-	users.ChangeUserCredentialsRoute(userGroup)
-	users.ChangeUserPasswordRoute(userGroup)
-	users.DeleteUserRoute(userGroup)
-	users.GetUserRoute(userGroup)
-	users.GetAllUsersRoute(userGroup)
+	ownInfoGroup := v1.Group("/profile", middlewares.AuthorizeJWT())
+	users.GetUserProfileRoute(ownInfoGroup)
+	users.ChangeOwnPasswordRoute(ownInfoGroup)
 
-	router.NoRoute(preflight.Preflight)
+	UserGroup := v1.Group("/users", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())
+	users.AddUserRoute(UserGroup)
+	users.ChangeUserCredentialsRoute(UserGroup)
+	users.DeleteUserRoute(UserGroup)
+	users.GetUserRoute(UserGroup)
+	users.GetAllUsersRoute(UserGroup)
 
 	err := router.Run(":" + configuration.GetResp().Server.Port)
 	return errors.Wrap(err, "Unable to run server")

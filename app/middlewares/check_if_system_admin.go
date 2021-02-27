@@ -10,11 +10,7 @@ import (
 // CheckIfSystemAdmin middleware checks if the user is system admin
 func CheckIfSystemAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Method == "OPTIONS" {
-			c.Next() // Preflight Request
-			return
-		}
-		role, _ := c.Get("role")
+		role, _ := c.Get(constants.Role)
 		if role != constants.SystemAdminRole {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return

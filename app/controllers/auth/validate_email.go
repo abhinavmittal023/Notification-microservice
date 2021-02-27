@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/authservice"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/authservice"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"github.com/gin-gonic/gin"
 )
 

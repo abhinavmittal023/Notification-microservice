@@ -4,8 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -14,7 +13,6 @@ import (
 // CheckIfFirstRoute used for signup guard
 func CheckIfFirstRoute(router *gin.RouterGroup) {
 	router.GET("/guard", CheckIfFirst)
-	router.OPTIONS("/guard", preflight.Preflight)
 }
 
 // CheckIfFirst checks if another user exists to inform the front-end
