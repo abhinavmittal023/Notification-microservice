@@ -17,10 +17,10 @@ import (
 
 // SignInRoute is used to sign in users
 func SignInRoute(router *gin.RouterGroup) {
-	router.POST("/", SignIn)
+	router.POST("", SignIn)
 }
 
-// SignIn Controller for /signin route
+// SignIn Controller for /login route
 func SignIn(c *gin.Context) {
 	var info serializers.LoginInfo
 	if c.BindJSON(&info) != nil {
