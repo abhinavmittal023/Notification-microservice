@@ -3,6 +3,7 @@ package users
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
@@ -13,14 +14,14 @@ import (
 
 // ChangeUserCredentialsRoute is used to change users email in database
 func ChangeUserCredentialsRoute(router *gin.RouterGroup) {
-	router.PUT("/changecredentials", ChangeCredentials)
+	router.POST("/:id/changecredentials", ChangeCredentials)
 }
 
 // ChangeCredentials Controller for /users/changeemail route
 func ChangeCredentials(c *gin.Context) {
 	var info serializers.ChangeCredentialsInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Email, New Email are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email, role are required"})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)
@@ -34,13 +35,29 @@ func ChangeCredentials(c *gin.Context) {
 		return
 	}
 
-	user, err := users.GetUserWithEmail(info.Email)
-	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "EmailId not in database"})
+	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "ID should be a unsigned integer",
+		})
 		return
 	}
-	if info.Role == 0 {
-		info.Role = user.Role
+
+	testUser, err := users.GetUserWithEmail(info.Email)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("GetUserWithEmail service error")
+		return
+	} else if testUser.ID != uint(userID) && err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Email ID already exists",
+		})
+	}
+
+	user, err := users.GetUserWithID(uint64(userID))
+	if err == gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID not in database"})
+		return
 	}
 
 	serializers.ChangeCredentialsInfoToUserModel(&info, user)
@@ -51,4 +68,5 @@ func ChangeCredentials(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+
 }
