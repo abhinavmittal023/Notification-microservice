@@ -1,10 +1,10 @@
-package api
+package app
 
 import (
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/auth"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/authorization"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/users"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/middlewares"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/auth"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/authorization"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/middlewares"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"

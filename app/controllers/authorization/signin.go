@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
