@@ -6,6 +6,7 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,7 +19,7 @@ func GetAllUsersRoute(router *gin.RouterGroup) {
 func GetAllUsers(c *gin.Context) {
 	usersArray, err := users.GetAllUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("find all users query error")
 		return
 	}

@@ -7,6 +7,7 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/authservice"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,16 +27,16 @@ func ValidateEmail(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
 	userDetails.Verified = true
 	err = users.PatchUser(userDetails)
 	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	location := url.URL{Path: "http://localhost:4200/users/login"}

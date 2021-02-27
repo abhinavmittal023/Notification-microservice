@@ -19,3 +19,25 @@ const (
 	// ID defines the key for saving the user_id to the request
 	ID = "user_id"
 )
+
+// Error is the struct used to store the error messages
+type Error struct {
+	InternalError       string
+	UnAuthorized        string
+	CredentialsMismatch string
+	InvalidID           string
+	IDNotInRecords      string
+	EmailAlreadyPresent string
+}
+
+// Errors is a function that returns all the error messages
+func Errors() Error {
+	return Error{
+		InternalError:       "Internal Server Error",
+		UnAuthorized:        "Unauthorized for the Route",
+		CredentialsMismatch: "Email and Password don't match",
+		InvalidID:           "ID should be a unsigned integer",
+		IDNotInRecords:      "ID is not in the database",
+		EmailAlreadyPresent: "Email ID is Already Present",
+	}
+}

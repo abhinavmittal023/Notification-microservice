@@ -23,7 +23,7 @@ func SignUpRoute(router *gin.RouterGroup) {
 func SignUp(c *gin.Context) {
 	var info serializers.SignupInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password,FirstName are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email ,Password and FirstName are required"})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)
@@ -42,7 +42,7 @@ func SignUp(c *gin.Context) {
 
 	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Error while hashing the password")
 		return
 	}

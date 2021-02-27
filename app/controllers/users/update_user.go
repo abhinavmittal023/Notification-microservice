@@ -7,6 +7,7 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -21,14 +22,13 @@ func UpdateUser(c *gin.Context) {
 	var info serializers.ChangeCredentialsInfo
 	var err error
 	if err = c.BindJSON(&info); err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email and role are required"})
 		return
 	}
 	info.ID, err = strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "ID should be a unsigned integer",
+			"error": constants.Errors().InvalidID,
 		})
 		return
 	}
@@ -43,14 +43,14 @@ func UpdateUser(c *gin.Context) {
 
 	user, err := users.GetUserWithID(uint64(info.ID))
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID not in database"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().IDNotInRecords})
 		return
 	}
 
 	serializers.ChangeCredentialsInfoToUserModel(&info, user)
 	err = users.PatchUser(user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Update User service error")
 		return
 	}

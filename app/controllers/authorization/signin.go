@@ -9,6 +9,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
@@ -24,7 +25,7 @@ func SignInRoute(router *gin.RouterGroup) {
 func SignIn(c *gin.Context) {
 	var info serializers.LoginInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email and Password are Required"})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)
@@ -40,29 +41,29 @@ func SignIn(c *gin.Context) {
 
 	user, err := users.GetUserWithEmail(info.Email)
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId or Passwords mismatch"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": constants.Errors().CredentialsMismatch})
 		return
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Get user with email error")
 		return
 	}
 
 	match, err := hash.Validate(info.Password, user.Password, configuration.GetResp().PasswordHash)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Error while validating the password")
 		return
 	}
 
 	if !match {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId or Passwords mismatch"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": constants.Errors().CredentialsMismatch})
 		return
 	}
 
 	if !user.Verified {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId not verified"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email Id is not verified"})
 		return
 	}
 
@@ -74,13 +75,13 @@ func SignIn(c *gin.Context) {
 
 	token.AccessToken, err = auth.GenerateAccessToken(uint64(user.ID), user.Role, configuration.GetResp().Token.ExpiryTime.AccessToken)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Access Token not generated")
 		return
 	}
 	token.RefreshToken, err = auth.GenerateRefreshToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.RefreshToken)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Refresh Token not generated")
 		return
 	}
@@ -91,7 +92,7 @@ func SignIn(c *gin.Context) {
 	})
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("JSON marshalling error")
 		return
 	}

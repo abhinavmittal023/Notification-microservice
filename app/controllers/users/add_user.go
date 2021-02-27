@@ -8,6 +8,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -22,7 +23,7 @@ func AddUserRoute(router *gin.RouterGroup) {
 func AddUser(c *gin.Context) {
 	var info serializers.AddUserInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password,FirstName are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email ,Password , FirstName are required"})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)
@@ -40,18 +41,18 @@ func AddUser(c *gin.Context) {
 
 	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Error while hashing the password")
 		return
 	}
 
 	user, err := users.GetUserWithEmail(info.Email)
 	if err == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "EmailId already in database"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().EmailAlreadyPresent})
 		return
 	}
 	if err != gorm.ErrRecordNotFound {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("GetUserWithEmail service error")
 		return
 	}

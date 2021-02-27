@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -27,6 +28,6 @@ func CheckIfFirst(c *gin.Context) {
 		log.Println(err.Error())
 	}
 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-		"error": "Unauthorized",
+		"error": constants.Errors().UnAuthorized,
 	})
 }

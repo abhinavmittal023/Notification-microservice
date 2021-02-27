@@ -9,6 +9,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -37,7 +38,7 @@ func ChangePassword(c *gin.Context) {
 		userID, err = strconv.ParseUint(fmt.Sprintf("%v", c.MustGet("user_id")), 10, 64)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": "Error converting id to integer",
+				"error": constants.Errors().InternalError,
 			})
 			return
 		}
@@ -49,7 +50,7 @@ func ChangePassword(c *gin.Context) {
 		userID, err = strconv.ParseUint(c.Param("id"), 10, 64)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": "ID should be a unsigned integer",
+				"error": constants.Errors().InvalidID,
 			})
 			return
 		}
@@ -57,18 +58,18 @@ func ChangePassword(c *gin.Context) {
 
 	info.NewPassword, err = hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Hashing error for new password")
 		return
 	}
 
 	user, err := users.GetUserWithID(uint64(userID))
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().IDNotInRecords})
 		return
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("GetUserWithID service error")
 		return
 	}
@@ -76,7 +77,7 @@ func ChangePassword(c *gin.Context) {
 	if info.OldPassword != "" {
 		match, err := hash.Validate(info.OldPassword, user.Password, configuration.GetResp().PasswordHash)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 			log.Println("Validation error for new password")
 			return
 		}
@@ -89,7 +90,7 @@ func ChangePassword(c *gin.Context) {
 	serializers.ChangePasswordInfoToUserModel(&info, user)
 	err = users.PatchUser(user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Update User service error")
 		return
 	}
