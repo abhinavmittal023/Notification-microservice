@@ -14,7 +14,7 @@ import (
 
 // ChangeUserCredentialsRoute is used to change users email in database
 func ChangeUserCredentialsRoute(router *gin.RouterGroup) {
-	router.POST("/:id/changecredentials", ChangeCredentials)
+	router.POST("/changecredentials/:id", ChangeCredentials)
 }
 
 // ChangeCredentials Controller for /users/changeemail route
