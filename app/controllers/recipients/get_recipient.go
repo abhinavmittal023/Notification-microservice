@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"github.com/gin-gonic/gin"
@@ -15,7 +14,6 @@ import (
 // GetRecipientRoute is used to get recipients from database
 func GetRecipientRoute(router *gin.RouterGroup) {
 	router.GET("/:id", GetRecipient)
-	router.OPTIONS("/:id", preflight.Preflight)
 }
 
 // GetRecipient Controller for get /recipient/:id route

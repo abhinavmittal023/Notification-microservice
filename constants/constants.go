@@ -12,4 +12,10 @@ const (
 
 	// AdminRole defines the role value for system admin in the database
 	AdminRole = 1
+
+	// Role defines the key for saving the role to the request
+	Role = "role"
+
+	// ID defines the key for saving the user_id to the request
+	ID = "user_id"
 )

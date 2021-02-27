@@ -20,12 +20,16 @@ func DeleteUser(c *gin.Context) {
 	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID should be a unsigned integer"})
-		log.Println("String Conversion Error")
 		return
 	}
 	user, err := users.GetUserWithID(uint64(userID))
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("GetUserWithID service error")
 		return
 	}
 

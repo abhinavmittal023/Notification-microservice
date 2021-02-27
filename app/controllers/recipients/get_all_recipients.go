@@ -3,7 +3,6 @@ package recipients
 import (
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"github.com/gin-gonic/gin"
@@ -13,7 +12,6 @@ import (
 // GetAllRecipientRoute is used to get recipients from database
 func GetAllRecipientRoute(router *gin.RouterGroup) {
 	router.GET("", GetAllRecipient)
-	router.OPTIONS("", preflight.Preflight)
 }
 
 // GetAllRecipient Controller for get /recipient route

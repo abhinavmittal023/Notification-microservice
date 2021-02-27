@@ -1,11 +1,11 @@
 package users
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"github.com/gin-gonic/gin"
@@ -14,18 +14,16 @@ import (
 
 // GetUserRoute is used to get users from database
 func GetUserRoute(router *gin.RouterGroup) {
-	router.GET("/:id", GetUser)
-	router.OPTIONS("/:id", preflight.Preflight)
+	router.GET("/get/:id", GetUser)
 }
 
-// GetUser Controller for get /users/:id route
+// GetUser Controller for /users/get/:id route
 func GetUser(c *gin.Context) {
 	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": "ID should be a unsigned integer",
 		})
-		log.Println("String Conversion Error")
 		return
 	}
 	user, err := users.GetUserWithID(uint64(userID))
@@ -33,9 +31,21 @@ func GetUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
 		return
 	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("GetUserWithID service error")
+		return
+	}
 
 	var info serializers.UserInfo
 	serializers.UserModelToUserInfo(&info, user)
 
-	c.JSON(http.StatusOK, info)
+	js, err := json.Marshal(&info)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("JSON marshalling error")
+		return
+	}
+	c.Data(http.StatusOK, "application/json", js)
 }

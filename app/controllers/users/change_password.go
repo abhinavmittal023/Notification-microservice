@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
@@ -18,13 +17,11 @@ import (
 // ChangeDifferentUserPasswordRoute is used to change password of another user in database
 func ChangeDifferentUserPasswordRoute(router *gin.RouterGroup) {
 	router.PUT("/:id/password", ChangePassword)
-	router.OPTIONS("/:id/password", preflight.Preflight)
 }
 
 // ChangeOwnPasswordRoute is used to change your own password
 func ChangeOwnPasswordRoute(router *gin.RouterGroup) {
 	router.PUT("/password", ChangePassword)
-	router.OPTIONS("/password", preflight.Preflight)
 }
 
 // ChangePassword Controller for put /users/:id/password and put /profile/password routes
@@ -58,17 +55,35 @@ func ChangePassword(c *gin.Context) {
 		}
 	}
 
-	info.NewPassword = hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)
+	info.NewPassword, err = hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Hashing error for new password")
+		return
+	}
 
 	user, err := users.GetUserWithID(uint64(userID))
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
 		return
 	}
-
-	if info.OldPassword != "" && !hash.Validate(info.OldPassword, user.Password, configuration.GetResp().PasswordHash) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Old Password is incorrect"})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("GetUserWithID service error")
 		return
+	}
+
+	if info.OldPassword != "" {
+		match, err := hash.Validate(info.OldPassword, user.Password, configuration.GetResp().PasswordHash)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			log.Println("Validation error for new password")
+			return
+		}
+		if !match {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Old Password is incorrect"})
+			return
+		}
 	}
 
 	serializers.ChangePasswordInfoToUserModel(&info, user)

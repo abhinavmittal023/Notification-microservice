@@ -4,9 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"github.com/gin-gonic/gin"
@@ -16,7 +14,6 @@ import (
 // UpdateUserRoute is used to change users email in database
 func UpdateUserRoute(router *gin.RouterGroup) {
 	router.PUT("/:id/update", UpdateUser)
-	router.OPTIONS("/:id/update", preflight.Preflight)
 }
 
 // UpdateUser Controller for put /users/:id/update route
@@ -35,31 +32,19 @@ func UpdateUser(c *gin.Context) {
 		})
 		return
 	}
-	if info.Email != "" {
-		info.Email = strings.ToLower(info.Email)
-		er := serializers.EmailRegexCheck(info.Email)
+	status, message := serializers.EmailRegexCheck(info.Email)
 
-		if er == "internal_server_error" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			log.Println("Internal Server Error due to email regex")
-			return
-		}
-		if er == "bad_request" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
-			return
-		}
+	if status != http.StatusOK {
+		c.JSON(status, gin.H{
+			"error": message,
+		})
+		return
 	}
 
 	user, err := users.GetUserWithID(uint64(info.ID))
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID not in database"})
 		return
-	}
-	if info.Role == 0 {
-		info.Role = user.Role
-	}
-	if info.Email == "" {
-		info.Email = user.Email
 	}
 
 	serializers.ChangeCredentialsInfoToUserModel(&info, user)

@@ -14,10 +14,6 @@ import (
 func AuthorizeJWT() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-		if c.Request.Method == "OPTIONS" {
-			c.Next() // Preflight Request
-			return
-		}
 		authHeader := c.GetHeader(constants.Authorization)
 		headerPrefix := configuration.GetResp().Token.HeaderPrefix
 		headerCheck := len(authHeader) < (len(headerPrefix)+2) || authHeader[:len(headerPrefix)] != headerPrefix
@@ -37,8 +33,8 @@ func AuthorizeJWT() gin.HandlerFunc {
 
 		claims := token.Claims.(*auth.CustomClaims)
 		if token.Valid && claims.TokenType == "access" {
-			c.Set("user_id", claims.UserID)
-			c.Set("role", claims.Role)
+			c.Set(constants.ID, claims.UserID)
+			c.Set(constants.Role, claims.Role)
 		} else {
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
