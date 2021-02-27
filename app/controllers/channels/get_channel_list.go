@@ -40,6 +40,22 @@ func GetAllChannels(c *gin.Context) {
 	}
 	filter.ConvertChannelStringToLower(&channelFilter)
 
+	recordsCount, err := channels.GetAllChannelsCount(&channelFilter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("find all channels query error")
+		return
+	}
+	var infoArray []serializers.ChannelInfo
+	channelListResponse := serializers.ChannelListResponse{
+		RecordsAffected: recordsCount,
+		ChannelInfo: infoArray,
+	}
+	if recordsCount == 0{
+		c.JSON(http.StatusOK, channelListResponse)
+		return
+	}
+
 	channelList, err := channels.GetAllChannels(&pagination, &channelFilter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
@@ -47,12 +63,17 @@ func GetAllChannels(c *gin.Context) {
 		return
 	}
 
-	var infoArray []serializers.ChannelInfo
 	var info serializers.ChannelInfo
 
 	for _, channel := range channelList {
 		serializers.ChannelModelToChannelInfo(&info, &channel)
 		infoArray = append(infoArray, info)
 	}
-	c.JSON(http.StatusOK, infoArray)
+
+	channelListResponse = serializers.ChannelListResponse{
+		RecordsAffected: recordsCount,
+		ChannelInfo: infoArray,
+	}
+
+	c.JSON(http.StatusOK, channelListResponse)
 }
