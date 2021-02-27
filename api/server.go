@@ -40,12 +40,14 @@ func InitServer() error {
 	authorization.SignInRoute(loginGroup)
 
 	userGroup := v1.Group("/users", middlewares.AuthorizeJWT())
-	users.AddUserRoute(userGroup)
-	users.ChangeUserCredentialsRoute(userGroup)
 	users.ChangeUserPasswordRoute(userGroup)
-	users.DeleteUserRoute(userGroup)
-	users.GetUserRoute(userGroup)
-	users.GetAllUsersRoute(userGroup)
+
+	systemAdminUserGroup := userGroup.Group("", middlewares.CheckIfSystemAdmin())
+	users.AddUserRoute(systemAdminUserGroup)
+	users.ChangeUserCredentialsRoute(systemAdminUserGroup)
+	users.DeleteUserRoute(systemAdminUserGroup)
+	users.GetUserRoute(systemAdminUserGroup)
+	users.GetAllUsersRoute(systemAdminUserGroup)
 
 	router.NoRoute(preflight.Preflight)
 
