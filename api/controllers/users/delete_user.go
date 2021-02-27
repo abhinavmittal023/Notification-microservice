@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -14,7 +13,6 @@ import (
 // DeleteUserRoute is used to delete users from database
 func DeleteUserRoute(router *gin.RouterGroup) {
 	router.DELETE("/delete/:id", DeleteUser)
-	router.OPTIONS("/delete/:id", preflight.Preflight)
 }
 
 // DeleteUser Controller for /users/delete/:id route
@@ -28,6 +26,11 @@ func DeleteUser(c *gin.Context) {
 	user, err := users.GetUserWithID(uint64(userID))
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("GetUserWithID service error")
 		return
 	}
 

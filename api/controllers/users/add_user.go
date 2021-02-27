@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
@@ -18,35 +17,43 @@ import (
 // AddUserRoute is used to add users to database
 func AddUserRoute(router *gin.RouterGroup) {
 	router.POST("/add", AddUser)
-	router.OPTIONS("/add", preflight.Preflight)
 }
 
 // AddUser Controller for /users/add route
 func AddUser(c *gin.Context) {
 	var info serializers.AddUserInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email,Password,FirstName are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email, Password, FirstName are required"})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)
 
-	er := serializers.EmailRegexCheck(info.Email)
+	status, message := serializers.EmailRegexCheck(info.Email)
 
-	if er == "internal_server_error" {
+	if status != http.StatusOK {
+		c.JSON(status, gin.H{
+			"error": message,
+		})
+		return
+	}
+
+	var err error
+
+	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Internal Server Error due to email regex")
+		log.Println("Error while hashing the password")
 		return
 	}
-	if er == "bad_request" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
-		return
-	}
-
-	info.Password = hash.Message(info.Password, configuration.GetResp().PasswordHash)
 
 	user, err := users.GetUserWithEmail(info.Email)
-	if err != gorm.ErrRecordNotFound {
+	if err == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "EmailId already in database"})
+		return
+	}
+	if err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("GetUserWithEmail service error")
 		return
 	}
 

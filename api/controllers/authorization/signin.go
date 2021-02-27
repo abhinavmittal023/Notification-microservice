@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/api/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/api/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
@@ -19,7 +18,6 @@ import (
 // SignInRoute is used to sign in users
 func SignInRoute(router *gin.RouterGroup) {
 	router.POST("/", SignIn)
-	router.OPTIONS("/", preflight.Preflight)
 }
 
 // SignIn Controller for /signin route
@@ -31,15 +29,12 @@ func SignIn(c *gin.Context) {
 	}
 	info.Email = strings.ToLower(info.Email)
 
-	er := serializers.EmailRegexCheck(info.Email)
+	status, message := serializers.EmailRegexCheck(info.Email)
 
-	if er == "internal_server_error" {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Internal Server Error due to email regex")
-		return
-	}
-	if er == "bad_request" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
+	if status != http.StatusOK {
+		c.JSON(status, gin.H{
+			"error": message,
+		})
 		return
 	}
 
@@ -54,7 +49,14 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	if !hash.Validate(info.Password, user.Password, configuration.GetResp().PasswordHash) {
+	match, err := hash.Validate(info.Password, user.Password, configuration.GetResp().PasswordHash)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("Error while validating the password")
+		return
+	}
+
+	if !match {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "EmailId or Passwords mismatch"})
 		return
 	}
