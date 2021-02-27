@@ -13,17 +13,17 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// ChangeUserPasswordRoute is used to change users password in database
-func ChangeUserPasswordRoute(router *gin.RouterGroup) {
+// ChangeOwnPasswordRoute is used to change your own password in database
+func ChangeOwnPasswordRoute(router *gin.RouterGroup) {
 	router.PUT("/changepassword", ChangePassword)
 }
 
-// ChangePassword Controller for /users/changepassword route
+// ChangePassword Controller for profile/changepassword route
 func ChangePassword(c *gin.Context) {
-	userID, _ := c.Get(constants.ID)
+	userID := c.MustGet(constants.ID)
 	var info serializers.ChangePasswordInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email, Role are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Old and New Password are required"})
 		return
 	}
 
