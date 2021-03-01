@@ -24,6 +24,9 @@ const (
 	// APIKeyLength is the length of API Key
 	APIKeyLength = 64
 
+	// ResetTokenLength is the length of API Key
+	ResetTokenLength = 64
+
 	// Pending for notification status
 	Pending = 1
 
@@ -40,6 +43,9 @@ const (
 
 	// LoginPath stores the url of the login page of the front-end
 	LoginPath = "http://localhost:4200/users/login"
+
+	// ResetPasswordPath stores the url of the reset password page of the front-end
+	ResetPasswordPath = "http://localhost:4200/users/password/reset/"
 )
 
 // ChannelType is a function mapping type field of channel to its string counterpart.

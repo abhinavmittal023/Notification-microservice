@@ -36,7 +36,8 @@ func CreateUserAndVerify(user *models.User) (int, error) {
 	to := []string{
 		user.Email,
 	}
-	err = auth.SendValidationEmail(to, uint64(user.ID))
+	message := "Thanks for using Notification Microservice! We need to verify your email address. Please do so by clicking on the following link:"
+	err = auth.SendHTMLEmail(to, user, message, false)
 	if err != nil {
 		log.Println("SMTP Error", err.Error())
 		err = tx.Rollback().Error

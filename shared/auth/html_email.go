@@ -11,24 +11,38 @@ import (
 	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/services"
 	"github.com/pkg/errors"
 )
 
-// SendValidationEmail sends validation email to new
-func SendValidationEmail(to []string, userID uint64) error {
+// SendHTMLEmail sends validation email to new
+func SendHTMLEmail(to []string, user *models.User, message string, resetPassword bool) error {
 	from := configuration.GetResp().EmailNotification.Email
 	password := configuration.GetResp().EmailNotification.Password
 	smtpHost := configuration.GetResp().EmailNotification.SMTPHost
 	smtpPort := configuration.GetResp().EmailNotification.SMTPPort
 	addr := fmt.Sprintf("%s:%s", smtpHost, smtpPort)
+	var token string
+	var err error
+	var link string
 
-	token, err := GenerateValidationToken(userID, configuration.GetResp().Token.ExpiryTime.ValidationToken)
-	if err != nil {
-		log.Println("Validation Token Generation error")
-		return errors.Wrap(err, "Unable to generate validation token")
+	if !resetPassword {
+		token, err = GenerateValidationToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.ValidationToken)
+		if err != nil {
+			log.Println("Validation Token Generation error")
+			return errors.Wrap(err, "Unable to generate validation token")
+		}
+		link = fmt.Sprintf("http://%s:%s/api/v1/auth/token/%s", configuration.GetResp().Server.Domain, configuration.GetResp().Server.Port, token)
+	} else {
+		token, err = services.CreateToken(user)
+		if err != nil {
+			log.Println("Reset Token Generation error")
+			return errors.Wrap(err, "Unable to generate reset token")
+		}
+		link = fmt.Sprintf("%s%s", constants.ResetPasswordPath, token)
 	}
-
-	link := fmt.Sprintf("http://%s:%s/api/v1/auth/token/%s", configuration.GetResp().Server.Domain, configuration.GetResp().Server.Port, token)
 
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -38,7 +52,7 @@ func SendValidationEmail(to []string, userID uint64) error {
 	for ; strings.Split(cwd, "/")[len(strings.Split(cwd, "/"))-1] != "notifications-microservice"; cwd = filepath.Dir(cwd) {
 	}
 
-	t, err := template.ParseFiles(fmt.Sprintf("%s/shared/auth/validation_email.html", cwd))
+	t, err := template.ParseFiles(fmt.Sprintf("%s/shared/auth/email.html", cwd))
 	if err != nil {
 		log.Println("Template File can't be opened")
 		return errors.Wrap(err, "Unable to open template file")
@@ -49,9 +63,11 @@ func SendValidationEmail(to []string, userID uint64) error {
 	body.Write([]byte(fmt.Sprintf("Subject: Verify Email Address \n%s\n\n", mimeHeaders)))
 
 	err = t.Execute(&body, struct {
-		Link string
+		Link    string
+		Message string
 	}{
-		Link: link,
+		Link:    link,
+		Message: message,
 	})
 	if err != nil {
 		log.Println("Unable to write to template")
