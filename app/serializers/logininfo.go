@@ -1,6 +1,9 @@
 package serializers
 
 import (
+	"fmt"
+	"log"
+	"net/http"
 	"regexp"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
@@ -29,13 +32,14 @@ func LoginInfoToUserModel(info LoginInfo, user *models.User) {
 }
 
 // EmailRegexCheck checks for email id in valid format
-func EmailRegexCheck(email string) string {
+func EmailRegexCheck(email string) (int, error) {
 	match, err := regexp.MatchString(constants.EmailRegex, email)
 	if err != nil {
-		return "internal_server_error"
+		log.Println(err.Error())
+		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 	}
 	if !match {
-		return "bad_request"
+		return http.StatusBadRequest, fmt.Errorf(constants.Errors().InvalidEmail)
 	}
-	return ""
+	return http.StatusOK, nil
 }

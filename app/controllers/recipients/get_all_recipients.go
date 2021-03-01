@@ -3,9 +3,9 @@ package recipients
 import (
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -13,7 +13,6 @@ import (
 // GetAllRecipientRoute is used to get recipients from database
 func GetAllRecipientRoute(router *gin.RouterGroup) {
 	router.GET("", GetAllRecipient)
-	router.OPTIONS("", preflight.Preflight)
 }
 
 // GetAllRecipient Controller for get /recipient route
@@ -21,7 +20,7 @@ func GetAllRecipient(c *gin.Context) {
 
 	recipientArray, err := recipients.GetAllRecipients()
 	if err != nil && err != gorm.ErrRecordNotFound {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
