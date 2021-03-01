@@ -23,7 +23,6 @@ func GetAllChannels(c *gin.Context) {
 	var pagination serializers.Pagination
 	err = c.BindQuery(&pagination)
 	if err != nil {
-		log.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": constants.Errors().InvalidPagination,
 		})
@@ -33,7 +32,6 @@ func GetAllChannels(c *gin.Context) {
 	var channelFilter filter.Channel
 	err = c.BindQuery(&channelFilter)
 	if err != nil {
-		log.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": constants.Errors().InvalidFilter,
 		})

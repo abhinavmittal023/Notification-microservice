@@ -45,14 +45,14 @@ func SignIn(c *gin.Context) {
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Get user with email error")
+		log.Println("Get user with email error", err.Error())
 		return
 	}
 
 	match, err := hash.Validate(info.Password, user.Password, configuration.GetResp().PasswordHash)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Error while validating the password")
+		log.Println("Error while validating the password", err.Error())
 		return
 	}
 
@@ -76,13 +76,13 @@ func SignIn(c *gin.Context) {
 	token.AccessToken, err = auth.GenerateAccessToken(uint64(user.ID), user.Role, configuration.GetResp().Token.ExpiryTime.AccessToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Access Token not generated")
+		log.Println("Access Token not generated", err.Error())
 		return
 	}
 	token.RefreshToken, err = auth.GenerateRefreshToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.RefreshToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Refresh Token not generated")
+		log.Println("Refresh Token not generated", err.Error())
 		return
 	}
 

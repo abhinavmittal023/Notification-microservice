@@ -41,7 +41,7 @@ func DeleteChannel(c *gin.Context) {
 
 	err = channels.DeleteChannel(channel)
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}

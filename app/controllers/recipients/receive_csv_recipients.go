@@ -1,7 +1,6 @@
 package recipients
 
 import (
-	"log"
 	"net/http"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
@@ -20,7 +19,6 @@ func AddUpdateRecipient(c *gin.Context) {
 	rFile, err := c.FormFile("recipients")
 
 	if err != nil {
-		log.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": constants.Errors().FileFormatError,
 		})

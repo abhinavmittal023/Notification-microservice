@@ -36,7 +36,7 @@ func AddChannel(c *gin.Context) {
 	err := channels.AddChannel(&channel)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("AddChannel service error")
+		log.Println("AddChannel service error", err.Error())
 		return
 	}
 

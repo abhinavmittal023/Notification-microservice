@@ -38,7 +38,7 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 
 			if err != nil {
 				if status == http.StatusInternalServerError {
-					log.Println("Error Due to Regex")
+					log.Println("Error Due to Regex", err.Error())
 					errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error at %v", index+2)})
 					tx.Rollback()
 					return http.StatusInternalServerError, &errors
@@ -56,7 +56,7 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannelID at %v is not in the database", index+2)})
 				invalid = true
 			} else if err != nil {
-				log.Println(err)
+				log.Println(err.Error())
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error at %v", index+2)})
 				return http.StatusInternalServerError, &errors
 			}

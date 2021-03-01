@@ -41,7 +41,7 @@ func SignUp(c *gin.Context) {
 	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Error while hashing the password")
+		log.Println("Error while hashing the password", err.Error())
 		return
 	}
 	var user models.User
