@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -17,7 +17,6 @@ import (
 // UpdateUserRoute is used to change users email in database
 func UpdateUserRoute(router *gin.RouterGroup) {
 	router.PUT("/:id/update", UpdateUser)
-	router.OPTIONS("/:id/update", preflight.Preflight)
 }
 
 // UpdateUser Controller for put /users/:id/update route
@@ -25,55 +24,59 @@ func UpdateUser(c *gin.Context) {
 	var info serializers.ChangeCredentialsInfo
 	var err error
 	if err = c.BindJSON(&info); err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().EmailRoleRequired})
 		return
 	}
+	_, found := misc.FindInSlice(constants.RoleType(), info.Role)
+	if !found {
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidRole})
+		return
+	}
+
+	info.Email = strings.ToLower(info.Email)
+
 	info.ID, err = strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "ID should be a unsigned integer",
+			"error": constants.Errors().InvalidID,
 		})
 		return
 	}
-	if info.Email != "" {
-		info.Email = strings.ToLower(info.Email)
-		er := serializers.EmailRegexCheck(info.Email)
 
-		if er == "internal_server_error" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-			log.Println("Internal Server Error due to email regex")
-			return
-		}
-		if er == "bad_request" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Email is invalid"})
-			return
-		}
+	status, err := serializers.EmailRegexCheck(info.Email)
+
+	if err != nil {
+		c.JSON(status, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	testUser, err := users.GetUserWithEmail(info.Email)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("GetUserWithEmail service error")
+		return
+	} else if testUser.ID != uint(info.ID) && err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": constants.Errors().EmailAlreadyPresent,
+		})
 	}
 
 	user, err := users.GetUserWithID(uint64(info.ID))
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID not in database"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().IDNotInRecords})
 		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		log.Println("Get user with id query error")
 		return
 	}
-	if info.Role == 0 {
-		info.Role = uint(user.Role)
-	} else if info.Role > constants.SystemAdminRole {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid User Role provided"})
-		return
-	}
-	if info.Email == "" {
-		info.Email = user.Email
-	}
 
 	serializers.ChangeCredentialsInfoToUserModel(&info, user)
 	err = users.PatchUser(user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Update User service error")
 		return
 	}

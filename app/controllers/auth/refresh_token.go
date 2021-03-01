@@ -4,9 +4,10 @@ import (
 	"log"
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/authservice"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +15,6 @@ import (
 // RefreshAccessTokenRoute is used to sign in users
 func RefreshAccessTokenRoute(router *gin.RouterGroup) {
 	router.POST("/token", RefreshAccessToken)
-	router.OPTIONS("/token", preflight.Preflight)
 }
 
 // RefreshAccessToken Provides a new access token given a valid refresh token
@@ -22,29 +22,27 @@ func RefreshAccessToken(c *gin.Context) {
 	var refreshToken serializers.RefreshToken
 	err := c.BindJSON(&refreshToken)
 	if err != nil {
-		log.Println(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Refresh Token is Required",
+			"error": constants.Errors().RefreshTokenRequired,
 		})
 		return
 	}
 
-	userDetails, err := authservice.ValidateToken(refreshToken.RefreshToken, "refresh")
+	userDetails, err := authservice.ValidateToken(refreshToken.RefreshToken, constants.TokenType().Refresh)
 	if err == authservice.ErrInvalidToken {
-		log.Println(err.Error())
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
-	refreshToken.AccessToken, err = auth.GenerateAccessToken(uint64(userDetails.ID), userDetails.Role, 3)
+	refreshToken.AccessToken, err = auth.GenerateAccessToken(uint64(userDetails.ID), userDetails.Role, configuration.GetResp().Token.ExpiryTime.AccessToken)
 	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	refreshToken.RefreshToken = ""
