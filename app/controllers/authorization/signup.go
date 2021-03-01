@@ -23,22 +23,20 @@ func SignUpRoute(router *gin.RouterGroup) {
 func SignUp(c *gin.Context) {
 	var info serializers.SignupInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email ,Password and FirstName are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().EmailPasswordNameRequired})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)
 	info.Role = constants.SystemAdminRole // signup user will always be system admin
 
-	status, message := serializers.EmailRegexCheck(info.Email)
+	status, err := serializers.EmailRegexCheck(info.Email)
 
-	if status != http.StatusOK {
+	if err != nil {
 		c.JSON(status, gin.H{
-			"error": message,
+			"error": err.Error(),
 		})
 		return
 	}
-
-	var err error
 
 	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)
 	if err != nil {
@@ -49,10 +47,10 @@ func SignUp(c *gin.Context) {
 	var user models.User
 
 	serializers.SignupInfoToUserModel(&info, &user)
-	status, message = users.CreateUserAndVerify(&user)
-	if message != "" {
+	status, err = users.CreateUserAndVerify(&user)
+	if err != nil {
 		c.JSON(status, gin.H{
-			"error": message,
+			"error": err.Error(),
 		})
 		return
 	}

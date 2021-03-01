@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -23,21 +25,25 @@ func AddUserRoute(router *gin.RouterGroup) {
 func AddUser(c *gin.Context) {
 	var info serializers.AddUserInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email ,Password , FirstName are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Role, %s", constants.Errors().EmailPasswordNameRequired)})
 		return
 	}
+	_, found := misc.FindInSlice(constants.RoleType(), info.Role)
+	if !found {
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidRole})
+		return
+	}
+
 	info.Email = strings.ToLower(info.Email)
 
-	status, message := serializers.EmailRegexCheck(info.Email)
+	status, err := serializers.EmailRegexCheck(info.Email)
 
-	if status != http.StatusOK {
+	if err != nil {
 		c.JSON(status, gin.H{
-			"error": message,
+			"error": err.Error(),
 		})
 		return
 	}
-
-	var err error
 
 	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)
 	if err != nil {
@@ -58,10 +64,10 @@ func AddUser(c *gin.Context) {
 	}
 
 	serializers.AddUserInfoToUserModel(&info, user)
-	status, message = users.CreateUserAndVerify(user)
-	if message != "" {
+	status, err = users.CreateUserAndVerify(user)
+	if err != nil {
 		c.JSON(status, gin.H{
-			"error": message,
+			"error": err.Error(),
 		})
 		return
 	}

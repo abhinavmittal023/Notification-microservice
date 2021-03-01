@@ -1,6 +1,8 @@
 package serializers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 
@@ -30,13 +32,14 @@ func LoginInfoToUserModel(info LoginInfo, user *models.User) {
 }
 
 // EmailRegexCheck checks for email id in valid format
-func EmailRegexCheck(email string) (int, string) {
+func EmailRegexCheck(email string) (int, error) {
 	match, err := regexp.MatchString(constants.EmailRegex, email)
 	if err != nil {
-		return http.StatusInternalServerError, "Internal Server Error"
+		log.Println(err.Error())
+		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 	}
 	if !match {
-		return http.StatusBadRequest, "Email ID is invalid"
+		return http.StatusBadRequest, fmt.Errorf(constants.Errors().InvalidEmail)
 	}
-	return http.StatusOK, ""
+	return http.StatusOK, nil
 }

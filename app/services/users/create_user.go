@@ -1,9 +1,11 @@
 package users
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
@@ -15,7 +17,7 @@ func CreateUser(user *models.User) error {
 }
 
 // CreateUserAndVerify creates a new user and sends a verification mail
-func CreateUserAndVerify(user *models.User) (int, string) {
+func CreateUserAndVerify(user *models.User) (int, error) {
 
 	tx := db.Get().Begin()
 	defer func() {
@@ -29,7 +31,7 @@ func CreateUserAndVerify(user *models.User) (int, string) {
 	err := tx.Create(user).Error
 	if err != nil {
 		log.Println("Create User error")
-		return http.StatusInternalServerError, "Internal Server Error"
+		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 	}
 	to := []string{
 		user.Email,
@@ -39,16 +41,16 @@ func CreateUserAndVerify(user *models.User) (int, string) {
 		err = tx.Rollback().Error
 		if err != nil {
 			log.Println("Transaction Rollback Error Error")
-			return http.StatusInternalServerError, "Internal Server Error"
+			return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 		}
 		log.Println("SMTP Error")
-		return http.StatusInternalServerError, "Internal Server Error"
+		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 	}
 	err = tx.Commit().Error
 	if err != nil {
 		log.Println("Transaction Commit Error Error")
-		return http.StatusInternalServerError, "Internal Server Error"
+		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 	}
-	return http.StatusOK, ""
+	return http.StatusOK, nil
 
 }

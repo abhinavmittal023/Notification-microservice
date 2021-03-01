@@ -40,11 +40,15 @@ func SendValidationEmail(to []string, userID uint64) error {
 	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	body.Write([]byte(fmt.Sprintf("Subject: Verify Email Address \n%s\n\n", mimeHeaders)))
 
-	_ = t.Execute(&body, struct {
+	err = t.Execute(&body, struct {
 		Link string
 	}{
 		Link: link,
 	})
+	if err != nil {
+		log.Println("Unable to write to template")
+		return errors.Wrap(err, "Unable to write to template")
+	}
 
 	//  Sending email.
 	err = smtp.SendMail(addr, nil, from, to, body.Bytes())
@@ -52,6 +56,5 @@ func SendValidationEmail(to []string, userID uint64) error {
 		log.Println("Unable to send email")
 		return errors.Wrap(err, "Unable to send email")
 	}
-	log.Println("Email Sent!")
 	return nil
 }

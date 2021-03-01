@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,14 +22,14 @@ func AddUpdateRecipient(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "File Format error",
+			"error": constants.Errors().FileFormatError,
 		})
 		return
 	}
 	recipientRecords, err := recipients.ReadCSV(rFile)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid CSV file",
+			"error": constants.Errors().InvalidCSVFile,
 		})
 		return
 	}

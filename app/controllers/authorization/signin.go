@@ -25,16 +25,16 @@ func SignInRoute(router *gin.RouterGroup) {
 func SignIn(c *gin.Context) {
 	var info serializers.LoginInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email and Password are Required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().EmailPasswordRequired})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)
 
-	status, message := serializers.EmailRegexCheck(info.Email)
+	status, err := serializers.EmailRegexCheck(info.Email)
 
-	if status != http.StatusOK {
+	if err != nil {
 		c.JSON(status, gin.H{
-			"error": message,
+			"error": err.Error(),
 		})
 		return
 	}
@@ -63,7 +63,7 @@ func SignIn(c *gin.Context) {
 	}
 
 	if !user.Verified {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email Id is not verified"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": constants.Errors().EmailNotVerified})
 		return
 	}
 

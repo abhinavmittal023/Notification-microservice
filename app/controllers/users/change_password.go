@@ -31,11 +31,11 @@ func ChangePassword(c *gin.Context) {
 	var err error
 	var info serializers.ChangePasswordInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "NewPassword is required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().NewPasswordRequired})
 		return
 	}
 	if c.Param("id") == "" {
-		userID, err = strconv.ParseUint(fmt.Sprintf("%v", c.MustGet("user_id")), 10, 64)
+		userID, err = strconv.ParseUint(fmt.Sprintf("%v", c.MustGet(constants.ID)), 10, 64)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": constants.Errors().InternalError,
@@ -43,7 +43,7 @@ func ChangePassword(c *gin.Context) {
 			return
 		}
 		if info.OldPassword == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "OldPassword is required"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().OldPasswordRequired})
 			return
 		}
 	} else {
@@ -82,7 +82,7 @@ func ChangePassword(c *gin.Context) {
 			return
 		}
 		if !match {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Old Password is incorrect"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().OldPasswordIncorrect})
 			return
 		}
 	}

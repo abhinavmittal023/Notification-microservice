@@ -21,7 +21,7 @@ func GetUserProfileRoute(router *gin.RouterGroup) {
 // GetUserProfile Controller for get profile/ route
 func GetUserProfile(c *gin.Context) {
 
-	userID, err := strconv.ParseUint(fmt.Sprintf("%v", c.MustGet("user_id")), 10, 64)
+	userID, err := strconv.ParseUint(fmt.Sprintf("%v", c.MustGet(constants.ID)), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("String Conversion Error")

@@ -23,7 +23,7 @@ func RefreshAccessToken(c *gin.Context) {
 	err := c.BindJSON(&refreshToken)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Refresh Token is Required",
+			"error": constants.Errors().RefreshTokenRequired,
 		})
 		return
 	}
