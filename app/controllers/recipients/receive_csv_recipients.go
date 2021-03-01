@@ -6,6 +6,7 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,10 +21,10 @@ func AddUpdateRecipient(c *gin.Context) {
 	rFile, err := c.FormFile("recipients")
 
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 		var errorList serializers.ErrorInfo
 		errorList.Error = map[int][]string{
-			1: {"File Format error"},
+			1: {constants.Errors().FileFormatError},
 		}
 		c.AbortWithStatusJSON(http.StatusBadRequest, errorList)
 		return

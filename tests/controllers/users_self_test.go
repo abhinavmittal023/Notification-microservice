@@ -12,6 +12,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/authorization"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
@@ -83,7 +84,11 @@ func TestCheckIfFirst(t *testing.T) {
 	auth.CheckIfFirst(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -110,7 +115,11 @@ func TestSignIn(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 
 	user := models.User{
 		FirstName: "test",
@@ -191,7 +200,11 @@ func TestChangePassword(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 
 	user := models.User{
 		FirstName: "test",
@@ -208,7 +221,7 @@ func TestChangePassword(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
-	c.Set("user_id", user.ID)
+	c.Set(constants.ID, user.ID)
 
 	data := []byte(`{"old_password": "test12","new_password": "test12.."}`)
 
@@ -226,7 +239,7 @@ func TestChangePassword(t *testing.T) {
 	w = httptest.NewRecorder()
 	c, _ = gin.CreateTestContext(w)
 
-	c.Set("user_id", user.ID)
+	c.Set(constants.ID, user.ID)
 
 	data = []byte(`{"old_password": "test12--","new_password": "test12.."}`)
 
@@ -248,7 +261,11 @@ func TestGetUserProfile(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 
 	user := models.User{
 		FirstName: "test",
@@ -265,7 +282,7 @@ func TestGetUserProfile(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
-	c.Set("user_id", user.ID+1)
+	c.Set(constants.ID, user.ID+1)
 
 	req, err := http.NewRequest("GET", "", nil)
 	if err != nil {
@@ -281,7 +298,7 @@ func TestGetUserProfile(t *testing.T) {
 	w = httptest.NewRecorder()
 	c, _ = gin.CreateTestContext(w)
 
-	c.Set("user_id", user.ID)
+	c.Set(constants.ID, user.ID)
 
 	req, err = http.NewRequest("GET", "", nil)
 	if err != nil {

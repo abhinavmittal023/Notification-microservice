@@ -19,7 +19,11 @@ func TestPatchUser(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -28,7 +32,7 @@ func TestPatchUser(t *testing.T) {
 		Role:      2,
 	}
 
-	err := SeedOneUser(&user)
+	err = SeedOneUser(&user)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -59,7 +63,11 @@ func TestSoftDeleteUser(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -68,13 +76,13 @@ func TestSoftDeleteUser(t *testing.T) {
 		Role:      2,
 	}
 
-	err := SeedOneUser(&user)
+	err = SeedOneUser(&user)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
 	}
 
-	gotError := users.SoftDeleteUser(&user)
+	gotError := users.DeleteUser(&user)
 	assert.Equal(t, gotError, nil)
 	assert.Equal(t, db.Get().First(models.User{}, user.ID).Error, gorm.ErrRecordNotFound)
 }

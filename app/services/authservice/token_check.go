@@ -19,7 +19,7 @@ var ErrAlreadyVerfied = errors.New("User Already Verified")
 func ValidateToken(tokenString string, tokenType string) (*models.User, error) {
 	token, err := auth.ValidateToken(tokenString)
 	if err != nil {
-		return &models.User{}, ErrInvalidToken
+		return nil, ErrInvalidToken
 	}
 
 	claims := token.Claims.(*auth.CustomClaims)
@@ -29,7 +29,7 @@ func ValidateToken(tokenString string, tokenType string) (*models.User, error) {
 		userDetails, err := users.GetUserWithID(claims.UserID)
 		if err != nil {
 			log.Println(err)
-			return &models.User{}, err
+			return nil, err
 		}
 		if tokenType == "validation" && userDetails.Verified == true {
 			return userDetails, ErrAlreadyVerfied
@@ -39,5 +39,5 @@ func ValidateToken(tokenString string, tokenType string) (*models.User, error) {
 		}
 		return nil, ErrInvalidToken
 	}
-	return &models.User{}, ErrInvalidToken
+	return nil, ErrInvalidToken
 }

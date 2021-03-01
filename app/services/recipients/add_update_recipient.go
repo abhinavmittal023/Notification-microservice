@@ -42,18 +42,20 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *s
 		}
 
 		if recipientRecord.Email != "" {
-			er := serializers.EmailRegexCheck(recipientRecord.Email)
+			status, err := serializers.EmailRegexCheck(recipientRecord.Email)
 
-			if er == "internal_server_error" {
-				log.Println("Error Due to Regex")
-				errorMap = append(errorMap, "Internal Server Error")
-				errors.Error[index+2] = errorMap
-				tx.Rollback()
-				return http.StatusInternalServerError, &errors
-			}
-			if er == "bad_request" {
-				errorMap = append(errorMap, "Email is Invalid")
-				invalid = true
+			if err != nil {
+				if status == http.StatusInternalServerError {
+					log.Println("Error Due to Regex", err.Error())
+					errorMap = append(errorMap, "Internal Server Error")
+					errors.Error[index+2] = errorMap
+					tx.Rollback()
+					return http.StatusInternalServerError, &errors
+				}
+				if status == http.StatusBadRequest {
+					errorMap = append(errorMap, "Email is Invalid")
+					invalid = true
+				}
 			}
 		}
 

@@ -25,7 +25,15 @@ func APIKeyAuth() gin.HandlerFunc {
 			})
 			return
 		}
-		if !hash.Validate(authHeader, apiKey, configuration.GetResp().APIHash) {
+		match, err := hash.Validate(authHeader, apiKey, configuration.GetResp().APIHash)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": "Internal Server Error",
+			})
+			return
+		}
+
+		if !match {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
