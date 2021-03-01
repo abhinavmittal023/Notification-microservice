@@ -25,7 +25,7 @@ func PostSendNotificationsRoute(router *gin.RouterGroup) {
 func PostSendNotifications(c *gin.Context) {
 	var info serializers.SendNotifications
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Notifications info is required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().NotificationInfoRequired})
 		return
 	}
 	var notification models.Notification
@@ -33,7 +33,7 @@ func PostSendNotifications(c *gin.Context) {
 	err := notifications.AddNotification(&notification)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Error",
+			"error": constants.Errors().InternalError,
 		})
 	}
 	var errors serializers.ErrorInfo
@@ -43,12 +43,12 @@ func PostSendNotifications(c *gin.Context) {
 		var errorMap []string
 		recipientModel, err := recipients.GetRecipientWithRecipientID(recipient)
 		if err == gorm.ErrRecordNotFound {
-			errorMap = append(errorMap, "Recipient ID incorrect")
+			errorMap = append(errorMap, constants.Errors().RecipientIDIncorrect)
 			errors.Error[index] = errorMap
 			errorFound = true
 			continue
 		} else if err != nil {
-			errorMap = append(errorMap, "Internal Server Error")
+			errorMap = append(errorMap, constants.Errors().InternalError)
 			errors.Error[index] = errorMap
 			errorFound = true
 			c.JSON(http.StatusInternalServerError, errors)
@@ -62,7 +62,7 @@ func PostSendNotifications(c *gin.Context) {
 			errorFound = true
 			continue
 		} else if err != nil {
-			errorMap = append(errorMap, "Internal Server Error")
+			errorMap = append(errorMap, constants.Errors().InternalError)
 			errors.Error[index] = errorMap
 			errorFound = true
 			c.JSON(http.StatusInternalServerError, errors)
@@ -76,7 +76,7 @@ func PostSendNotifications(c *gin.Context) {
 		}
 		err = recipientnotifications.AddRecipientNotification(&recipientNotification)
 		if err != nil {
-			errorMap = append(errorMap, "Internal Server Error")
+			errorMap = append(errorMap, constants.Errors().InternalError)
 			errors.Error[index] = errorMap
 			errorFound = true
 			c.JSON(http.StatusInternalServerError, errors)

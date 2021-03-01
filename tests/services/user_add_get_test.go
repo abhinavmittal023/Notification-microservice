@@ -19,7 +19,11 @@ func TestGetUserWithID(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -28,7 +32,7 @@ func TestGetUserWithID(t *testing.T) {
 		Role:      2,
 	}
 
-	err := SeedOneUser(&user)
+	err = SeedOneUser(&user)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -52,7 +56,11 @@ func TestGetFirstUser(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	usersList := []models.User{
 		{
 			FirstName: "test1",
@@ -77,7 +85,7 @@ func TestGetFirstUser(t *testing.T) {
 		},
 	}
 
-	err := SeedUsers(&usersList)
+	err = SeedUsers(&usersList)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -126,7 +134,11 @@ func TestGetUserWithEmail(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	usersList := []models.User{
 		{
 			FirstName: "test1",
@@ -151,7 +163,7 @@ func TestGetUserWithEmail(t *testing.T) {
 		},
 	}
 
-	err := SeedUsers(&usersList)
+	err = SeedUsers(&usersList)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -174,7 +186,11 @@ func TestGetAllUsers(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	usersList := []models.User{
 		{
 			FirstName: "test1",
@@ -199,7 +215,7 @@ func TestGetAllUsers(t *testing.T) {
 		},
 	}
 
-	err := SeedUsers(&usersList)
+	err = SeedUsers(&usersList)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -236,7 +252,11 @@ func TestGetAllUsersFilters(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	usersList := []models.User{
 		{
 			FirstName: "test1",
@@ -261,7 +281,7 @@ func TestGetAllUsersFilters(t *testing.T) {
 		},
 	}
 
-	err := SeedUsers(&usersList)
+	err = SeedUsers(&usersList)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -297,7 +317,11 @@ func TestCreateUser(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test1",
 		Email:     "test1@test.com",
