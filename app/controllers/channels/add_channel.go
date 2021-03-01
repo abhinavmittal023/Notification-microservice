@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
@@ -15,7 +14,6 @@ import (
 // AddChannelRoute is used to add channels to database
 func AddChannelRoute(router *gin.RouterGroup) {
 	router.POST("", AddChannel)
-	router.OPTIONS("", preflight.Preflight)
 }
 
 // AddChannel controller for the post channels/ route

@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
@@ -16,7 +15,6 @@ import (
 // UpdateChannelRoute is used to update existing channels
 func UpdateChannelRoute(router *gin.RouterGroup) {
 	router.PUT(":id", UpdateChannel)
-	router.OPTIONS(":id", preflight.Preflight)
 }
 
 // UpdateChannel controller for put the channels/:id route

@@ -28,7 +28,7 @@ func AddUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Role, %s", constants.Errors().EmailPasswordNameRequired)})
 		return
 	}
-	_, found := misc.FindInSlice(constants.RoleType(), info.Role)
+	_, found := misc.FindInSlice(constants.RoleType(), int(info.Role))
 	if !found {
 		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidRole})
 		return
