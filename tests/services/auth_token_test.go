@@ -17,7 +17,11 @@ func TestValidateToken(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -26,7 +30,7 @@ func TestValidateToken(t *testing.T) {
 		Role:      2,
 	}
 
-	err := SeedOneUser(&user)
+	err = SeedOneUser(&user)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -78,7 +82,11 @@ func TestValidateTokenInvalid(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -87,7 +95,7 @@ func TestValidateTokenInvalid(t *testing.T) {
 		Role:      2,
 	}
 
-	err := SeedOneUser(&user)
+	err = SeedOneUser(&user)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -101,7 +109,7 @@ func TestValidateTokenInvalid(t *testing.T) {
 
 	user1, err := authservice.ValidateToken(tokenString, "refresh")
 	assert.Equal(t, err.Error(), "Invalid Token")
-	assert.NotEqual(t, user.ID, user1.ID)
+	assert.Equal(t, user1, nil)
 
 	tokenString, err = auth.GenerateRefreshToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.RefreshToken)
 	if err != nil {
@@ -111,7 +119,7 @@ func TestValidateTokenInvalid(t *testing.T) {
 
 	user1, err = authservice.ValidateToken(tokenString, "access")
 	assert.Equal(t, err.Error(), "Invalid Token")
-	assert.NotEqual(t, user.ID, user1.ID)
+	assert.Equal(t, user1, nil)
 
 	tokenString, err = auth.GenerateAccessToken(uint64(user.ID), user.Role, configuration.GetResp().Token.ExpiryTime.AccessToken)
 	if err != nil {
@@ -121,6 +129,5 @@ func TestValidateTokenInvalid(t *testing.T) {
 
 	user1, err = authservice.ValidateToken(tokenString, "refresh")
 	assert.Equal(t, err.Error(), "Invalid Token")
-	assert.NotEqual(t, user.ID, user1.ID)
-	assert.NotEqual(t, user.Role, user1.Role)
+	assert.Equal(t, user1, nil)
 }

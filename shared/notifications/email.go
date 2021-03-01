@@ -14,7 +14,7 @@ type Notifications interface {
 
 // Email struct implements Notifications interface
 type Email struct {
-	To      []string
+	To      string
 	Subject string
 	Message string
 }
@@ -33,7 +33,7 @@ func (email *Email) SendNotification() error {
 	auth := smtp.PlainAuth("", from, password, addr)
 
 	//  Sending email.
-	err := smtp.SendMail(addr, auth, from, email.To, msg)
+	err := smtp.SendMail(addr, auth, from, []string{email.To}, msg)
 	if err != nil {
 		return errors.Wrap(err, "Unable to send email")
 	}

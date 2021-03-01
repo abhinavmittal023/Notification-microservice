@@ -83,7 +83,11 @@ func TestCheckIfFirst(t *testing.T) {
 	auth.CheckIfFirst(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -110,7 +114,11 @@ func TestSignIn(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 
 	user := models.User{
 		FirstName: "test",
@@ -191,7 +199,11 @@ func TestChangePassword(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 
 	user := models.User{
 		FirstName: "test",
@@ -248,7 +260,11 @@ func TestGetUserProfile(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 
 	user := models.User{
 		FirstName: "test",
