@@ -5,7 +5,9 @@ import (
 	"strconv"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	miscquery "code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/misc_query"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -26,7 +28,31 @@ func GetChannel(c *gin.Context) {
 		return
 	}
 
-	channel, err := channels.GetChannelWithID(uint(channelID))
+	var iteratorInfo miscquery.Iterator
+	err = c.BindQuery(&iteratorInfo)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Non boolean next or prev provided",
+		})
+		return
+	}
+
+	if iteratorInfo.Next && iteratorInfo.Previous {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Provide either next or previous",
+		})
+		return
+	}
+
+	var channel *models.Channel
+	if iteratorInfo.Next {
+		channel, err = channels.GetNextChannelfromID(channelID)
+	} else if iteratorInfo.Previous {
+		channel, err = channels.GetPreviousChannelfromID(channelID)
+	} else {
+		channel, err = channels.GetChannelWithID(uint(channelID))
+	}
+
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "ID is not in the database",
@@ -37,8 +63,26 @@ func GetChannel(c *gin.Context) {
 		return
 	}
 
+	firstRecord, err := channels.GetFirstChannel()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	prevAvail := firstRecord.ID != channel.ID
+
+	lastRecord, err := channels.GetLastChannel()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+	nextAvail := lastRecord.ID != channel.ID
+
 	var channelInfo serializers.ChannelInfo
 	serializers.ChannelModelToChannelInfo(&channelInfo, channel)
 
-	c.JSON(http.StatusOK, channelInfo)
+	c.JSON(http.StatusOK, gin.H{
+		"channel_details": channelInfo,
+		"next":            nextAvail,
+		"previous":        prevAvail,
+	})
 }

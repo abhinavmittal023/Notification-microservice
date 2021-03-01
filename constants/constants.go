@@ -46,6 +46,13 @@ func ChannelType(index uint) string {
 	return []string{"Email", "Push", "Web"}[int(index-1)]
 }
 
+// CSVHeaders is a function that returns the headers of our csv file
+func CSVHeaders() []string {
+	return []string{
+		"ID", "Email", "PushToken", "WebToken", "PreferredChannelType",
+	}
+}
+
 // ChannelTypeToInt converts channel type to its uint counterpart
 func ChannelTypeToInt(channel string) uint {
 	channel = strings.ToLower(channel)

@@ -14,10 +14,47 @@ func GetChannelWithID(id uint) (*models.Channel, error) {
 	return &channel, res.Error
 }
 
+// GetLastChannel function gets the information of last record of the table
+func GetLastChannel() (*models.Channel, error) {
+	var channel models.Channel
+	res := db.Get().Last(&channel)
+	return &channel, res.Error
+}
+
+// GetFirstChannel function gets the information of first record of the table
+func GetFirstChannel() (*models.Channel, error) {
+	var channel models.Channel
+	res := db.Get().First(&channel)
+	return &channel, res.Error
+}
+
+// GetNextChannelfromID function gives the details of the next channel and returns record not found
+// if the record is the last one
+func GetNextChannelfromID(channelID uint64) (*models.Channel, error) {
+	var channelDetails models.Channel
+	res := db.Get().Model(&models.Channel{}).Where("id > ?", channelID).First(&channelDetails)
+	return &channelDetails, res.Error
+}
+
+// GetPreviousChannelfromID function gives the details of the previous channel and returns record not found
+// if the record is the first one
+func GetPreviousChannelfromID(channelID uint64) (*models.Channel, error) {
+	var channelDetails models.Channel
+	res := db.Get().Model(&models.Channel{}).Where("id < ?", channelID).First(&channelDetails)
+	return &channelDetails, res.Error
+}
+
 // GetChannelWithType gets the channel of specified type from the database, and returns error/nil
 func GetChannelWithType(channelType uint) (*models.Channel, error) {
 	var channel models.Channel
 	res := db.Get().Model(&models.Channel{}).Where("type = ?", channelType).First(&channel)
+	return &channel, res.Error
+}
+
+// GetChannelWithName gets the channel of specified name from the database, and returns error/nil
+func GetChannelWithName(channelName string) (*models.Channel, error) {
+	var channel models.Channel
+	res := db.Get().Model(&models.Channel{}).Where("name = ?", channelName).First(&channel)
 	return &channel, res.Error
 }
 

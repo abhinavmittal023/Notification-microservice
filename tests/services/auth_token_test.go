@@ -22,7 +22,7 @@ func TestValidateToken(t *testing.T) {
 		FirstName: "test",
 		Email:     "test@test.com",
 		Password:  password,
-		Verified:  true,
+		Verified:  false,
 		Role:      2,
 	}
 

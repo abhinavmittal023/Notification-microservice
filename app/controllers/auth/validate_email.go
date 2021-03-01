@@ -21,6 +21,7 @@ func ValidateEmailRoute(router *gin.RouterGroup) {
 // ValidateEmail Controller verifies the email after checking the token
 func ValidateEmail(c *gin.Context) {
 	tokenString := c.Param("token")
+	location := url.URL{Path: "http://localhost:4200/users/login"}
 
 	userDetails, err := authservice.ValidateToken(tokenString, "validation")
 	if err == authservice.ErrInvalidToken {
@@ -31,6 +32,9 @@ func ValidateEmail(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": "User Not Found in the Database",
 		})
+		return
+	} else if err == authservice.ErrAlreadyVerfied {
+		c.Redirect(http.StatusFound, location.RequestURI())
 		return
 	} else if err != nil {
 		log.Println(err)
@@ -45,6 +49,5 @@ func ValidateEmail(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
 	}
-	location := url.URL{Path: "http://localhost:4200/users/login"}
 	c.Redirect(http.StatusFound, location.RequestURI())
 }

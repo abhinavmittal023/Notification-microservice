@@ -18,17 +18,40 @@ func GetUserWithID(userID uint64) (*models.User, error) {
 	return &user, res.Error
 }
 
+// GetNextUserfromID function gives the details of the next user and returns record not found
+// if the record is the last one
+func GetNextUserfromID(userID uint64) (*models.User, error) {
+	var userDetails models.User
+	res := db.Get().Model(&models.User{}).Where("id > ?", userID).First(&userDetails)
+	return &userDetails, res.Error
+}
+
+// GetPreviousUserfromID function gives the details of the previous user and returns record not found
+// if the record is the first one
+func GetPreviousUserfromID(userID uint64) (*models.User, error) {
+	var userDetails models.User
+	res := db.Get().Model(&models.User{}).Where("id < ?", userID).First(&userDetails)
+	return &userDetails, res.Error
+}
+
 // GetFirstUser gets the details of the first user in the database
-// Use with signup guards only
-func GetFirstUser() (*models.User, error) {
+// provide checkVerified as true for signup guard to check and delete unverified user signup
+func GetFirstUser(checkVerified bool) (*models.User, error) {
 	var user models.User
 	res := db.Get().First(&user)
-	if res.Error == nil && !user.Verified && time.Duration((time.Now().Unix()-user.CreatedAt.Unix()))-3600*configuration.GetResp().Token.ExpiryTime.ValidationToken > 0 {
+	if checkVerified && res.Error == nil && !user.Verified && time.Duration((time.Now().Unix()-user.CreatedAt.Unix()))-3600*configuration.GetResp().Token.ExpiryTime.ValidationToken > 0 {
 		if err := SoftDeleteUser(&user); err != nil {
 			return nil, err
 		}
 		return nil, gorm.ErrRecordNotFound
 	}
+	return &user, res.Error
+}
+
+// GetLastUser function gets the information of last record of the table
+func GetLastUser() (*models.User, error) {
+	var user models.User
+	res := db.Get().Last(&user)
 	return &user, res.Error
 }
 

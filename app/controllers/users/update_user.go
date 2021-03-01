@@ -25,8 +25,7 @@ func UpdateUser(c *gin.Context) {
 	var info serializers.ChangeCredentialsInfo
 	var err error
 	if err = c.BindJSON(&info); err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or role provided"})
 		return
 	}
 	info.ID, err = strconv.ParseUint(c.Param("id"), 10, 64)

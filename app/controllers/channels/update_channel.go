@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
@@ -54,8 +55,20 @@ func UpdateChannel(c *gin.Context) {
 		return
 	}
 
-	testChannel, err := channels.GetChannelWithType(info.Type)
-	if testChannel.ID != channel.ID && err != gorm.ErrRecordNotFound {
+	testChannel, err := channels.GetChannelWithName(strings.ToLower(info.Name))
+	if err != gorm.ErrRecordNotFound && err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	} else if testChannel.ID != channel.ID && err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Channel with provided name already exists"})
+		return
+	}
+
+	testChannel, err = channels.GetChannelWithType(info.Type)
+	if err != gorm.ErrRecordNotFound && err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	} else if testChannel.ID != channel.ID && err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Channel with provided type already exists"})
 		return
 	}

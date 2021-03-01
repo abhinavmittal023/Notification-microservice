@@ -38,7 +38,16 @@ func AddChannel(c *gin.Context) {
 	var channel models.Channel
 	serializers.ChannelInfoToChannelModel(&info, &channel)
 
-	_, err := channels.GetChannelWithType(info.Type)
+	_, err := channels.GetChannelWithName(channel.Name)
+	if err != gorm.ErrRecordNotFound && err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	} else if err != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Channel with provided name already exists"})
+		return
+	}
+
+	_, err = channels.GetChannelWithType(info.Type)
 	if err != gorm.ErrRecordNotFound && err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return
