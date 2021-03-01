@@ -30,7 +30,7 @@ func CreateUserAndVerify(user *models.User) (int, error) {
 
 	err := tx.Create(user).Error
 	if err != nil {
-		log.Println("Create User error")
+		log.Println("Create User error", err.Error())
 		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 	}
 	to := []string{
@@ -38,17 +38,17 @@ func CreateUserAndVerify(user *models.User) (int, error) {
 	}
 	err = auth.SendValidationEmail(to, uint64(user.ID))
 	if err != nil {
+		log.Println("SMTP Error", err.Error())
 		err = tx.Rollback().Error
 		if err != nil {
-			log.Println("Transaction Rollback Error Error")
+			log.Println("Transaction Rollback Error Error", err.Error())
 			return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 		}
-		log.Println("SMTP Error")
 		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 	}
 	err = tx.Commit().Error
 	if err != nil {
-		log.Println("Transaction Commit Error Error")
+		log.Println("Transaction Commit Error", err.Error())
 		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 	}
 	return http.StatusOK, nil

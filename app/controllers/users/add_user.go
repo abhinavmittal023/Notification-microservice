@@ -48,7 +48,7 @@ func AddUser(c *gin.Context) {
 	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Error while hashing the password")
+		log.Println("Error while hashing the password", err.Error())
 		return
 	}
 
@@ -59,7 +59,7 @@ func AddUser(c *gin.Context) {
 	}
 	if err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("GetUserWithEmail service error")
+		log.Println("GetUserWithEmail service error", err.Error())
 		return
 	}
 

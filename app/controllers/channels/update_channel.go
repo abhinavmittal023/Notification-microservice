@@ -8,6 +8,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -21,18 +22,19 @@ func UpdateChannelRoute(router *gin.RouterGroup) {
 func UpdateChannel(c *gin.Context) {
 	var info serializers.ChannelInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "valid name, type and priority are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().NameTypePriorityRequired})
 		return
 	}
-	if info.Type > constants.MaxType {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Type provided"})
+	_, found := misc.FindInSlice(constants.ChannelIntType(), int(info.Type))
+	if !found {
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidType})
 		return
 	}
 
 	channelID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "ID should be a unsigned integer",
+			"error": constants.Errors().InvalidID,
 		})
 		return
 	}
@@ -40,11 +42,11 @@ func UpdateChannel(c *gin.Context) {
 	channel, err := channels.GetChannelWithID(uint(channelID))
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "ID is not in the database",
+			"error": constants.Errors().IDNotInRecords,
 		})
 		return
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
@@ -52,8 +54,8 @@ func UpdateChannel(c *gin.Context) {
 
 	err = channels.PatchChannel(channel)
 	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 

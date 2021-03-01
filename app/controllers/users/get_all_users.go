@@ -23,9 +23,8 @@ func GetAllUsers(c *gin.Context) {
 	var pagination serializers.Pagination
 	err = c.BindQuery(&pagination)
 	if err != nil {
-		log.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid limit and offset",
+			"error": constants.Errors().InvalidPagination,
 		})
 		return
 	}
@@ -33,9 +32,8 @@ func GetAllUsers(c *gin.Context) {
 	var userFilter filter.User
 	err = c.BindQuery(&userFilter)
 	if err != nil {
-		log.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid filter Parameters",
+			"error": constants.Errors().InvalidFilter,
 		})
 		return
 	}
@@ -43,7 +41,7 @@ func GetAllUsers(c *gin.Context) {
 	usersArray, err := users.GetAllUsers(pagination, userFilter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("find all users query error")
+		log.Println("find all users query error", err.Error())
 		return
 	}
 

@@ -33,7 +33,7 @@ func GetUser(c *gin.Context) {
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("GetUserWithID service error")
+		log.Println("GetUserWithID service error", err.Error())
 		return
 	}
 

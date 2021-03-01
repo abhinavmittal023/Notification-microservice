@@ -24,7 +24,7 @@ func GetUserProfile(c *gin.Context) {
 	userID, err := strconv.ParseUint(fmt.Sprintf("%v", c.MustGet(constants.ID)), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("String Conversion Error")
+		log.Println("String Conversion Error", err.Error())
 		return
 	}
 	user, err := users.GetUserWithID(uint64(userID))
@@ -33,7 +33,7 @@ func GetUserProfile(c *gin.Context) {
 		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Get user with id query error")
+		log.Println("Get user with id query error", err.Error())
 		return
 	}
 

@@ -13,9 +13,6 @@ const (
 	// AdminRole defines the role value for system admin in the database
 	AdminRole = 1
 
-	// MaxType Defines the maximum types of notifications supported by the service
-	MaxType = 3
-
 	// Role defines the key for saving the role to the request
 	Role = "role"
 
@@ -29,15 +26,17 @@ const (
 // ChannelType is an function mapping type field of channel to its string counterpart.
 // We are using a function as golang doesn't allow complex types to be constants
 func ChannelType(index uint) string {
-	if index < 1 || index > MaxType {
-		return ""
-	}
 	return []string{"Email", "Push", "Web"}[int(index-1)]
 }
 
 // RoleType defines the role values of all possible role types
 func RoleType() []int {
 	return []int{1, 2}
+}
+
+// ChannelIntType defines the type int values of all possible channel types
+func ChannelIntType() []int {
+	return []int{1, 2, 3}
 }
 
 // TokenType defines the various token types
@@ -77,6 +76,10 @@ type Error struct {
 	OldPasswordIncorrect      string
 	InvalidRole               string
 	InvalidEmail              string
+	NameTypePriorityRequired  string
+	InvalidType               string
+	InvalidFilter             string
+	InvalidPagination         string
 }
 
 // Errors is a function that returns all the error messages
@@ -100,5 +103,9 @@ func Errors() Error {
 		OldPasswordRequired:       "Old Password is required",
 		InvalidRole:               "Invalid Role is provided",
 		InvalidEmail:              "Email ID is invalid",
+		NameTypePriorityRequired:  "Name, Type and Priority are required",
+		InvalidType:               "Invalid Type Provided",
+		InvalidFilter:             "Invalid Filter Parameters",
+		InvalidPagination:         "Invalid Limit and Offset",
 	}
 }

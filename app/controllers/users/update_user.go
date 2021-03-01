@@ -55,7 +55,7 @@ func UpdateUser(c *gin.Context) {
 	testUser, err := users.GetUserWithEmail(info.Email)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("GetUserWithEmail service error")
+		log.Println("GetUserWithEmail service error", err.Error())
 		return
 	} else if testUser.ID != uint(info.ID) && err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -68,8 +68,8 @@ func UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().IDNotInRecords})
 		return
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Get user with id query error")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("Get user with id query error", err.Error())
 		return
 	}
 
@@ -77,7 +77,7 @@ func UpdateUser(c *gin.Context) {
 	err = users.PatchUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Update User service error")
+		log.Println("Update User service error", err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})

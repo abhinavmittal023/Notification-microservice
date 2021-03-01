@@ -24,17 +24,16 @@ func ValidateEmail(c *gin.Context) {
 
 	userDetails, err := authservice.ValidateToken(tokenString, constants.TokenType().Validation)
 	if err == authservice.ErrInvalidToken {
-		log.Println(err.Error())
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	} else if err == gorm.ErrRecordNotFound {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "User Not Found in the Database",
+			"error": constants.Errors().IDNotInRecords,
 		})
 		return
 	} else if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 

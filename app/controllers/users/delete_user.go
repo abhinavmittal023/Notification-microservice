@@ -30,14 +30,14 @@ func DeleteUser(c *gin.Context) {
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("GetUserWithID service error")
+		log.Println("GetUserWithID service error", err.Error())
 		return
 	}
 
 	err = users.DeleteUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Delete User Service Error")
+		log.Println("Delete User Service Error", err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})

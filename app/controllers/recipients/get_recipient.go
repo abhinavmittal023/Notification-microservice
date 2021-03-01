@@ -24,7 +24,6 @@ func GetRecipient(c *gin.Context) {
 	recipientID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidID})
-		log.Println("String Conversion Error")
 		return
 	}
 	recipient, err := recipients.GetRecipientWithID(uint64(recipientID))
@@ -32,7 +31,8 @@ func GetRecipient(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().IDNotInRecords})
 		return
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
@@ -53,7 +53,8 @@ func GetRecipient(c *gin.Context) {
 			})
 			return
 		} else if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			log.Println(err.Error())
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 			return
 		}
 		serializers.ChannelModelToChannelInfo(&channelInfo, channel)

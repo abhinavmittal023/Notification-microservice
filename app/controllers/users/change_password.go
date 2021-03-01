@@ -40,6 +40,7 @@ func ChangePassword(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": constants.Errors().InternalError,
 			})
+			log.Println(err.Error())
 			return
 		}
 		if info.OldPassword == "" {
@@ -59,7 +60,7 @@ func ChangePassword(c *gin.Context) {
 	info.NewPassword, err = hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Hashing error for new password")
+		log.Println("Hashing error for new password", err.Error())
 		return
 	}
 
@@ -70,7 +71,7 @@ func ChangePassword(c *gin.Context) {
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("GetUserWithID service error")
+		log.Println("GetUserWithID service error", err.Error())
 		return
 	}
 
@@ -78,7 +79,7 @@ func ChangePassword(c *gin.Context) {
 		match, err := hash.Validate(info.OldPassword, user.Password, configuration.GetResp().PasswordHash)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-			log.Println("Validation error for new password")
+			log.Println("Validation error for new password", err.Error())
 			return
 		}
 		if !match {
@@ -91,7 +92,7 @@ func ChangePassword(c *gin.Context) {
 	err = users.PatchUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Update User service error")
+		log.Println("Update User service error", err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
