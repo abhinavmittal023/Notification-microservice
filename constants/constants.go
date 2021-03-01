@@ -126,6 +126,10 @@ type Error struct {
 	InvalidType               string
 	InvalidFilter             string
 	InvalidPagination         string
+	InvalidPriority           string
+	ChannelTypePresent        string
+	NotificationInfoRequired  string
+	RecipientIDIncorrect      string
 }
 
 // Errors is a function that returns all the error messages
@@ -153,5 +157,9 @@ func Errors() Error {
 		InvalidType:               "Invalid Type Provided",
 		InvalidFilter:             "Invalid Filter Parameters",
 		InvalidPagination:         "Invalid Limit and Offset",
+		InvalidPriority:           "Invalid Priority Provided",
+		ChannelTypePresent:        "Channel with Provided Type already exists",
+		NotificationInfoRequired:  "Notification Info is required",
+		RecipientIDIncorrect:      "Recipient ID incorrect",
 	}
 }
