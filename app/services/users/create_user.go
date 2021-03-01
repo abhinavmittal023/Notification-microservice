@@ -41,7 +41,7 @@ func CreateUserAndVerify(user *models.User) (int, error) {
 		log.Println("SMTP Error", err.Error())
 		err = tx.Rollback().Error
 		if err != nil {
-			log.Println("Transaction Rollback Error Error", err.Error())
+			log.Println("Transaction Rollback Error", err.Error())
 			return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 		}
 		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
