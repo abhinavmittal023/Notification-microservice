@@ -14,6 +14,7 @@ import (
 // SendValidationEmail sends validation email to new
 func SendValidationEmail(to []string, userID uint64) error {
 	from := configuration.GetResp().EmailNotification.Email
+	password := configuration.GetResp().EmailNotification.Password
 	smtpHost := configuration.GetResp().EmailNotification.SMTPHost
 	smtpPort := configuration.GetResp().EmailNotification.SMTPPort
 	addr := fmt.Sprintf("%s:%s", smtpHost, smtpPort)
@@ -46,8 +47,11 @@ func SendValidationEmail(to []string, userID uint64) error {
 		return errors.Wrap(err, "Unable to write to template")
 	}
 
+	// Authentication
+	auth := smtp.PlainAuth("", from, password, addr)
+
 	//  Sending email.
-	err = smtp.SendMail(addr, nil, from, to, body.Bytes())
+	err = smtp.SendMail(addr, auth, from, to, body.Bytes())
 	if err != nil {
 		log.Println("Unable to send email", err.Error())
 		return errors.Wrap(err, "Unable to send email")
