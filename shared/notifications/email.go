@@ -14,7 +14,7 @@ type Notifications interface {
 
 // Email struct implements Notifications interface
 type Email struct {
-	To      string
+	To      []string
 	Subject string
 	Message string
 }
@@ -22,14 +22,18 @@ type Email struct {
 // SendNotification method send email notifications
 func (email *Email) SendNotification() error {
 	from := configuration.GetResp().EmailNotification.Email
+	password := configuration.GetResp().EmailNotification.Password
 	smtpHost := configuration.GetResp().EmailNotification.SMTPHost
 	smtpPort := configuration.GetResp().EmailNotification.SMTPPort
 	addr := smtpHost + ":" + smtpPort
 	msg := []byte("Subject: " + email.Subject + "\r\n" +
 		"\r\n" + email.Message + "\r\n")
 
+	// Authentication
+	auth := smtp.PlainAuth("", from, password, addr)
+
 	//  Sending email.
-	err := smtp.SendMail(addr, nil, from, []string{email.To}, msg)
+	err := smtp.SendMail(addr, auth, from, email.To, msg)
 	if err != nil {
 		return errors.Wrap(err, "Unable to send email")
 	}
