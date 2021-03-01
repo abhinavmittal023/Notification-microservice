@@ -34,14 +34,14 @@ func GetChannel(c *gin.Context) {
 	err = c.BindQuery(&iteratorInfo)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Non boolean next or prev provided",
+			"error": constants.Errors().NextPrevNonBool,
 		})
 		return
 	}
 
 	if iteratorInfo.Next && iteratorInfo.Previous {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Provide either next or previous",
+			"error": constants.Errors().NextPrevBothProvided,
 		})
 		return
 	}
@@ -68,14 +68,14 @@ func GetChannel(c *gin.Context) {
 
 	firstRecord, err := channels.GetFirstChannel()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	prevAvail := firstRecord.ID != channel.ID
 
 	lastRecord, err := channels.GetLastChannel()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	nextAvail := lastRecord.ID != channel.ID

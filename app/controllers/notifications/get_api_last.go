@@ -19,7 +19,7 @@ func GetAPILast(c *gin.Context) {
 	apiLast, err := notifications.GetAPILast()
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "No API Key exists",
+			"error": constants.Errors().NoAPIKey,
 		})
 		return
 	} else if err != nil {

@@ -137,6 +137,10 @@ type Error struct {
 	ChannelTypePresent        string
 	NotificationInfoRequired  string
 	RecipientIDIncorrect      string
+	ChannelNamePresent        string
+	NextPrevNonBool           string
+	NextPrevBothProvided      string
+	NoAPIKey                  string
 }
 
 // Errors is a function that returns all the error messages
@@ -168,5 +172,9 @@ func Errors() Error {
 		ChannelTypePresent:        "Channel with Provided Type already exists",
 		NotificationInfoRequired:  "Notification Info is required",
 		RecipientIDIncorrect:      "Recipient ID incorrect",
+		ChannelNamePresent:        "Channel with Provided Name already exists",
+		NextPrevNonBool:           "Non boolean next or prev provided",
+		NextPrevBothProvided:      "Provide either next or previous",
+		NoAPIKey:                  "No API Key exists",
 	}
 }

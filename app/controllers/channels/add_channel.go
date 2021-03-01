@@ -40,10 +40,10 @@ func AddChannel(c *gin.Context) {
 
 	_, err := channels.GetChannelWithName(channel.Name)
 	if err != gorm.ErrRecordNotFound && err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	} else if err != gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Channel with provided name already exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().ChannelNamePresent})
 		return
 	}
 

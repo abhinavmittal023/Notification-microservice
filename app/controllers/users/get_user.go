@@ -33,14 +33,14 @@ func GetUser(c *gin.Context) {
 	err = c.BindQuery(&iteratorInfo)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Non boolean next or prev provided",
+			"error": constants.Errors().NextPrevNonBool,
 		})
 		return
 	}
 
 	if iteratorInfo.Next && iteratorInfo.Previous {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Provide either next or previous",
+			"error": constants.Errors().NextPrevBothProvided,
 		})
 		return
 	}
@@ -67,14 +67,14 @@ func GetUser(c *gin.Context) {
 
 	firstRecord, err := users.GetFirstUser(false)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	prevAvail := firstRecord.ID != user.ID
 
 	lastRecord, err := users.GetLastUser()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	nextAvail := lastRecord.ID != user.ID

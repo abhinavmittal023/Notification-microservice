@@ -33,14 +33,14 @@ func GetRecipient(c *gin.Context) {
 	err = c.BindQuery(&iteratorInfo)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Non boolean next or prev provided",
+			"error": constants.Errors().NextPrevNonBool,
 		})
 		return
 	}
 
 	if iteratorInfo.Next && iteratorInfo.Previous {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Provide either next or previous",
+			"error": constants.Errors().NextPrevBothProvided,
 		})
 		return
 	}
@@ -65,14 +65,14 @@ func GetRecipient(c *gin.Context) {
 
 	firstRecord, err := recipients.GetFirstRecipient()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	prevAvail := firstRecord.ID != recipient.ID
 
 	lastRecord, err := recipients.GetLastRecipient()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	nextAvail := lastRecord.ID != recipient.ID

@@ -347,9 +347,9 @@ func TestGetUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, float64(user.ID), got["user_id"])
-	assert.Equal(t, (user.Email), got["email"])
-	assert.Equal(t, (user.FirstName), got["first_name"])
+	assert.Equal(t, float64(user.ID), got["user_details"].(map[string]interface{})["user_id"])
+	assert.Equal(t, (user.Email), got["user_details"].(map[string]interface{})["email"])
+	assert.Equal(t, (user.FirstName), got["user_details"].(map[string]interface{})["first_name"])
 
 	w = httptest.NewRecorder()
 	c, _ = gin.CreateTestContext(w)
