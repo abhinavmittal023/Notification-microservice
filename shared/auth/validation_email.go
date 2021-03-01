@@ -14,7 +14,7 @@ import (
 // SendValidationEmail sends validation email to new
 func SendValidationEmail(to []string, userID uint64) error {
 	from := configuration.GetResp().EmailNotification.Email
-	//password := configuration.GetResp().EmailNotification.Password
+	password := configuration.GetResp().EmailNotification.Password
 	smtpHost := configuration.GetResp().EmailNotification.SMTPHost
 	smtpPort := configuration.GetResp().EmailNotification.SMTPPort
 	addr := fmt.Sprintf("%s:%s", smtpHost, smtpPort)
@@ -28,7 +28,7 @@ func SendValidationEmail(to []string, userID uint64) error {
 	link := fmt.Sprintf("http://%s:%s/api/v1/auth/token/%s", configuration.GetResp().Server.Domain, configuration.GetResp().Server.Port, token)
 
 	//  Authentication.
-	//auth := smtp.PlainAuth("", from, password, smtpHost)
+	auth := smtp.PlainAuth("", from, password, smtpHost)
 
 	t, err := template.ParseFiles("./shared/auth/validation_email.html")
 	if err != nil {
@@ -51,7 +51,7 @@ func SendValidationEmail(to []string, userID uint64) error {
 	}
 
 	//  Sending email.
-	err = smtp.SendMail(addr, nil, from, to, body.Bytes())
+	err = smtp.SendMail(addr, auth, from, to, body.Bytes())
 	if err != nil {
 		log.Println("Unable to send email")
 		return errors.Wrap(err, "Unable to send email")
