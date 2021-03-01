@@ -14,10 +14,10 @@ import (
 
 // GetUserRoute is used to get users from database
 func GetUserRoute(router *gin.RouterGroup) {
-	router.GET("/get/:id", GetUser)
+	router.GET("/:id", GetUser)
 }
 
-// GetUser Controller for /users/get/:id route
+// GetUser Controller for /users/:id route
 func GetUser(c *gin.Context) {
 	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -34,10 +34,6 @@ func GetUser(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("GetUserWithID service error")
-		return
-	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Get user with id query error")
 		return
 	}
 

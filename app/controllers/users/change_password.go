@@ -67,10 +67,6 @@ func ChangePassword(c *gin.Context) {
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().IDNotInRecords})
 		return
-	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Get user with id query error")
-		return
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
