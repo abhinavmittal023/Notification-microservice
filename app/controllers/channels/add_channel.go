@@ -4,29 +4,29 @@ import (
 	"log"
 	"net/http"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
 	"github.com/gin-gonic/gin"
 )
 
 // AddChannelRoute is used to add channels to database
 func AddChannelRoute(router *gin.RouterGroup) {
 	router.POST("", AddChannel)
-	router.OPTIONS("", preflight.Preflight)
 }
 
 // AddChannel controller for the post channels/ route
 func AddChannel(c *gin.Context) {
 	var info serializers.ChannelInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "valid name, type and priority are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().NameTypePriorityRequired})
 		return
 	}
-	if info.Type > constants.MaxType {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Type provided"})
+	_, found := misc.FindInSlice(constants.ChannelIntType(), int(info.Type))
+	if !found {
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidType})
 		return
 	}
 
@@ -35,8 +35,8 @@ func AddChannel(c *gin.Context) {
 
 	err := channels.AddChannel(&channel)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("AddChannel service error")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("AddChannel service error", err.Error())
 		return
 	}
 

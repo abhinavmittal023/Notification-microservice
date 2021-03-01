@@ -8,6 +8,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/middlewares"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -16,7 +17,14 @@ import (
 func InitServer() error {
 	router := gin.Default()
 	// setting the cors headers
-	router.Use(middlewares.CorsHeaders())
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowCredentials: true,
+		AllowHeaders:     []string{"Content-Type", "Content-Length", "Accept-Encoding", "Authorization", "ResponseType", "accept", "origin"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowMethods:     []string{"POST", "OPTIONS", "GET", "PUT", "DELETE"},
+	}))
 
 	v1 := router.Group("/api/v1")
 

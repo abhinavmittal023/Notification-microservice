@@ -34,17 +34,19 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 		}
 
 		if recipientRecord.Email != "" {
-			er := serializers.EmailRegexCheck(recipientRecord.Email)
+			status, err := serializers.EmailRegexCheck(recipientRecord.Email)
 
-			if er == "internal_server_error" {
-				log.Println("Error Due to Regex")
-				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error at %v", index+2)})
-				tx.Rollback()
-				return http.StatusInternalServerError, &errors
-			}
-			if er == "bad_request" {
-				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Email at %v is invalid", index+2)})
-				invalid = true
+			if err != nil {
+				if status == http.StatusInternalServerError {
+					log.Println("Error Due to Regex", err.Error())
+					errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error at %v", index+2)})
+					tx.Rollback()
+					return http.StatusInternalServerError, &errors
+				}
+				if status == http.StatusBadRequest {
+					errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Email at %v is invalid", index+2)})
+					continue
+				}
 			}
 		}
 
@@ -54,7 +56,7 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *[
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("PreferredChannelID at %v is not in the database", index+2)})
 				invalid = true
 			} else if err != nil {
-				log.Println(err)
+				log.Println(err.Error())
 				errors = append(errors, serializers.ErrorInfo{Error: fmt.Sprintf("Internal Server Error at %v", index+2)})
 				return http.StatusInternalServerError, &errors
 			}

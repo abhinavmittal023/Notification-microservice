@@ -7,6 +7,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,9 +23,8 @@ func GetAllUsers(c *gin.Context) {
 	var pagination serializers.Pagination
 	err = c.BindQuery(&pagination)
 	if err != nil {
-		log.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid limit and offset",
+			"error": constants.Errors().InvalidPagination,
 		})
 		return
 	}
@@ -32,17 +32,16 @@ func GetAllUsers(c *gin.Context) {
 	var userFilter filter.User
 	err = c.BindQuery(&userFilter)
 	if err != nil {
-		log.Println(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid filter Parameters",
+			"error": constants.Errors().InvalidFilter,
 		})
 		return
 	}
 
 	usersArray, err := users.GetAllUsers(pagination, userFilter)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("find all users query error")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("find all users query error", err.Error())
 		return
 	}
 
