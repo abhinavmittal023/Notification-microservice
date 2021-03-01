@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
 )
@@ -22,17 +23,17 @@ func getSecretKey() string {
 
 // GenerateRefreshToken generates the refresh token with userID and given expiry
 func GenerateRefreshToken(userID uint64, expiry time.Duration) (string, error) {
-	return GenerateToken(userID, 0, "refresh", expiry)
+	return GenerateToken(userID, 0, constants.TokenType().Refresh, expiry)
 }
 
 // GenerateAccessToken generates the access token with userID, role and given expiry
 func GenerateAccessToken(userID uint64, role int, expiry time.Duration) (string, error) {
-	return GenerateToken(userID, role, "access", expiry)
+	return GenerateToken(userID, role, constants.TokenType().Access, expiry)
 }
 
 // GenerateValidationToken generates the validation token with userID and given expiry
 func GenerateValidationToken(userID uint64, expiry time.Duration) (string, error) {
-	return GenerateToken(userID, 0, "validation", expiry)
+	return GenerateToken(userID, 0, constants.TokenType().Validation, expiry)
 }
 
 // GenerateToken function generates a new jwt token given userID, role, tokentype and the expiry for the token

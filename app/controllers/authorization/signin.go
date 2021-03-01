@@ -1,7 +1,6 @@
 package authorization
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
@@ -86,15 +85,10 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	js, err := json.Marshal(&serializers.LoginResponse{
+	loginOutput := serializers.LoginResponse{
 		LoginInfo:    info,
 		RefreshToken: token,
-	})
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("JSON marshalling error")
-		return
 	}
-	c.Data(http.StatusOK, "application/json", js)
+
+	c.JSON(http.StatusOK, loginOutput)
 }

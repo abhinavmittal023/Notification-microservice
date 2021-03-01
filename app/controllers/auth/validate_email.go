@@ -21,7 +21,7 @@ func ValidateEmail(c *gin.Context) {
 	tokenString := c.Param("token")
 	location := url.URL{Path: constants.LoginPath}
 
-	userDetails, err := authservice.ValidateToken(tokenString, "validation")
+	userDetails, err := authservice.ValidateToken(tokenString, constants.TokenType().Validation)
 	if err == authservice.ErrInvalidToken {
 		log.Println(err.Error())
 		c.AbortWithStatus(http.StatusUnauthorized)

@@ -23,9 +23,26 @@ const (
 	LoginPath = "http://localhost:4200/users/login"
 )
 
-// RoleType defines the role values of three possible role types
+// RoleType defines the role values of all possible role types
 func RoleType() []int {
 	return []int{1, 2}
+}
+
+// TokenType defines the various token types
+func TokenType() struct {
+	Validation string
+	Access     string
+	Refresh    string
+} {
+	return struct {
+		Validation string
+		Access     string
+		Refresh    string
+	}{
+		Validation: "validation",
+		Access:     "access",
+		Refresh:    "refresh",
+	}
 }
 
 // Error is the struct used to store the error messages

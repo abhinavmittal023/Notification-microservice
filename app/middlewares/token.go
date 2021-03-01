@@ -32,7 +32,7 @@ func AuthorizeJWT() gin.HandlerFunc {
 		}
 
 		claims := token.Claims.(*auth.CustomClaims)
-		if token.Valid && claims.TokenType == "access" {
+		if token.Valid && claims.TokenType == constants.TokenType().Access {
 			c.Set(constants.ID, claims.UserID)
 			c.Set(constants.Role, claims.Role)
 		} else {

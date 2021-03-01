@@ -34,7 +34,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	err = users.SoftDeleteUser(user)
+	err = users.DeleteUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("Delete User Service Error")
