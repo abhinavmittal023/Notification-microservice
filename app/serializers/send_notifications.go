@@ -3,6 +3,7 @@ package serializers
 import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	"github.com/pkg/errors"
 )
 
 // SendNotifications struct holds information about APIKey and Notifications
@@ -19,8 +20,12 @@ type Notifications struct {
 }
 
 // NotificationsInfoToNotificationModel converts the serializer to model
-func NotificationsInfoToNotificationModel(info *SendNotifications, notification *models.Notification) {
+func NotificationsInfoToNotificationModel(info *SendNotifications, notification *models.Notification) error {
 	notification.Priority = constants.PriorityTypeToInt(info.Notifications.Priority)
+	if notification.Priority == 0{
+		return errors.New("Invalid Priority")
+	}
 	notification.Title = info.Notifications.Title
 	notification.Body = info.Notifications.Body
+	return nil
 }

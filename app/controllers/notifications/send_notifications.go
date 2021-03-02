@@ -28,12 +28,19 @@ func PostSendNotifications(c *gin.Context) {
 		return
 	}
 	var notification models.Notification
-	serializers.NotificationsInfoToNotificationModel(&info, &notification)
-	err := notifications.AddNotification(&notification)
+	err := serializers.NotificationsInfoToNotificationModel(&info, &notification)
+	if err!= nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	err = notifications.AddNotification(&notification)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": constants.Errors().InternalError,
 		})
+		return
 	}
 	var errors serializers.ErrorInfo
 	errors.Error = make(map[int][]string)
