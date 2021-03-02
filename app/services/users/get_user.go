@@ -40,7 +40,7 @@ func GetFirstUser(checkVerified bool) (*models.User, error) {
 	var user models.User
 	res := db.Get().First(&user)
 	if checkVerified && res.Error == nil && !user.Verified && time.Duration((time.Now().Unix()-user.CreatedAt.Unix()))-3600*configuration.GetResp().Token.ExpiryTime.ValidationToken > 0 {
-		if err := SoftDeleteUser(&user); err != nil {
+		if err := DeleteUser(&user); err != nil {
 			return nil, err
 		}
 		return nil, gorm.ErrRecordNotFound

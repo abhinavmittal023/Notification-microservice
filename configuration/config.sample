@@ -24,6 +24,7 @@
   },
   "password_hash": "<hash_key>",
   "api_hash": "<another_hash_key>",
+  "reset_token_hash": "<reset_token_hash_key>",
   "web_notification": {
     "server_key": "<firebase_server_key>",
     "url": "https://fcm.googleapis.com/fcm/send"

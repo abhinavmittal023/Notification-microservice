@@ -9,8 +9,8 @@ import (
 // ChangeCredentialsInfo serializer to bind request data
 type ChangeCredentialsInfo struct {
 	ID    uint64 `json:"-"`
-	Email string `json:"email"`
-	Role  uint   `json:"role"`
+	Email string `json:"email" binding:"required"`
+	Role  int    `json:"role" binding:"required"`
 }
 
 // ChangePasswordInfo serializer to bind request data

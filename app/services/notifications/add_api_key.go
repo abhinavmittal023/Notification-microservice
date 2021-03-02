@@ -19,7 +19,10 @@ func GetAPIKey() (string, error) {
 	if err != gorm.ErrRecordNotFound && err != nil {
 		return "", errors.Wrap(err, "Get API Key error")
 	} else if err != gorm.ErrRecordNotFound {
-		organisation.APIKey = hash.Message(apiKey, configuration.GetResp().APIHash)
+		organisation.APIKey, err = hash.Message(apiKey, configuration.GetResp().APIHash)
+		if err != nil {
+			return "", errors.Wrap(err, "Hashing the Key error")
+		}
 		organisation.APILast = apiLast
 		err = db.Get().Save(&organisation).Error
 		if err != nil {
@@ -30,7 +33,10 @@ func GetAPIKey() (string, error) {
 
 	organisation = models.Organisation{}
 
-	organisation.APIKey = hash.Message(apiKey, configuration.GetResp().APIHash)
+	organisation.APIKey, err = hash.Message(apiKey, configuration.GetResp().APIHash)
+	if err != nil {
+		return "", errors.Wrap(err, "Hashing the Key error")
+	}
 	organisation.APILast = apiLast
 	err = db.Get().Create(&organisation).Error
 	if err != nil {

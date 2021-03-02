@@ -20,7 +20,11 @@ func TestValidateEmail(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 
 	user := models.User{
 		FirstName: "test",

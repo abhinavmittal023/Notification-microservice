@@ -10,6 +10,7 @@ type Configuration struct {
 	EmailNotification EmailNotification `json:"email_notification"`
 	PasswordHash      string            `json:"password_hash"`
 	APIHash           string            `json:"api_hash"`
+	ResetTokenHash    string            `json:"reset_token_hash"`
 	PushNotification  PushNotification  `json:"push_notification"`
 	WebNotification   WebNotification   `json:"web_notification"`
 }

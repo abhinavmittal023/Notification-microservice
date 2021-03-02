@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	miscquery "code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/misc_query"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -17,17 +17,15 @@ import (
 // GetUserRoute is used to get users from database
 func GetUserRoute(router *gin.RouterGroup) {
 	router.GET("/:id", GetUser)
-	router.OPTIONS("/:id", preflight.Preflight)
 }
 
-// GetUser Controller for get /users/:id route
+// GetUser Controller for /users/:id route
 func GetUser(c *gin.Context) {
 	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "ID should be a unsigned integer",
+			"error": constants.Errors().InvalidID,
 		})
-		log.Println("String Conversion Error")
 		return
 	}
 
@@ -35,14 +33,14 @@ func GetUser(c *gin.Context) {
 	err = c.BindQuery(&iteratorInfo)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Non boolean next or prev provided",
+			"error": constants.Errors().NextPrevNonBool,
 		})
 		return
 	}
 
 	if iteratorInfo.Next && iteratorInfo.Previous {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Provide either next or previous",
+			"error": constants.Errors().NextPrevBothProvided,
 		})
 		return
 	}
@@ -58,23 +56,25 @@ func GetUser(c *gin.Context) {
 	}
 
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().IDNotInRecords})
 		return
-	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("GetUserWithID service error", err.Error())
 		return
 	}
 
 	firstRecord, err := users.GetFirstUser(false)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	prevAvail := firstRecord.ID != user.ID
 
 	lastRecord, err := users.GetLastUser()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	nextAvail := lastRecord.ID != user.ID

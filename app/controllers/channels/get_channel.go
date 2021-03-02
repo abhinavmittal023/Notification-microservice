@@ -1,12 +1,14 @@
 package channels
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	miscquery "code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/misc_query"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -23,7 +25,7 @@ func GetChannel(c *gin.Context) {
 	channelID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "ID should be a unsigned integer",
+			"error": constants.Errors().InvalidID,
 		})
 		return
 	}
@@ -32,14 +34,14 @@ func GetChannel(c *gin.Context) {
 	err = c.BindQuery(&iteratorInfo)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Non boolean next or prev provided",
+			"error": constants.Errors().NextPrevNonBool,
 		})
 		return
 	}
 
 	if iteratorInfo.Next && iteratorInfo.Previous {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "Provide either next or previous",
+			"error": constants.Errors().NextPrevBothProvided,
 		})
 		return
 	}
@@ -55,24 +57,25 @@ func GetChannel(c *gin.Context) {
 
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "ID is not in the database",
+			"error": constants.Errors().IDNotInRecords,
 		})
 		return
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
 	firstRecord, err := channels.GetFirstChannel()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	prevAvail := firstRecord.ID != channel.ID
 
 	lastRecord, err := channels.GetLastChannel()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 	nextAvail := lastRecord.ID != channel.ID

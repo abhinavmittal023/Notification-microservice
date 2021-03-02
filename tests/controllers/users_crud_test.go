@@ -23,7 +23,11 @@ func TestGetAllUsers(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	usersList := []models.User{
 		{
 			FirstName: "test1",
@@ -48,7 +52,7 @@ func TestGetAllUsers(t *testing.T) {
 		},
 	}
 
-	err := SeedUsers(&usersList)
+	err = SeedUsers(&usersList)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -87,7 +91,11 @@ func TestGetAllUsersPagination(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	usersList := []models.User{
 		{
 			FirstName: "test1",
@@ -112,7 +120,7 @@ func TestGetAllUsersPagination(t *testing.T) {
 		},
 	}
 
-	err := SeedUsers(&usersList)
+	err = SeedUsers(&usersList)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -236,7 +244,11 @@ func TestDeleteUser(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -293,7 +305,11 @@ func TestGetUser(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -302,7 +318,7 @@ func TestGetUser(t *testing.T) {
 		Role:      2,
 	}
 
-	err := SeedOneUser(&user)
+	err = SeedOneUser(&user)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -331,9 +347,9 @@ func TestGetUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, float64(user.ID), got["user_id"])
-	assert.Equal(t, (user.Email), got["email"])
-	assert.Equal(t, (user.FirstName), got["first_name"])
+	assert.Equal(t, float64(user.ID), got["user_details"].(map[string]interface{})["user_id"])
+	assert.Equal(t, (user.Email), got["user_details"].(map[string]interface{})["email"])
+	assert.Equal(t, (user.FirstName), got["user_details"].(map[string]interface{})["first_name"])
 
 	w = httptest.NewRecorder()
 	c, _ = gin.CreateTestContext(w)
@@ -361,7 +377,11 @@ func TestUpdateUser(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -370,7 +390,7 @@ func TestUpdateUser(t *testing.T) {
 		Role:      2,
 	}
 
-	err := SeedOneUser(&user)
+	err = SeedOneUser(&user)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()
@@ -413,7 +433,11 @@ func TestUpdateUserInvlaid(t *testing.T) {
 		t.Fail()
 	}
 
-	password := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	password, err := hash.Message("test12--", configuration.GetResp().PasswordHash)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	user := models.User{
 		FirstName: "test",
 		Email:     "test@test.com",
@@ -422,7 +446,7 @@ func TestUpdateUserInvlaid(t *testing.T) {
 		Role:      2,
 	}
 
-	err := SeedOneUser(&user)
+	err = SeedOneUser(&user)
 	if err != nil {
 		log.Println(err.Error())
 		t.Fail()

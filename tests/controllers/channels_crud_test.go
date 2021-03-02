@@ -371,10 +371,10 @@ func TestGetChannel(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, float64(channelsList[0].ID), got["id"])
-	assert.Equal(t, channelsList[0].Name, got["name"])
-	assert.Equal(t, float64(channelsList[0].Priority), got["priority"])
-	assert.Equal(t, float64(channelsList[0].Type), got["type"])
+	assert.Equal(t, float64(channelsList[0].ID), got["channel_details"].(map[string]interface{})["id"])
+	assert.Equal(t, channelsList[0].Name, got["channel_details"].(map[string]interface{})["name"])
+	assert.Equal(t, float64(channelsList[0].Priority), got["channel_details"].(map[string]interface{})["priority"])
+	assert.Equal(t, float64(channelsList[0].Type), got["channel_details"].(map[string]interface{})["type"])
 
 	// Checking with invalid id
 	w = httptest.NewRecorder()

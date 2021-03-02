@@ -18,7 +18,7 @@ func main() {
 	dbstring := configuration.GetResp().Database.Dbstring
 	err = db.Init(dbstring)
 	if err != nil {
-		log.Println("Error Connecting to the Database")
+		log.Println("Error Connecting to the Database", err.Error())
 		return
 	}
 
@@ -26,7 +26,7 @@ func main() {
 	defer dbG.Close()
 	err = app.InitServer()
 	if err != nil {
-		log.Println("Error connecting to Server")
+		log.Println("Error connecting to Server", err.Error())
 		return
 	}
 }

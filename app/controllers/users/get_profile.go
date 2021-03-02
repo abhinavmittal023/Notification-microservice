@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -16,25 +16,24 @@ import (
 // GetUserProfileRoute is used to get your own information
 func GetUserProfileRoute(router *gin.RouterGroup) {
 	router.GET("", GetUserProfile)
-	router.OPTIONS("", preflight.Preflight)
 }
 
 // GetUserProfile Controller for get profile/ route
 func GetUserProfile(c *gin.Context) {
 
-	userID, err := strconv.ParseUint(fmt.Sprintf("%v", c.MustGet("user_id")), 10, 64)
+	userID, err := strconv.ParseUint(fmt.Sprintf("%v", c.MustGet(constants.ID)), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("String Conversion Error")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("String Conversion Error", err.Error())
 		return
 	}
 	user, err := users.GetUserWithID(uint64(userID))
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Id not in database"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().IDNotInRecords})
 		return
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("Get user with id query error")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("Get user with id query error", err.Error())
 		return
 	}
 

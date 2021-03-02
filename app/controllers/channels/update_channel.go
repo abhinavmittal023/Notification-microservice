@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/preflight"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -17,29 +17,29 @@ import (
 // UpdateChannelRoute is used to update existing channels
 func UpdateChannelRoute(router *gin.RouterGroup) {
 	router.PUT(":id", UpdateChannel)
-	router.OPTIONS(":id", preflight.Preflight)
 }
 
 // UpdateChannel controller for put the channels/:id route
 func UpdateChannel(c *gin.Context) {
 	var info serializers.ChannelInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "valid name, type and priority are required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().NameTypePriorityRequired})
 		return
 	}
-	if info.Type > constants.MaxType {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Type provided"})
+	_, found := misc.FindInSlice(constants.ChannelIntType(), int(info.Type))
+	if !found {
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidType})
 		return
 	}
 	if info.Priority > constants.MaxPriority {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Priority provided"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidPriority})
 		return
 	}
 
 	channelID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "ID should be a unsigned integer",
+			"error": constants.Errors().InvalidID,
 		})
 		return
 	}
@@ -47,29 +47,29 @@ func UpdateChannel(c *gin.Context) {
 	channel, err := channels.GetChannelWithID(uint(channelID))
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "ID is not in the database",
+			"error": constants.Errors().IDNotInRecords,
 		})
 		return
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
 	testChannel, err := channels.GetChannelWithName(strings.ToLower(info.Name))
 	if err != gorm.ErrRecordNotFound && err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	} else if testChannel.ID != channel.ID && err != gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Channel with provided name already exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().ChannelNamePresent})
 		return
 	}
 
 	testChannel, err = channels.GetChannelWithType(info.Type)
 	if err != gorm.ErrRecordNotFound && err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	} else if testChannel.ID != channel.ID && err != gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Channel with provided type already exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().ChannelTypePresent})
 		return
 	}
 
@@ -77,8 +77,8 @@ func UpdateChannel(c *gin.Context) {
 
 	err = channels.PatchChannel(channel)
 	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
