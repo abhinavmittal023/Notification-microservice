@@ -27,7 +27,7 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *s
 			var errorMap []string
 			tx.Rollback()
 			log.Println(r)
-			errorMap = append(errorMap, "Internal Server Error")
+			errorMap = append(errorMap, constants.Errors().InternalError)
 			errors.Error[index+2] = errorMap
 		}
 	}()
@@ -47,13 +47,13 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *s
 			if err != nil {
 				if status == http.StatusInternalServerError {
 					log.Println("Error Due to Regex", err.Error())
-					errorMap = append(errorMap, "Internal Server Error")
+					errorMap = append(errorMap, constants.Errors().InternalError)
 					errors.Error[index+2] = errorMap
 					tx.Rollback()
 					return http.StatusInternalServerError, &errors
 				}
 				if status == http.StatusBadRequest {
-					errorMap = append(errorMap, "Email is Invalid")
+					errorMap = append(errorMap, constants.Errors().InvalidEmail)
 					invalid = true
 				}
 			}
@@ -66,10 +66,11 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *s
 				invalid = true
 			} else if err != nil {
 				log.Println(err)
-				errorMap = append(errorMap, "Internal Server Error")
+				errorMap = append(errorMap, constants.Errors().InternalError)
 				errors.Error[index+2] = errorMap
 				return http.StatusInternalServerError, &errors
 			}
+
 			channelType := constants.ChannelType(uint(recipientRecord.ChannelType))
 
 			if channelType == "Email" && recipientRecord.Email == "" {
@@ -93,7 +94,7 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *s
 		status, err := AddUpdateRecipientWithID(&recipientRecord, tx)
 		if err != nil {
 			if status == http.StatusInternalServerError {
-				errorMap = append(errorMap, "Internal Server Error")
+				errorMap = append(errorMap, constants.Errors().InternalError)
 				errors.Error[index+2] = errorMap
 				tx.Rollback()
 				return http.StatusInternalServerError, &errors
