@@ -10,6 +10,7 @@ import (
 // Notifications interface is used to send different types of notificaitons
 type Notifications interface {
 	SendNotification() error
+	NewNotification(to string, title string, body string)
 }
 
 // Email struct implements Notifications interface
@@ -17,6 +18,13 @@ type Email struct {
 	To      string
 	Subject string
 	Message string
+}
+
+// NewNotification creates fills the values in the struct with the provided ones
+func (email *Email) NewNotification(to string, title string, body string) {
+	email.Message = body
+	email.To = to
+	email.Subject = title
 }
 
 // SendNotification method send email notifications
