@@ -17,7 +17,7 @@ import (
 
 // ResetPasswordRoute is used to send reset password link to another user
 func ResetPasswordRoute(router *gin.RouterGroup) {
-	router.PUT("/:id/password", ResetPassword)
+	router.GET("/:id/password", ResetPassword)
 }
 
 // CreatePasswordRoute is used to create a new password after checking the token
@@ -54,6 +54,13 @@ func ResetPassword(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
+	err = users.PatchUser(user)
+	if err != nil {
+		log.Println("PatchUser Error", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})

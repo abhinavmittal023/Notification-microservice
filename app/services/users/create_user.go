@@ -48,6 +48,11 @@ func CreateUserAndVerify(user *models.User, firstUser bool) (int, error) {
 		}
 		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 	}
+	err = tx.Save(user).Error
+	if err != nil {
+		log.Println(err.Error())
+		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
+	}
 	err = tx.Commit().Error
 	if err != nil {
 		log.Println("Transaction Commit Error", err.Error())

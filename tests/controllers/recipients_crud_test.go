@@ -295,7 +295,7 @@ func TestGetAllRecipientsPagination(t *testing.T) {
 		t.Fatal(err)
 	}
 	recipientRecords := got["recipient_records"].([]interface{})
-	assert.Equal(t, len(got), 1)
+	assert.Equal(t, len(recipientRecords), 1)
 	assert.Equal(t, float64(recipientsList[len(recipientsList)-1].ID), recipientRecords[0].(map[string]interface{})["id"])
 	assert.Equal(t, recipientsList[len(recipientsList)-1].RecipientID, recipientRecords[0].(map[string]interface{})["recipient_id"])
 	assert.Equal(t, (recipientsList[len(recipientsList)-1].Email), recipientRecords[0].(map[string]interface{})["email"])
@@ -321,7 +321,7 @@ func TestGetAllRecipientsPagination(t *testing.T) {
 		t.Fatal(err)
 	}
 	recipientRecords = got["recipient_records"].([]interface{})
-	assert.Equal(t, len(got), 1)
+	assert.Equal(t, len(recipientRecords), 1)
 	assert.Equal(t, float64(recipientsList[len(recipientsList)-2].ID), recipientRecords[0].(map[string]interface{})["id"])
 	assert.Equal(t, recipientsList[len(recipientsList)-2].RecipientID, recipientRecords[0].(map[string]interface{})["recipient_id"])
 	assert.Equal(t, (recipientsList[len(recipientsList)-2].Email), recipientRecords[0].(map[string]interface{})["email"])
