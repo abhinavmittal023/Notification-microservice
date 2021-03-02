@@ -62,6 +62,13 @@ func GetUserWithEmail(email string) (*models.User, error) {
 	return &user, res.Error
 }
 
+// GetUserWithToken gets the user with specified Token from the database
+func GetUserWithToken(token string) (*models.User, error) {
+	var user models.User
+	res := db.Get().Where("reset_token = ?", token).First(&user)
+	return &user, res.Error
+}
+
 // GetAllUsers gets all users from the database and returns []models.User,err
 func GetAllUsers(pagination *serializers.Pagination, userFilter *filter.User) ([]models.User, error) {
 

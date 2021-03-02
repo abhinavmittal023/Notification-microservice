@@ -18,7 +18,7 @@ import (
 )
 
 // SendHTMLEmail sends validation email to new
-func SendHTMLEmail(to []string, user *models.User, message string, resetPassword bool) error {
+func SendHTMLEmail(to []string, user *models.User, message string, subject string, resetPassword bool) error {
 	from := configuration.GetResp().EmailNotification.Email
 	password := configuration.GetResp().EmailNotification.Password
 	smtpHost := configuration.GetResp().EmailNotification.SMTPHost
@@ -60,7 +60,7 @@ func SendHTMLEmail(to []string, user *models.User, message string, resetPassword
 	var body bytes.Buffer
 
 	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body.Write([]byte(fmt.Sprintf("Subject: Verify Email Address \n%s\n\n", mimeHeaders)))
+	body.Write([]byte(fmt.Sprintf("Subject: %s \n%s\n\n", subject, mimeHeaders)))
 
 	err = t.Execute(&body, struct {
 		Link    string

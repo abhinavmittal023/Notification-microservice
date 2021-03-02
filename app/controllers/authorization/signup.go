@@ -47,7 +47,7 @@ func SignUp(c *gin.Context) {
 	var user models.User
 
 	serializers.SignupInfoToUserModel(&info, &user)
-	status, err = users.CreateUserAndVerify(&user)
+	status, err = users.CreateUserAndVerify(&user, true)
 	if err != nil {
 		c.JSON(status, gin.H{
 			"error": err.Error(),

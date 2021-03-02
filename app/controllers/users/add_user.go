@@ -1,16 +1,13 @@
 package users
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -25,7 +22,7 @@ func AddUserRoute(router *gin.RouterGroup) {
 func AddUser(c *gin.Context) {
 	var info serializers.AddUserInfo
 	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Role, %s", constants.Errors().EmailPasswordNameRequired)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().EmailNameRoleRequired})
 		return
 	}
 	_, found := misc.FindInSlice(constants.RoleType(), int(info.Role))
@@ -45,13 +42,6 @@ func AddUser(c *gin.Context) {
 		return
 	}
 
-	info.Password, err = hash.Message(info.Password, configuration.GetResp().PasswordHash)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Error while hashing the password", err.Error())
-		return
-	}
-
 	user, err := users.GetUserWithEmail(info.Email)
 	if err == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().EmailAlreadyPresent})
@@ -64,7 +54,7 @@ func AddUser(c *gin.Context) {
 	}
 
 	serializers.AddUserInfoToUserModel(&info, user)
-	status, err = users.CreateUserAndVerify(user)
+	status, err = users.CreateUserAndVerify(user, false)
 	if err != nil {
 		c.JSON(status, gin.H{
 			"error": err.Error(),

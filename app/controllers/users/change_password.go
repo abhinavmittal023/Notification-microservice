@@ -15,11 +15,6 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// ChangeDifferentUserPasswordRoute is used to change password of another user in database
-func ChangeDifferentUserPasswordRoute(router *gin.RouterGroup) {
-	router.PUT("/:id/password", ChangePassword)
-}
-
 // ChangeOwnPasswordRoute is used to change your own password
 func ChangeOwnPasswordRoute(router *gin.RouterGroup) {
 	router.PUT("/password", ChangePassword)
@@ -34,27 +29,17 @@ func ChangePassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().NewPasswordRequired})
 		return
 	}
-	if c.Param("id") == "" {
-		userID, err = strconv.ParseUint(fmt.Sprintf("%v", c.MustGet(constants.ID)), 10, 64)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": constants.Errors().InternalError,
-			})
-			log.Println(err.Error())
-			return
-		}
-		if info.OldPassword == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().OldPasswordRequired})
-			return
-		}
-	} else {
-		userID, err = strconv.ParseUint(c.Param("id"), 10, 64)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": constants.Errors().InvalidID,
-			})
-			return
-		}
+	if info.OldPassword == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().OldPasswordRequired})
+		return
+	}
+	userID, err = strconv.ParseUint(fmt.Sprintf("%v", c.MustGet(constants.ID)), 10, 64)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": constants.Errors().InternalError,
+		})
+		log.Println(err.Error())
+		return
 	}
 
 	info.NewPassword, err = hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)

@@ -45,6 +45,7 @@ func InitServer() error {
 	auth.RefreshAccessTokenRoute(authToken)
 	auth.ValidateEmailRoute(authToken)
 	auth.CheckIfFirstRoute(authToken)
+	users.CreatePasswordRoute(authToken)
 
 	loginGroup := v1.Group("/login", middlewares.CheckIfLogged())
 	authorization.SignInRoute(loginGroup)
@@ -59,7 +60,7 @@ func InitServer() error {
 	users.DeleteUserRoute(userGroup)
 	users.GetUserRoute(userGroup)
 	users.UpdateUserRoute(userGroup)
-	users.ChangeDifferentUserPasswordRoute(userGroup)
+	users.ResetPasswordRoute(userGroup)
 
 	recipientGroup := v1.Group("/recipients", middlewares.AuthorizeJWT())
 	recipientSystemAdminGroup := recipientGroup.Group("", middlewares.CheckIfSystemAdmin())

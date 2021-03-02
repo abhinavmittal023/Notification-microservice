@@ -147,6 +147,8 @@ type Error struct {
 	NextPrevNonBool           string
 	NextPrevBothProvided      string
 	NoAPIKey                  string
+	InvalidToken              string
+	EmailNameRoleRequired     string
 }
 
 // Errors is a function that returns all the error messages
@@ -182,5 +184,7 @@ func Errors() Error {
 		NextPrevNonBool:           "Non boolean next or prev provided",
 		NextPrevBothProvided:      "Provide either next or previous",
 		NoAPIKey:                  "No API Key exists",
+		InvalidToken:              "Provided token is invalid",
+		EmailNameRoleRequired:     "Role, Email and Name are required",
 	}
 }
