@@ -39,6 +39,22 @@ func GetAllUsers(c *gin.Context) {
 	}
 	filter.ConvertUserStringToLower(&userFilter)
 
+	recordsCount, err := users.GetAllUsersCount(&userFilter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		log.Println("find all users query error")
+		return
+	}
+	var infoArray []serializers.UserInfo
+	userListResponse := serializers.UserListResponse{
+		RecordsAffected: recordsCount,
+		UserInfo: infoArray,
+	}
+	if recordsCount == 0{
+		c.JSON(http.StatusOK, userListResponse)
+		return
+	}
+
 	usersArray, err := users.GetAllUsers(&pagination, &userFilter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
@@ -46,12 +62,16 @@ func GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	var infoArray []serializers.UserInfo
 	var info serializers.UserInfo
 
 	for _, user := range usersArray {
 		serializers.UserModelToUserInfo(&info, &user)
 		infoArray = append(infoArray, info)
 	}
-	c.JSON(http.StatusOK, infoArray)
+
+	userListResponse = serializers.UserListResponse{
+		RecordsAffected: recordsCount,
+		UserInfo: infoArray,
+	}
+	c.JSON(http.StatusOK, userListResponse)
 }
