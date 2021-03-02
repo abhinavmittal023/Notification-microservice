@@ -51,6 +51,13 @@ func GetChannelWithType(channelType uint) (*models.Channel, error) {
 	return &channel, res.Error
 }
 
+// GetChannelsWithPriorityLessThan gets the channels with priority less than or equal to specified from the database, and returns error/nil
+func GetChannelsWithPriorityLessThan(priority uint) (*[]models.Channel, error) {
+	var channel []models.Channel
+	res := db.Get().Model(&models.Channel{}).Where("priority < ?", priority+1).Find(&channel)
+	return &channel, res.Error
+}
+
 // GetChannelWithName gets the channel of specified name from the database, and returns error/nil
 func GetChannelWithName(channelName string) (*models.Channel, error) {
 	var channel models.Channel

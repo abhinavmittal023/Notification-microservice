@@ -1,7 +1,6 @@
 package notifications
 
 import (
-	"fmt"
 	"net/http"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
@@ -39,8 +38,10 @@ func PostSendNotifications(c *gin.Context) {
 	var errors serializers.ErrorInfo
 	errors.Error = make(map[int][]string)
 	var errorFound = false
+
 	for index, recipient := range info.Notifications.Recipients {
 		var errorMap []string
+		channelSent := map[string]bool{}
 		recipientModel, err := recipients.GetRecipientWithRecipientID(recipient)
 		if err == gorm.ErrRecordNotFound {
 			errorMap = append(errorMap, constants.Errors().RecipientIDIncorrect)
@@ -54,27 +55,7 @@ func PostSendNotifications(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, errors)
 			return
 		}
-		channelType := 1 // Email
-		channel, err := channels.GetChannelWithType(uint(channelType))
-		if err == gorm.ErrRecordNotFound {
-			errorMap = append(errorMap, fmt.Sprintf("Channel Type %s was deleted", constants.ChannelType(uint(channelType))))
-			errors.Error[index] = errorMap
-			errorFound = true
-			continue
-		} else if err != nil {
-			errorMap = append(errorMap, constants.Errors().InternalError)
-			errors.Error[index] = errorMap
-			errorFound = true
-			c.JSON(http.StatusInternalServerError, errors)
-			return
-		}
-		recipientNotification := models.RecipientNotifications{
-			NotificationID: uint64(notification.ID),
-			RecipientID:    uint64(recipientModel.ID),
-			ChannelID:      uint64(channel.ID),
-			Status:         constants.Pending,
-		}
-		err = recipientnotifications.AddRecipientNotification(&recipientNotification)
+		channelList, err := channels.GetChannelsWithPriorityLessThan(uint(notification.Priority))
 		if err != nil {
 			errorMap = append(errorMap, constants.Errors().InternalError)
 			errors.Error[index] = errorMap
@@ -82,23 +63,201 @@ func PostSendNotifications(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, errors)
 			return
 		}
-		if recipientModel.Email != "" {
-			email := sendNotification.Email{
-				To:      recipientModel.Email,
-				Subject: info.Notifications.Title,
-				Message: info.Notifications.Body,
+		for _, channel := range *channelList {
+
+			recipientNotification := models.RecipientNotifications{
+				NotificationID: uint64(notification.ID),
+				RecipientID:    uint64(recipientModel.ID),
+				ChannelID:      uint64(channel.ID),
+				Status:         constants.Pending,
 			}
-			err = email.SendNotification()
-			if err != nil {
-				errorMap = append(errorMap, "Failure")
+
+			if constants.ChannelType(uint(channel.Type)) == "Email" && recipientModel.Email != "" {
+				channelSent["Email"] = true
+				err = recipientnotifications.AddRecipientNotification(&recipientNotification)
+				if err != nil {
+					errorMap = append(errorMap, constants.Errors().InternalError)
+					errors.Error[index] = errorMap
+					errorFound = true
+					c.JSON(http.StatusInternalServerError, errors)
+					return
+				}
+				email := sendNotification.Email{
+					To:      recipientModel.Email,
+					Subject: info.Notifications.Title,
+					Message: info.Notifications.Body,
+				}
+				err = email.SendNotification()
+				if err != nil {
+					errorMap = append(errorMap, "Failure")
+					errors.Error[index] = errorMap
+					errorFound = true
+					recipientNotification.Status = constants.Failure
+					recipientnotifications.PatchRecipientNotification(&recipientNotification)
+					continue
+				}
+				recipientNotification.Status = constants.Success
+				recipientnotifications.PatchRecipientNotification(&recipientNotification)
+
+			} else if constants.ChannelType(uint(channel.Type)) == "Push" && recipientModel.PushToken != "" {
+				channelSent["Push"] = true
+				err = recipientnotifications.AddRecipientNotification(&recipientNotification)
+				if err != nil {
+					errorMap = append(errorMap, constants.Errors().InternalError)
+					errors.Error[index] = errorMap
+					errorFound = true
+					c.JSON(http.StatusInternalServerError, errors)
+					return
+				}
+				push := sendNotification.Push{
+					To:    recipientModel.PushToken,
+					Title: info.Notifications.Title,
+					Body:  info.Notifications.Body,
+				}
+				err = push.SendNotification()
+				if err != nil {
+					errorMap = append(errorMap, "Failure")
+					errors.Error[index] = errorMap
+					errorFound = true
+					recipientNotification.Status = constants.Failure
+					recipientnotifications.PatchRecipientNotification(&recipientNotification)
+					continue
+				}
+				recipientNotification.Status = constants.Success
+				recipientnotifications.PatchRecipientNotification(&recipientNotification)
+
+			} else if constants.ChannelType(uint(channel.Type)) == "Web" && recipientModel.WebToken != "" {
+				channelSent["Web"] = true
+				err = recipientnotifications.AddRecipientNotification(&recipientNotification)
+				if err != nil {
+					errorMap = append(errorMap, constants.Errors().InternalError)
+					errors.Error[index] = errorMap
+					errorFound = true
+					c.JSON(http.StatusInternalServerError, errors)
+					return
+				}
+				web := sendNotification.Web{
+					To:    recipientModel.WebToken,
+					Title: info.Notifications.Title,
+					Body:  info.Notifications.Body,
+				}
+				err = web.SendNotification()
+				if err != nil {
+					errorMap = append(errorMap, "Failure")
+					errors.Error[index] = errorMap
+					errorFound = true
+					recipientNotification.Status = constants.Failure
+					recipientnotifications.PatchRecipientNotification(&recipientNotification)
+					continue
+				}
+				recipientNotification.Status = constants.Success
+				recipientnotifications.PatchRecipientNotification(&recipientNotification)
+			}
+		}
+		if recipientModel.PreferredChannelType > 0 && !channelSent[constants.ChannelType(recipientModel.PreferredChannelType)] {
+			channel, err := channels.GetChannelWithType(recipientModel.PreferredChannelType)
+			if err == gorm.ErrRecordNotFound {
+				errorMap = append(errorMap, "Preferred Channel was Deleted")
 				errors.Error[index] = errorMap
 				errorFound = true
-				recipientNotification.Status = constants.Failure
-				recipientnotifications.PatchRecipientNotification(&recipientNotification)
 				continue
 			}
-			recipientNotification.Status = constants.Success
-			recipientnotifications.PatchRecipientNotification(&recipientNotification)
+			if err != nil {
+				errorMap = append(errorMap, constants.Errors().InternalError)
+				errors.Error[index] = errorMap
+				errorFound = true
+				c.JSON(http.StatusInternalServerError, errors)
+				return
+			}
+
+			recipientNotification := models.RecipientNotifications{
+				NotificationID: uint64(notification.ID),
+				RecipientID:    uint64(recipientModel.ID),
+				ChannelID:      uint64(channel.ID),
+				Status:         constants.Pending,
+			}
+
+			if constants.ChannelType(uint(channel.Type)) == "Email" && recipientModel.Email != "" {
+				channelSent["Email"] = true
+				err = recipientnotifications.AddRecipientNotification(&recipientNotification)
+				if err != nil {
+					errorMap = append(errorMap, constants.Errors().InternalError)
+					errors.Error[index] = errorMap
+					errorFound = true
+					c.JSON(http.StatusInternalServerError, errors)
+					return
+				}
+				email := sendNotification.Email{
+					To:      recipientModel.Email,
+					Subject: info.Notifications.Title,
+					Message: info.Notifications.Body,
+				}
+				err = email.SendNotification()
+				if err != nil {
+					errorMap = append(errorMap, "Failure")
+					errors.Error[index] = errorMap
+					errorFound = true
+					recipientNotification.Status = constants.Failure
+					recipientnotifications.PatchRecipientNotification(&recipientNotification)
+					continue
+				}
+				recipientNotification.Status = constants.Success
+				recipientnotifications.PatchRecipientNotification(&recipientNotification)
+
+			} else if constants.ChannelType(uint(channel.Type)) == "Push" && recipientModel.PushToken != "" {
+				channelSent["Push"] = true
+				err = recipientnotifications.AddRecipientNotification(&recipientNotification)
+				if err != nil {
+					errorMap = append(errorMap, constants.Errors().InternalError)
+					errors.Error[index] = errorMap
+					errorFound = true
+					c.JSON(http.StatusInternalServerError, errors)
+					return
+				}
+				push := sendNotification.Push{
+					To:    recipientModel.PushToken,
+					Title: info.Notifications.Title,
+					Body:  info.Notifications.Body,
+				}
+				err = push.SendNotification()
+				if err != nil {
+					errorMap = append(errorMap, "Failure")
+					errors.Error[index] = errorMap
+					errorFound = true
+					recipientNotification.Status = constants.Failure
+					recipientnotifications.PatchRecipientNotification(&recipientNotification)
+					continue
+				}
+				recipientNotification.Status = constants.Success
+				recipientnotifications.PatchRecipientNotification(&recipientNotification)
+
+			} else if constants.ChannelType(uint(channel.Type)) == "Web" && recipientModel.WebToken != "" {
+				channelSent["Web"] = true
+				err = recipientnotifications.AddRecipientNotification(&recipientNotification)
+				if err != nil {
+					errorMap = append(errorMap, constants.Errors().InternalError)
+					errors.Error[index] = errorMap
+					errorFound = true
+					c.JSON(http.StatusInternalServerError, errors)
+					return
+				}
+				web := sendNotification.Web{
+					To:    recipientModel.WebToken,
+					Title: info.Notifications.Title,
+					Body:  info.Notifications.Body,
+				}
+				err = web.SendNotification()
+				if err != nil {
+					errorMap = append(errorMap, "Failure")
+					errors.Error[index] = errorMap
+					errorFound = true
+					recipientNotification.Status = constants.Failure
+					recipientnotifications.PatchRecipientNotification(&recipientNotification)
+					continue
+				}
+				recipientNotification.Status = constants.Success
+				recipientnotifications.PatchRecipientNotification(&recipientNotification)
+			}
 		}
 	}
 	if errorFound {

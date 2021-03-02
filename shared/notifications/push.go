@@ -13,6 +13,13 @@ type Push struct {
 	Body  string
 }
 
+// NewNotification creates fills the values in the struct with the provided ones
+func (push *Push) NewNotification(to string, title string, body string) {
+	push.Title = title
+	push.Body = body
+	push.To = to
+}
+
 // SendNotification method send push notifications
 func (push *Push) SendNotification() error {
 	var NP fcm.NotificationPayload

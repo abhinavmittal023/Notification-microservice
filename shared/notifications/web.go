@@ -18,6 +18,13 @@ type Web struct {
 	Body  string
 }
 
+// NewNotification creates fills the values in the struct with the provided ones
+func (web *Web) NewNotification(to string, title string, body string) {
+	web.Body = body
+	web.Title = title
+	web.To = to
+}
+
 // SendNotification function sends a web notification to the specified deviceToken given the server key and title, body of the notification
 func (web *Web) SendNotification() error {
 	url := configuration.GetResp().WebNotification.URL
