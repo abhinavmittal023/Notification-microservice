@@ -41,16 +41,16 @@ func GetAllUsers(c *gin.Context) {
 
 	recordsCount, err := users.GetAllUsersCount(&userFilter)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		log.Println("find all users query error")
 		return
 	}
 	var infoArray []serializers.UserInfo
 	userListResponse := serializers.UserListResponse{
 		RecordsAffected: recordsCount,
-		UserInfo: infoArray,
+		UserInfo:        infoArray,
 	}
-	if recordsCount == 0{
+	if recordsCount == 0 {
 		c.JSON(http.StatusOK, userListResponse)
 		return
 	}
@@ -71,7 +71,7 @@ func GetAllUsers(c *gin.Context) {
 
 	userListResponse = serializers.UserListResponse{
 		RecordsAffected: recordsCount,
-		UserInfo: infoArray,
+		UserInfo:        infoArray,
 	}
 	c.JSON(http.StatusOK, userListResponse)
 }

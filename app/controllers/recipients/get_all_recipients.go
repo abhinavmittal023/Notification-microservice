@@ -44,15 +44,15 @@ func GetAllRecipient(c *gin.Context) {
 
 	recordsCount, err := recipients.GetAllRecipientsCount(&recipientFilter)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-		log.Println("find all recipients query error")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("find all recipients query error", err.Error())
 		return
 	}
-	
+
 	var infoArray []serializers.RecipientInfo
-	if recordsCount == 0{
+	if recordsCount == 0 {
 		c.JSON(http.StatusOK, gin.H{
-			"records_count": recordsCount,
+			"records_count":     recordsCount,
 			"recipient_records": infoArray})
 		return
 	}
@@ -64,7 +64,6 @@ func GetAllRecipient(c *gin.Context) {
 		return
 	}
 
-	
 	warning := ""
 
 	for _, recipient := range recipientArray {
@@ -90,12 +89,12 @@ func GetAllRecipient(c *gin.Context) {
 
 	if warning != "" {
 		c.JSON(http.StatusOK, gin.H{
-			"records_count": recordsCount,
+			"records_count":     recordsCount,
 			"recipient_records": infoArray,
 			"warning":           warning})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"records_count": recordsCount,
+			"records_count":     recordsCount,
 			"recipient_records": infoArray})
 	}
 }
