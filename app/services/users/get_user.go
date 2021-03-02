@@ -93,3 +93,35 @@ func GetAllUsers(pagination *serializers.Pagination, userFilter *filter.User) ([
 	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Find(&users)
 	return users, res.Error
 }
+
+// GetAllUsersCount gets all users count from the database and returns user records count,err
+func GetAllUsersCount(userFilter *filter.User) (int64, error) {
+
+	var users []models.User
+	dbg := db.Get()
+	tx := dbg.Model(&models.User{})
+
+	if userFilter.ID != 0 {
+		tx = tx.Where("id = ?", userFilter.ID)
+	}
+	if userFilter.FirstName != "" {
+		tx = tx.Where("first_name = ?", userFilter.FirstName)
+	}
+	if userFilter.LastName != "" {
+		tx = tx.Where("last_name = ?", userFilter.LastName)
+	}
+	if userFilter.Email != "" {
+		tx = tx.Where("email = ?", userFilter.Email)
+	}
+	if userFilter.Verified > 0 {
+		tx = tx.Where("verified = ?", true)
+	} else if userFilter.Verified < 0 {
+		tx = tx.Where("verified = ?", false)
+	}
+	if userFilter.Role != 0 {
+		tx = tx.Where("role = ?", userFilter.Role)
+	}
+
+	res := tx.Find(&users)
+	return res.RowsAffected, res.Error
+}

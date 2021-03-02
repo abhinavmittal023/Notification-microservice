@@ -77,6 +77,39 @@ func GetAllRecipients(pagination *serializers.Pagination, recipientFilter *filte
 	return recipients, res.Error
 }
 
+// GetAllRecipientsCount gets Recipients count from the database and returns recipients count,err
+func GetAllRecipientsCount(recipientFilter *filter.Recipient) (int64, error) {
+
+	var recipients []models.Recipient
+	dbg := db.Get()
+	tx := dbg.Model(&models.Recipient{})
+
+	if recipientFilter.RecipientID != "" {
+		tx = tx.Where("recipient_id = ?", recipientFilter.RecipientID)
+	}
+	if recipientFilter.PreferredChannelType != 0 {
+		tx = tx.Where("preferred_channel_type = ?", recipientFilter.PreferredChannelType)
+	}
+	if recipientFilter.Email > 0 {
+		tx = tx.Not("email", "")
+	} else if recipientFilter.Email < 0 {
+		tx = tx.Where("email = ?", "")
+	}
+	if recipientFilter.PushToken > 0 {
+		tx = tx.Not("push_token", "")
+	} else if recipientFilter.PushToken < 0 {
+		tx = tx.Where("push_token = ?", "")
+	}
+	if recipientFilter.WebToken > 0 {
+		tx = tx.Not("web_token", "")
+	} else if recipientFilter.WebToken < 0 {
+		tx = tx.Where("web_token = ?", "")
+	}
+
+	res := tx.Find(&recipients)
+	return res.RowsAffected, res.Error
+}
+
 // GetRecipientWithRecipientID gets the recipient with specified ID from the database, and returns error/nil
 func GetRecipientWithRecipientID(recipientID string) (*models.Recipient, error) {
 	var recipient models.Recipient

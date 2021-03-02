@@ -42,6 +42,21 @@ func GetAllRecipient(c *gin.Context) {
 	}
 	filter.ConvertRecipientStringToLower(&recipientFilter)
 
+	recordsCount, err := recipients.GetAllRecipientsCount(&recipientFilter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("find all recipients query error", err.Error())
+		return
+	}
+
+	var infoArray []serializers.RecipientInfo
+	if recordsCount == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"records_count":     recordsCount,
+			"recipient_records": infoArray})
+		return
+	}
+
 	recipientArray, err := recipients.GetAllRecipients(&pagination, &recipientFilter)
 	if err != nil {
 		log.Println(err.Error())
@@ -49,7 +64,6 @@ func GetAllRecipient(c *gin.Context) {
 		return
 	}
 
-	var infoArray []serializers.RecipientInfo
 	warning := ""
 
 	for _, recipient := range recipientArray {
@@ -75,10 +89,12 @@ func GetAllRecipient(c *gin.Context) {
 
 	if warning != "" {
 		c.JSON(http.StatusOK, gin.H{
+			"records_count":     recordsCount,
 			"recipient_records": infoArray,
 			"warning":           warning})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
+			"records_count":     recordsCount,
 			"recipient_records": infoArray})
 	}
 }

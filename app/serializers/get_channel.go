@@ -16,6 +16,12 @@ type ChannelInfo struct {
 	Configuration    string `json:"configuration,omitempty"`
 }
 
+// ChannelListResponse serializer for channel list response
+type ChannelListResponse struct {
+	RecordsAffected		int64	`json:"records_count"`
+	ChannelInfo			[]ChannelInfo 	`json:"channels"`
+}
+
 // ChannelInfoToChannelModel function copies the data from channel serializer to channel model
 func ChannelInfoToChannelModel(channelInfo *ChannelInfo, channelModel *models.Channel) {
 	channelModel.Name = strings.ToLower(channelInfo.Name)
@@ -34,3 +40,5 @@ func ChannelModelToChannelInfo(channelInfo *ChannelInfo, channelModel *models.Ch
 	channelInfo.Priority = channelModel.Priority
 	channelInfo.Configuration = channelModel.Configuration
 }
+
+

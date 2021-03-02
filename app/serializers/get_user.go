@@ -18,6 +18,12 @@ type UserInfo struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// UserListResponse serializer for user list response
+type UserListResponse struct {
+	RecordsAffected		int64	`json:"records_count"`
+	UserInfo			[]UserInfo 	`json:"users"`
+}
+
 // UserModelToUserInfo converts the user model to UserInfo struct
 func UserModelToUserInfo(info *UserInfo, user *models.User) {
 	info.ID = user.ID

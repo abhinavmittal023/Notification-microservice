@@ -81,3 +81,27 @@ func GetAllChannels(pagination *serializers.Pagination, channelFilter *filter.Ch
 	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Find(&channels)
 	return channels, res.Error
 }
+
+// GetAllChannelsCount gets all the channels from the database and returns records count,err
+func GetAllChannelsCount(channelFilter *filter.Channel) (int64, error) {
+
+	var channels []models.Channel
+	dbG := db.Get()
+	tx := dbG.Model(&models.Channel{})
+
+	if channelFilter.ID != 0 {
+		tx = tx.Where("id = ?", channelFilter.ID)
+	}
+	if channelFilter.Name != "" {
+		tx = tx.Where("name = ?", channelFilter.Name)
+	}
+	if channelFilter.Type != 0 {
+		tx = tx.Where("type = ?", channelFilter.Type)
+	}
+	if channelFilter.Priority != 0 {
+		tx = tx.Where("priority = ?", channelFilter.Priority)
+	}
+
+	res := tx.Find(&channels)
+	return res.RowsAffected, res.Error
+}

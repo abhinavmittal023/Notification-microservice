@@ -13,22 +13,18 @@ import (
 // APIKeyAuth middleware checks if API Key is correct
 func APIKeyAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Method == "OPTIONS" {
-			c.Next() // Preflight Request
-			return
-		}
 		authHeader := c.GetHeader(constants.Authorization)
 		apiKey, err := notifications.GetAPIHash()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": "Internal Server Error",
+				"error": constants.Errors().InternalError,
 			})
 			return
 		}
 		match, err := hash.Validate(authHeader, apiKey, configuration.GetResp().APIHash)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": "Internal Server Error",
+				"error": constants.Errors().InternalError,
 			})
 			return
 		}
