@@ -72,16 +72,16 @@ func TestGetAllUsers(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var got []gin.H
+	var got gin.H
 	err = json.Unmarshal(w.Body.Bytes(), &got)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for i := range usersList {
-		assert.Equal(t, float64(usersList[len(usersList)-1-i].ID), got[i]["user_id"])
-		assert.Equal(t, (usersList[len(usersList)-1-i].Email), got[i]["email"])
-		assert.Equal(t, (usersList[len(usersList)-1-i].FirstName), got[i]["first_name"])
+		assert.Equal(t, float64(usersList[len(usersList)-1-i].ID), got["users"].([]interface{})[i].(map[string]interface{})["user_id"])
+		assert.Equal(t, (usersList[len(usersList)-1-i].Email), got["users"].([]interface{})[i].(map[string]interface{})["email"])
+		assert.Equal(t, (usersList[len(usersList)-1-i].FirstName), got["users"].([]interface{})[i].(map[string]interface{})["first_name"])
 	}
 }
 
@@ -140,15 +140,15 @@ func TestGetAllUsersPagination(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var got []gin.H
+	var got gin.H
 	err = json.Unmarshal(w.Body.Bytes(), &got)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, len(got), 1)
-	assert.Equal(t, float64(usersList[len(usersList)-1].ID), got[0]["user_id"])
-	assert.Equal(t, (usersList[len(usersList)-1].Email), got[0]["email"])
-	assert.Equal(t, (usersList[len(usersList)-1].FirstName), got[0]["first_name"])
+	assert.Equal(t, len(got["users"].([]interface{})), 1)
+	assert.Equal(t, float64(usersList[len(usersList)-1].ID), got["users"].([]interface{})[0].(map[string]interface{})["user_id"])
+	assert.Equal(t, (usersList[len(usersList)-1].Email), got["users"].([]interface{})[0].(map[string]interface{})["email"])
+	assert.Equal(t, (usersList[len(usersList)-1].FirstName), got["users"].([]interface{})[0].(map[string]interface{})["first_name"])
 
 	w = httptest.NewRecorder()
 	c, _ = gin.CreateTestContext(w)
@@ -164,15 +164,15 @@ func TestGetAllUsersPagination(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	got = []gin.H{}
+	got = gin.H{}
 	err = json.Unmarshal(w.Body.Bytes(), &got)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, len(got), 1)
-	assert.Equal(t, float64(usersList[len(usersList)-2].ID), got[0]["user_id"])
-	assert.Equal(t, (usersList[len(usersList)-2].Email), got[0]["email"])
-	assert.Equal(t, (usersList[len(usersList)-2].FirstName), got[0]["first_name"])
+	assert.Equal(t, len(got["users"].([]interface{})), 1)
+	assert.Equal(t, float64(usersList[len(usersList)-2].ID), got["users"].([]interface{})[0].(map[string]interface{})["user_id"])
+	assert.Equal(t, (usersList[len(usersList)-2].Email), got["users"].([]interface{})[0].(map[string]interface{})["email"])
+	assert.Equal(t, (usersList[len(usersList)-2].FirstName), got["users"].([]interface{})[0].(map[string]interface{})["first_name"])
 }
 
 func TestAddUser(t *testing.T) {
@@ -183,7 +183,7 @@ func TestAddUser(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
-	data := []byte(`{"first_name": "test","last_name": "","email": "test@test.com","password": "test12--","role": 1}`)
+	data := []byte(`{"first_name": "test","last_name": "","email": "test@test.com","role": 1}`)
 
 	req, err := http.NewRequest("POST", "", bytes.NewReader(data))
 	if err != nil {
@@ -193,7 +193,6 @@ func TestAddUser(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	c.Request = req
 	users.AddUser(c)
-
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	w = httptest.NewRecorder()

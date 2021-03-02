@@ -1,0 +1,30 @@
+<!-- template.html -->
+<!DOCTYPE html>
+<html>
+  <style>
+    .container {
+      margin: 1rem auto 0rem;
+      max-width: 800px;
+      outline: solid lightgray 0.1rem;
+    }
+
+    .heading {
+      text-align: center;
+      padding-top: 0.1rem;
+    }
+
+    .content {
+      text-align: justify;
+      padding: 0rem 0.1rem 0rem 0.1rem;
+    }
+
+  </style>
+  <body>
+    <div class="container">
+      <h2 class="heading">Notification Microservice</h2>
+      <div class="content">{{.Message}}
+        <a href="{{.Link}}">Click here</a>
+      </div>
+    </div>
+  </body>
+</html>

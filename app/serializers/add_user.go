@@ -30,7 +30,6 @@ type AddUserInfo struct {
 	FirstName string `json:"first_name" binding:"required"`
 	LastName  string `json:"last_name"`
 	Email     string `json:"email" binding:"required"`
-	Password  string `json:"password,omitempty" binding:"required"`
 	Role      uint   `json:"role" binding:"required"`
 }
 
@@ -39,7 +38,6 @@ func AddUserInfoToUserModel(info *AddUserInfo, user *models.User) {
 	user.FirstName = strings.ToLower(info.FirstName)
 	user.LastName = strings.ToLower(info.LastName)
 	user.Email = strings.ToLower(info.Email)
-	user.Password = info.Password
 	user.Verified = false
 	user.Role = int(info.Role)
 }

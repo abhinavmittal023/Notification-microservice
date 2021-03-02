@@ -17,7 +17,7 @@ func CreateUser(user *models.User) error {
 }
 
 // CreateUserAndVerify creates a new user and sends a verification mail
-func CreateUserAndVerify(user *models.User) (int, error) {
+func CreateUserAndVerify(user *models.User, firstUser bool) (int, error) {
 
 	tx := db.Get().Begin()
 	defer func() {
@@ -37,7 +37,8 @@ func CreateUserAndVerify(user *models.User) (int, error) {
 		user.Email,
 	}
 	message := "Thanks for using Notification Microservice! We need to verify your email address. Please do so by clicking on the following link:"
-	err = auth.SendHTMLEmail(to, user, message, false)
+	subject := "Verify Email Address"
+	err = auth.SendHTMLEmail(to, user, message, subject, !firstUser)
 	if err != nil {
 		log.Println("SMTP Error", err.Error())
 		err = tx.Rollback().Error
@@ -45,6 +46,11 @@ func CreateUserAndVerify(user *models.User) (int, error) {
 			log.Println("Transaction Rollback Error", err.Error())
 			return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 		}
+		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
+	}
+	err = tx.Save(user).Error
+	if err != nil {
+		log.Println(err.Error())
 		return http.StatusInternalServerError, fmt.Errorf(constants.Errors().InternalError)
 	}
 	err = tx.Commit().Error

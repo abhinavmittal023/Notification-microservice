@@ -18,7 +18,7 @@ import (
 )
 
 // SendHTMLEmail sends validation email to new
-func SendHTMLEmail(to []string, user *models.User, message string, resetPassword bool) error {
+func SendHTMLEmail(to []string, user *models.User, message string, subject string, resetPassword bool) error {
 	from := configuration.GetResp().EmailNotification.Email
 	password := configuration.GetResp().EmailNotification.Password
 	smtpHost := configuration.GetResp().EmailNotification.SMTPHost
@@ -52,7 +52,7 @@ func SendHTMLEmail(to []string, user *models.User, message string, resetPassword
 	for ; strings.Split(cwd, "/")[len(strings.Split(cwd, "/"))-1] != "notifications-microservice"; cwd = filepath.Dir(cwd) {
 	}
 
-	t, err := template.ParseFiles(fmt.Sprintf("%s/shared/auth/email.html", cwd))
+	t, err := template.ParseFiles(fmt.Sprintf("%s/shared/template/email.html", cwd))
 	if err != nil {
 		log.Println("Template File can't be opened")
 		return errors.Wrap(err, "Unable to open template file")
@@ -60,7 +60,7 @@ func SendHTMLEmail(to []string, user *models.User, message string, resetPassword
 	var body bytes.Buffer
 
 	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body.Write([]byte(fmt.Sprintf("Subject: Verify Email Address \n%s\n\n", mimeHeaders)))
+	body.Write([]byte(fmt.Sprintf("Subject: %s \n%s\n\n", subject, mimeHeaders)))
 
 	err = t.Execute(&body, struct {
 		Link    string
