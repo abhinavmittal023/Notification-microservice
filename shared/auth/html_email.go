@@ -52,7 +52,7 @@ func SendHTMLEmail(to []string, user *models.User, message string, subject strin
 	for ; strings.Split(cwd, "/")[len(strings.Split(cwd, "/"))-1] != "notifications-microservice"; cwd = filepath.Dir(cwd) {
 	}
 
-	t, err := template.ParseFiles(fmt.Sprintf("%s/shared/auth/email.html", cwd))
+	t, err := template.ParseFiles(fmt.Sprintf("%s/shared/template/email.html", cwd))
 	if err != nil {
 		log.Println("Template File can't be opened")
 		return errors.Wrap(err, "Unable to open template file")
