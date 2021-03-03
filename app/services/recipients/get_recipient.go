@@ -40,7 +40,7 @@ func GetNextRecipientfromID(recipientID uint64) (*models.Recipient, error) {
 // if the record is the first one
 func GetPreviousRecipientfromID(recipientID uint64) (*models.Recipient, error) {
 	var recipientDetails models.Recipient
-	res := db.Get().Model(&models.Recipient{}).Where("id < ?", recipientID).First(&recipientDetails)
+	res := db.Get().Model(&models.Recipient{}).Where("id < ?", recipientID).Last(&recipientDetails)
 	return &recipientDetails, res.Error
 }
 

@@ -30,7 +30,7 @@ func GetNextUserfromID(userID uint64) (*models.User, error) {
 // if the record is the first one
 func GetPreviousUserfromID(userID uint64) (*models.User, error) {
 	var userDetails models.User
-	res := db.Get().Model(&models.User{}).Where("id < ?", userID).First(&userDetails)
+	res := db.Get().Model(&models.User{}).Where("id < ?", userID).Last(&userDetails)
 	return &userDetails, res.Error
 }
 

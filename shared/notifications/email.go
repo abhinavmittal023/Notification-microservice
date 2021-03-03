@@ -1,9 +1,14 @@
 package notifications
 
 import (
+	"encoding/json"
+	"log"
 	"net/smtp"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/pkg/errors"
 )
 
@@ -29,10 +34,26 @@ func (email *Email) NewNotification(to string, title string, body string) {
 
 // SendNotification method send email notifications
 func (email *Email) SendNotification() error {
-	from := configuration.GetResp().EmailNotification.Email
-	password := configuration.GetResp().EmailNotification.Password
-	smtpHost := configuration.GetResp().EmailNotification.SMTPHost
-	smtpPort := configuration.GetResp().EmailNotification.SMTPPort
+	channel, err := channels.GetChannelWithType(uint(constants.ChannelIntType()[0]))
+	if err != nil {
+		log.Println(err.Error())
+		return errors.Wrap(err, constants.Errors().InternalError)
+	}
+	var from,smtpHost,smtpPort string
+	var password string
+	var config serializers.EmailConfig
+	err = json.Unmarshal([]byte(channel.Configuration),&config)
+	if err != nil {
+		from = configuration.GetResp().EmailNotification.Email
+		password = configuration.GetResp().EmailNotification.Password
+		smtpHost = configuration.GetResp().EmailNotification.SMTPHost
+		smtpPort = configuration.GetResp().EmailNotification.SMTPPort
+	}else{
+		from = config.Email
+		password = config.Password
+		smtpHost = config.SMTPHost
+		smtpPort = config.SMTPPort
+	}
 	addr := smtpHost + ":" + smtpPort
 	msg := []byte("Subject: " + email.Subject + "\r\n" +
 		"\r\n" + email.Message + "\r\n")
@@ -41,7 +62,7 @@ func (email *Email) SendNotification() error {
 	auth := smtp.PlainAuth("", from, password, addr)
 
 	//  Sending email.
-	err := smtp.SendMail(addr, auth, from, []string{email.To}, msg)
+	err = smtp.SendMail(addr, auth, from, []string{email.To}, msg)
 	if err != nil {
 		return errors.Wrap(err, "Unable to send email")
 	}

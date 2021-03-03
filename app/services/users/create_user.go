@@ -19,6 +19,10 @@ func CreateUser(user *models.User) error {
 // CreateUserAndVerify creates a new user and sends a verification mail
 func CreateUserAndVerify(user *models.User, firstUser bool) (int, error) {
 
+	if !firstUser {
+		user.Verified = true;
+	}
+	
 	tx := db.Get().Begin()
 	defer func() {
 		if r := recover(); r != nil {

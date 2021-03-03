@@ -13,7 +13,7 @@ import (
 // APIKeyAuth middleware checks if API Key is correct
 func APIKeyAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader(constants.Authorization)
+		authHeader := c.GetHeader(constants.XAPIKey)
 		apiKey, err := notifications.GetAPIHash()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{

@@ -14,7 +14,7 @@ func GetAPILastRoute(router *gin.RouterGroup) {
 	router.GET("", GetAPILast)
 }
 
-// GetAPILast function is a controller for the get notifications/ route
+// GetAPILast function is a controller for the get /api-key route
 func GetAPILast(c *gin.Context) {
 	apiLast, err := notifications.GetAPILast()
 	if err == gorm.ErrRecordNotFound {

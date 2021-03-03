@@ -13,7 +13,7 @@ func GetAPIKeyRoute(router *gin.RouterGroup) {
 	router.GET("/new", GetAPIKey)
 }
 
-// GetAPIKey function is a controller for post notifications/api_key route
+// GetAPIKey function is a controller for post /api-key/new route
 func GetAPIKey(c *gin.Context) {
 	apiKey, err := notifications.GetAPIKey()
 	if err != nil {

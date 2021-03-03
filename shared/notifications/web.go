@@ -5,9 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/pkg/errors"
 )
 
@@ -35,8 +39,23 @@ func (web *Web) SendNotification() error {
 		},
 		"to" : "%s"}`, web.Title, web.Body, web.To))
 
+	channel, err := channels.GetChannelWithType(uint(constants.ChannelIntType()[2]))
+	if err != nil {
+		log.Println(err.Error())
+		return errors.Wrap(err, constants.Errors().InternalError)
+	}
+
+	var config serializers.WebConfig
+	var serverKey string
+	err = json.Unmarshal([]byte(channel.Configuration),&config)
+	if err != nil {
+		serverKey = configuration.GetResp().WebNotification.ServerKey
+	}else{
+		serverKey = config.ServerKey
+	}
+	
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	req.Header.Set("Authorization", fmt.Sprintf("key=%s", configuration.GetResp().WebNotification.ServerKey))
+	req.Header.Set("Authorization", fmt.Sprintf("key=%s", serverKey))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
