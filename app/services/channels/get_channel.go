@@ -40,7 +40,7 @@ func GetNextChannelfromID(channelID uint64) (*models.Channel, error) {
 // if the record is the first one
 func GetPreviousChannelfromID(channelID uint64) (*models.Channel, error) {
 	var channelDetails models.Channel
-	res := db.Get().Model(&models.Channel{}).Where("id < ?", channelID).First(&channelDetails)
+	res := db.Get().Model(&models.Channel{}).Where("id < ?", channelID).Last(&channelDetails)
 	return &channelDetails, res.Error
 }
 

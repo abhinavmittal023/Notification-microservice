@@ -16,6 +16,24 @@ type ChannelInfo struct {
 	Configuration    string `json:"configuration,omitempty"`
 }
 
+// WebConfig serializer to get config info for web channel
+type WebConfig struct {
+	ServerKey	string	`json:"server_key" binding:"required"`
+}
+
+// PushConfig serializer to get config info for push channel
+type PushConfig struct {
+	ServerKey string `json:"server_key" binding:"required"`
+}
+
+// EmailConfig serializer to get config info for email channel
+type EmailConfig struct {
+	Email string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	SMTPHost string `json:"smtp_host" binding:"required"`
+	SMTPPort string `json:"smtp_port" binding:"required"`
+}
+
 // ChannelListResponse serializer for channel list response
 type ChannelListResponse struct {
 	RecordsAffected		int64	`json:"records_count"`
@@ -28,7 +46,7 @@ func ChannelInfoToChannelModel(channelInfo *ChannelInfo, channelModel *models.Ch
 	channelModel.ShortDescription = strings.ToLower(channelInfo.ShortDescription)
 	channelModel.Type = int(channelInfo.Type)
 	channelModel.Priority = channelInfo.Priority
-	channelModel.Configuration = strings.ToLower(channelInfo.Configuration)
+	channelModel.Configuration = channelInfo.Configuration
 }
 
 // ChannelModelToChannelInfo function copies the data from channel model to channel serializer

@@ -1,7 +1,13 @@
 package notifications
 
 import (
+	"encoding/json"
+	"log"
+
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/NaySoftware/go-fcm"
 	"github.com/pkg/errors"
 )
@@ -28,7 +34,23 @@ func (push *Push) SendNotification() error {
 
 	data := map[string]string{}
 
-	c := fcm.NewFcmClient(configuration.GetResp().PushNotification.ServerKey)
+	channel, err := channels.GetChannelWithType(uint(constants.ChannelIntType()[1]))
+	if err != nil {
+		log.Println(err.Error())
+		return errors.Wrap(err, constants.Errors().InternalError)
+	}
+
+	var config serializers.PushConfig
+	err = json.Unmarshal([]byte(channel.Configuration),&config)
+
+	var c *fcm.FcmClient
+
+	if err != nil {
+		c = fcm.NewFcmClient(configuration.GetResp().PushNotification.ServerKey)
+	}else{
+		c = fcm.NewFcmClient(config.ServerKey)
+	}	
+
 	c.NewFcmRegIdsMsg([]string{push.To}, data)
 	c.SetNotificationPayload(&NP)
 	status, err := c.Send()

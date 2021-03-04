@@ -12,6 +12,9 @@ const (
 	// Authorization is the header type for authorization token
 	Authorization = "Authorization"
 
+	// XAPIKey is the header type for API Key based open endpoint
+	XAPIKey = "X-API-KEY"
+
 	// SystemAdminRole defines the role value for system admin in the database
 	SystemAdminRole = 2
 
@@ -42,7 +45,7 @@ const (
 	ID = "user_id"
 
 	// LoginPath stores the url of the login page of the front-end
-	LoginPath = "http://localhost:4200/users/login"
+	LoginPath = "http://localhost:4200/users/login?setup=true"
 
 	// ResetPasswordPath stores the url of the reset password page of the front-end
 	ResetPasswordPath = "http://localhost:4200/users/password/reset/"

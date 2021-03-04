@@ -76,7 +76,7 @@ func InitServer() error {
 	channels.DeleteChannelRoute(channelSystemAdminGroup)
 	channels.GetChannelRoute(channelGroup)
 
-	apiKeyGroup := v1.Group("/api_key", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())
+	apiKeyGroup := v1.Group("/api-key", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())
 	notifications.GetAPILastRoute(apiKeyGroup)
 	notifications.GetAPIKeyRoute(apiKeyGroup)
 
