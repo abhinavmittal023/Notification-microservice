@@ -107,7 +107,7 @@ func GetAllRecipientsCount(recipientFilter *filter.Recipient) (int64, error) {
 
 	var count int64
 	res := tx.Count(&count)
-	return count,res.Error
+	return count, res.Error
 }
 
 // GetRecipientWithRecipientID gets the recipient with specified ID from the database, and returns error/nil

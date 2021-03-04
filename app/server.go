@@ -80,8 +80,11 @@ func InitServer() error {
 	notifications.GetAPILastRoute(apiKeyGroup)
 	notifications.GetAPIKeyRoute(apiKeyGroup)
 
-	notificationGroup := v1.Group("/notification")
-	notificationOpenAPI := notificationGroup.Group("", middlewares.APIKeyAuth())
+	notificationGroup := v1.Group("/notifications", middlewares.AuthorizeJWT())
+	notifications.GetAllNotificationsRoute(notificationGroup)
+
+	sendNotificationGroup := v1.Group("/send-notification")
+	notificationOpenAPI := sendNotificationGroup.Group("", middlewares.APIKeyAuth())
 	notifications.PostSendNotificationsRoute(notificationOpenAPI)
 
 	err := router.Run(":" + configuration.GetResp().Server.Port)

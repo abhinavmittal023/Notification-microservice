@@ -89,7 +89,7 @@ func GetAllChannels(pagination *serializers.Pagination, channelFilter *filter.Ch
 	return channels, res.Error
 }
 
-// GetAllChannelsCount gets all the channels from the database and returns records count,err
+// GetAllChannelsCount gets all the channels count from the database and returns records count,err
 func GetAllChannelsCount(channelFilter *filter.Channel) (int64, error) {
 
 	dbG := db.Get()

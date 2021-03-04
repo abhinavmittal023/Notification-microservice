@@ -45,7 +45,7 @@ const (
 	ID = "user_id"
 
 	// LoginPath stores the url of the login page of the front-end
-	LoginPath = "http://localhost:4200/users/login?setup=true"
+	LoginPath = "http://localhost:4200/users/login"
 
 	// ResetPasswordPath stores the url of the reset password page of the front-end
 	ResetPasswordPath = "http://localhost:4200/users/password/reset/"

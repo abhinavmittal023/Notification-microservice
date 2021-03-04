@@ -39,16 +39,16 @@ func (email *Email) SendNotification() error {
 		log.Println(err.Error())
 		return errors.Wrap(err, constants.Errors().InternalError)
 	}
-	var from,smtpHost,smtpPort string
+	var from, smtpHost, smtpPort string
 	var password string
 	var config serializers.EmailConfig
-	err = json.Unmarshal([]byte(channel.Configuration),&config)
+	err = json.Unmarshal([]byte(channel.Configuration), &config)
 	if err != nil {
 		from = configuration.GetResp().EmailNotification.Email
 		password = configuration.GetResp().EmailNotification.Password
 		smtpHost = configuration.GetResp().EmailNotification.SMTPHost
 		smtpPort = configuration.GetResp().EmailNotification.SMTPPort
-	}else{
+	} else {
 		from = config.Email
 		password = config.Password
 		smtpHost = config.SMTPHost

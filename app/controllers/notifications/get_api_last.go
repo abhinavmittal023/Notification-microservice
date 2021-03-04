@@ -18,7 +18,7 @@ func GetAPILastRoute(router *gin.RouterGroup) {
 func GetAPILast(c *gin.Context) {
 	apiLast, err := notifications.GetAPILast()
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": constants.Errors().NoAPIKey,
 		})
 		return

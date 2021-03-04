@@ -23,6 +23,6 @@ type RecipientNotifications struct {
 	Recipient      Recipient
 	RecipientID    uint64 `gorm:"not null"`
 	Channel        Channel
-	ChannelID      uint64 `gorm:"not null;index"`
+	ChannelName    string `gorm:"type:varchar(100);not null;index"`
 	Status         uint64 `gorm:"not null;index"`
 }
