@@ -84,6 +84,7 @@ func GetAllNotificationsCount(notificationFilter *filter.Notification) (int64, e
 func GetGraphData(notificationFilter *filter.Notification) (*serializers.GraphData, error) {
 	dbG := db.Get()
 	var graphData serializers.GraphData
+	graphKey := []time.Time{}
 	type successFailedData struct {
 		Successful uint64 `json:"successful"`
 		Failed     uint64 `json:"failed"`
@@ -122,22 +123,28 @@ func GetGraphData(notificationFilter *filter.Notification) (*serializers.GraphDa
 	if !notificationFilter.From.IsZero() && !notificationFilter.To.IsZero() {
 		tx = tx.Where("updated_at BETWEEN ? AND ?", notificationFilter.From, notificationFilter.To)
 	}
-	res = tx.Select("updated_at, count(*) as failed").Where("status = ?", constants.Failure).Group("updated_at").Scan(&results)
+	res = tx.Select("updated_at, count(*) as failed").Where("status = ?", constants.Failure).Group("updated_at").Order("updated_at asc").Scan(&results)
 	if res.Error != nil {
 		return nil, res.Error
 	}
 	for _, result := range results {
+		graphKey = append(graphKey, result.UpdatedAt.Truncate(time.Minute))
 		data[result.UpdatedAt.Truncate(time.Minute)] = successFailedData{
 			Failed:     data[result.UpdatedAt.Truncate(time.Minute)].Failed + result.Failed,
 			Successful: data[result.UpdatedAt.Truncate(time.Minute)].Successful,
 			Total:      data[result.UpdatedAt.Truncate(time.Minute)].Failed + result.Failed + data[result.UpdatedAt.Truncate(time.Minute)].Successful,
 		}
 	}
-	for key, val := range data {
-		graphData.UpdatedAt = append(graphData.UpdatedAt, key)
-		graphData.Successful = append(graphData.Successful, val.Successful)
-		graphData.Failed = append(graphData.Failed, val.Failed)
-		graphData.Total = append(graphData.Total, val.Total)
+	var prevVal time.Time = time.Time{}
+	for _, val := range graphKey {
+		if prevVal == val {
+			continue
+		}
+		prevVal = val
+		graphData.UpdatedAt = append(graphData.UpdatedAt, val)
+		graphData.Successful = append(graphData.Successful, data[val].Successful)
+		graphData.Failed = append(graphData.Failed, data[val].Failed)
+		graphData.Total = append(graphData.Total, data[val].Total)
 	}
 	return &graphData, nil
 }
