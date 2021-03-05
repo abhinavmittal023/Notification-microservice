@@ -10,54 +10,150 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 )
 
-// GetAllNotifications gets all the notifications from the database and returns []models.RecipientNotifications, err
-func GetAllNotifications(pagination *serializers.Pagination, notificationFilter *filter.Notification) ([]models.RecipientNotifications, error) {
-	return nil, nil
-	// dbG := db.Get()
-	// var recipientNotifications []models.RecipientNotifications
+// GetAllNotifications gets all the notifications from the database and returns []serializers.NotificationsInfo, err
+func GetAllNotifications(pagination *serializers.Pagination, notificationFilter *filter.Notification) ([]serializers.NotificationsInfo, error) {
+	dbG := db.Get()
+    var recipientNotifications []serializers.NotificationsInfo
 
-	// var recipientNotification models.RecipientNotifications
+    var recipientNotification models.RecipientNotifications
 
-	// var notificationsInfo []serializers.NotificationsInfo
-	// data := make(map[uint64]serializers.NotificationsInfo)
+	type successFailedData struct{
+		Successful uint64 
+        Failed     uint64 
+        Total      uint64 
+	}
 
-	// if notificationFilter.RecipientID != "" {
-	// 	err := db.Get().Table("recipients").Select("id").Where("recipient_id = ?", notificationFilter.RecipientID).Find(&recipientNotification).Error
-	// 	if err != nil{
-	// 		return nil,err
-	// 	}
-	// }
-	// tx := dbG.Model(&models.RecipientNotifications{})
-	// tx = tx.Select("distinct(notification_id)")
-	// if notificationFilter.RecipientID != "" {
-	// 	tx = tx.Where("recipient_id = ?", recipientNotification.ID)
-	// }
-	// if notificationFilter.ChannelName != "" {
-	// 	tx = tx.Where("channel_name = ?", notificationFilter.ChannelName)
-	// }
-	// if !notificationFilter.From.IsZero() && !notificationFilter.To.IsZero() {
-	// 	tx = tx.Where("updated_at BETWEEN ? AND ?",notificationFilter.From, notificationFilter.To )
-	// }
+	type notificationData struct {
+		NotificationID uint64
+	}
 
-	// res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Find(&recipientNotifications)
+    type structResponse struct{
+        Priority             int                    
+        Title                string                 
+        Body                 string                 
+        NotificationChannels map[string]successFailedData 
+	}
 
-	// tx = dbG.Model(&models.Notification{})
+    data := make(map[uint64]structResponse)
 
-	// for _,result := range(recipientNotifications){
-	// 	var notification models.Notification
-	// 	res = tx.Where("id = ?",result.NotificationID).Find(&notification)
-	// 	if res!=nil{
-	// 		return nil,res.Error
-	// 	}
-	// 	data[result.NotificationID] = serializers.NotificationsInfo{
-	// 		Title: notification.Title,
-	// 		Body: notification.Body,
-	// 		Priority: notification.Priority,
-	// 		NotificationChannels: []serializers.NotificationChannels{},
-	// 	}
-	// }
+    if notificationFilter.RecipientID != "" {
+        err := db.Get().Table("recipients").Select("id").Where("recipient_id = ?", notificationFilter.RecipientID).Find(&recipientNotification).Error
+        if err != nil{
+            return nil,err
+        }
+	}
+	var notificationID []notificationData
+	tx := dbG.Model(&models.RecipientNotifications{})
+	if notificationFilter.RecipientID != "" {
+		tx = tx.Where("recipient_id = ?", recipientNotification.ID)
+	}
+	if notificationFilter.ChannelName != "" {
+		tx = tx.Where("channel_name = ?", notificationFilter.ChannelName)
+	}
+	if !notificationFilter.From.IsZero() && !notificationFilter.To.IsZero() {
+		tx = tx.Where("updated_at BETWEEN ? AND ?",notificationFilter.From, notificationFilter.To )
+	}
+	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Select("distinct(notification_id)").Scan(&notificationID)
+	if res.Error != nil {
+		return nil, res.Error
+	}
 
-	// return recipientNotifications, res.Error
+	for _,value := range notificationID{
+
+		if _,found := data[uint64(value.NotificationID)]; !found{
+			tx = dbG.Model(&models.Notification{})
+			var notification models.Notification
+			res = tx.Where("id = ?",value.NotificationID).Find(&notification)
+			data[uint64(value.NotificationID)] = structResponse{
+				Body: notification.Body,
+				Title: notification.Title,
+				Priority: notification.Priority,
+				NotificationChannels: make(map[string]successFailedData),
+			}
+		}
+		
+		tx = dbG.Model(&models.RecipientNotifications{})
+		if notificationFilter.RecipientID != "" {
+			tx = tx.Where("recipient_id = ?", recipientNotification.ID)
+		}
+		if notificationFilter.ChannelName != "" {
+			tx = tx.Where("channel_name = ?", notificationFilter.ChannelName)
+		}
+		if !notificationFilter.From.IsZero() && !notificationFilter.To.IsZero() {
+			tx = tx.Where("updated_at BETWEEN ? AND ?",notificationFilter.From, notificationFilter.To )
+		}
+		results := []serializers.NotificationChannels{}
+
+		res = tx.Select("channel_name, count(*) as successful").Where("notification_id = ? and status = ?", value.NotificationID , constants.Success).Group("channel_name").Scan(&results)
+		if res.Error != nil {
+			return nil, res.Error
+		}
+		for _,val := range results {
+			data[uint64(value.NotificationID)].NotificationChannels[val.ChannelName] = successFailedData{
+				Successful: val.Successful,
+				Total: val.Successful,
+			}
+		}
+	}
+
+	for _,value := range notificationID{
+
+		if _,found := data[uint64(value.NotificationID)]; !found{
+			tx = dbG.Model(&models.Notification{})
+			var notification models.Notification
+			res = tx.Where("id = ?",value.NotificationID).Find(&notification)
+			data[uint64(value.NotificationID)] = structResponse{
+				Body: notification.Body,
+				Title: notification.Title,
+				Priority: notification.Priority,
+				NotificationChannels: make(map[string]successFailedData),
+			}
+		}
+		tx = dbG.Model(&models.RecipientNotifications{})
+		if notificationFilter.RecipientID != "" {
+			tx = tx.Where("recipient_id = ?", recipientNotification.ID)
+		}
+		if notificationFilter.ChannelName != "" {
+			tx = tx.Where("channel_name = ?", notificationFilter.ChannelName)
+		}
+		if !notificationFilter.From.IsZero() && !notificationFilter.To.IsZero() {
+			tx = tx.Where("updated_at BETWEEN ? AND ?",notificationFilter.From, notificationFilter.To )
+		}
+		results := []serializers.NotificationChannels{}
+
+		res = tx.Select("channel_name, count(*) as failure").Where("notification_id = ? and status = ?", value.NotificationID , constants.Failure).Group("channel_name").Scan(&results)
+		if res.Error != nil {
+			return nil, res.Error
+		}
+		for _,val := range results {
+			data[uint64(value.NotificationID)].NotificationChannels[val.ChannelName] = successFailedData{
+				Successful: data[uint64(value.NotificationID)].NotificationChannels[val.ChannelName].Successful,
+            	Failed: val.Failure,
+            	Total: data[uint64(value.NotificationID)].NotificationChannels[val.ChannelName].Successful + val.Failure,
+			}
+		}
+	}
+
+    var channelSlice []serializers.NotificationChannels
+    for _,val := range data{
+        channelSlice = []serializers.NotificationChannels{}
+        for name,channel := range val.NotificationChannels{
+            channelSlice = append(channelSlice, serializers.NotificationChannels{
+                ChannelName: name,
+                Successful: channel.Successful,
+                Failure: channel.Failed,
+                Total: channel.Total,
+            })
+        }
+        recipientNotifications = append(recipientNotifications, serializers.NotificationsInfo{
+            Priority: val.Priority,
+            Title: val.Title,
+            Body: val.Body,
+            NotificationChannels: channelSlice,
+        })
+    }
+
+    return recipientNotifications, res.Error
 }
 
 // GetAllNotificationsCount gets all the notifications count from the database and returns records count,err
@@ -75,9 +171,11 @@ func GetAllNotificationsCount(notificationFilter *filter.Notification) (int64, e
 		tx = tx.Where("updated_at BETWEEN ? AND ?", notificationFilter.From, notificationFilter.To)
 	}
 
-	var count int64
-	res := tx.Count(&count)
-	return count, res.Error
+	var count struct{
+		Count int64
+	}
+	res := tx.Select("count(distinct(notification_id)) as count").Scan(&count)
+	return count.Count, res.Error
 }
 
 // GetGraphData is used to get the required graph data

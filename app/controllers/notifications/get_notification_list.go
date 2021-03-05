@@ -46,7 +46,19 @@ func GetAllNotifications(c *gin.Context) {
 		log.Println("find all notifications count query error", err.Error())
 		return
 	}
-	log.Println(recordsCount)
+
+	result,err := notifications.GetAllNotifications(&pagination,&notificationFilter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		return
+	}
+
+	notificationListResponse := serializers.NotificationsResponse{
+		RecordsAffected: recordsCount,
+		NotificationsInfo: result,
+	}
+
+	c.JSON(http.StatusOK,notificationListResponse)
 }
 
 // GetGraphData function is a controller for get notifications/:id route
