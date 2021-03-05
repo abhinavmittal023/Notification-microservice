@@ -45,7 +45,7 @@ func (push *Push) SendNotification() error {
 
 	var c *fcm.FcmClient
 
-	if err != nil {
+	if err != nil || config.ServerKey == "" {
 		c = fcm.NewFcmClient(configuration.GetResp().PushNotification.ServerKey)
 	} else {
 		c = fcm.NewFcmClient(config.ServerKey)

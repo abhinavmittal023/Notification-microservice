@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/smtp"
+	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
@@ -40,17 +41,17 @@ func (email *Email) SendNotification() error {
 		return errors.Wrap(err, constants.Errors().InternalError)
 	}
 	var from, smtpHost, smtpPort string
-	var password string
+	// var password string
 	var config serializers.EmailConfig
 	err = json.Unmarshal([]byte(channel.Configuration), &config)
-	if err != nil {
+	if err != nil || config.Email == "" || config.SMTPHost == "" || config.SMTPPort == ""{
 		from = configuration.GetResp().EmailNotification.Email
-		password = configuration.GetResp().EmailNotification.Password
+		// password = configuration.GetResp().EmailNotification.Password
 		smtpHost = configuration.GetResp().EmailNotification.SMTPHost
 		smtpPort = configuration.GetResp().EmailNotification.SMTPPort
 	} else {
-		from = config.Email
-		password = config.Password
+		from = strings.ToLower(config.Email)
+		// password = config.Password
 		smtpHost = config.SMTPHost
 		smtpPort = config.SMTPPort
 	}
@@ -59,10 +60,10 @@ func (email *Email) SendNotification() error {
 		"\r\n" + email.Message + "\r\n")
 
 	// Authentication
-	auth := smtp.PlainAuth("", from, password, addr)
+	// auth := smtp.PlainAuth("", from, password, addr)
 
 	//  Sending email.
-	err = smtp.SendMail(addr, auth, from, []string{email.To}, msg)
+	err = smtp.SendMail(addr, nil, from, []string{email.To}, msg)
 	if err != nil {
 		return errors.Wrap(err, "Unable to send email")
 	}
