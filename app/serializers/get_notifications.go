@@ -2,8 +2,8 @@ package serializers
 
 // NotificationsResponse serializer to send notifications list
 type NotificationsResponse struct {
-	RecordsAffected int64         `json:"records_count"`
-	NotificationsInfo	[]NotificationsInfo `json:"notifications"`
+	RecordsAffected   int64               `json:"records_count"`
+	NotificationsInfo []NotificationsInfo `json:"notifications"`
 }
 
 // NotificationsInfo serializer to get and show notifications information

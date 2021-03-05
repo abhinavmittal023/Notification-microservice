@@ -47,18 +47,18 @@ func GetAllNotifications(c *gin.Context) {
 		return
 	}
 
-	result,err := notifications.GetAllNotifications(&pagination,&notificationFilter)
+	result, err := notifications.GetAllNotifications(&pagination, &notificationFilter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
 	notificationListResponse := serializers.NotificationsResponse{
-		RecordsAffected: recordsCount,
+		RecordsAffected:   recordsCount,
 		NotificationsInfo: result,
 	}
 
-	c.JSON(http.StatusOK,notificationListResponse)
+	c.JSON(http.StatusOK, notificationListResponse)
 }
 
 // GetGraphData function is a controller for get notifications/:id route
