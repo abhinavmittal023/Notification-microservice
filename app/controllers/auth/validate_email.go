@@ -20,7 +20,8 @@ func ValidateEmailRoute(router *gin.RouterGroup) {
 // ValidateEmail Controller verifies the email after checking the token
 func ValidateEmail(c *gin.Context) {
 	tokenString := c.Param("token")
-	location := url.URL{Path: constants.LoginPath}
+	location := url.URL{Path: constants.LoginPath,
+		RawQuery: "setup=true"}
 
 	userDetails, err := authservice.ValidateToken(tokenString, constants.TokenType().Validation)
 	if err == authservice.ErrInvalidToken {

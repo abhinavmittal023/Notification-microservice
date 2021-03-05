@@ -104,7 +104,6 @@ func GetAllUsers(pagination *serializers.Pagination, userFilter *filter.User) ([
 // GetAllUsersCount gets all users count from the database and returns user records count,err
 func GetAllUsersCount(userFilter *filter.User) (int64, error) {
 
-	var users []models.User
 	dbg := db.Get()
 	tx := dbg.Model(&models.User{})
 
@@ -129,6 +128,7 @@ func GetAllUsersCount(userFilter *filter.User) (int64, error) {
 		tx = tx.Where("role = ?", userFilter.Role)
 	}
 
-	res := tx.Find(&users)
-	return res.RowsAffected, res.Error
+	var count int64
+	res := tx.Count(&count)
+	return count, res.Error
 }

@@ -80,7 +80,6 @@ func GetAllRecipients(pagination *serializers.Pagination, recipientFilter *filte
 // GetAllRecipientsCount gets Recipients count from the database and returns recipients count,err
 func GetAllRecipientsCount(recipientFilter *filter.Recipient) (int64, error) {
 
-	var recipients []models.Recipient
 	dbg := db.Get()
 	tx := dbg.Model(&models.Recipient{})
 
@@ -106,8 +105,9 @@ func GetAllRecipientsCount(recipientFilter *filter.Recipient) (int64, error) {
 		tx = tx.Where("web_token = ?", "")
 	}
 
-	res := tx.Find(&recipients)
-	return res.RowsAffected, res.Error
+	var count int64
+	res := tx.Count(&count)
+	return count, res.Error
 }
 
 // GetRecipientWithRecipientID gets the recipient with specified ID from the database, and returns error/nil

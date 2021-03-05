@@ -47,13 +47,13 @@ func (web *Web) SendNotification() error {
 
 	var config serializers.WebConfig
 	var serverKey string
-	err = json.Unmarshal([]byte(channel.Configuration),&config)
-	if err != nil {
+	err = json.Unmarshal([]byte(channel.Configuration), &config)
+	if err != nil || config.ServerKey == ""{
 		serverKey = configuration.GetResp().WebNotification.ServerKey
-	}else{
+	} else {
 		serverKey = config.ServerKey
 	}
-	
+
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Authorization", fmt.Sprintf("key=%s", serverKey))
 	req.Header.Set("Content-Type", "application/json")

@@ -34,11 +34,20 @@ func AddChannel(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidPriority})
 		return
 	}
-
 	var channel models.Channel
+	err := serializers.ChannelConfigValidation(&info)
+	
+	if err != nil && err.Error() == constants.Errors().InternalError{
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		return
+	}else if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	serializers.ChannelInfoToChannelModel(&info, &channel)
 
-	_, err := channels.GetChannelWithName(channel.Name)
+	_, err = channels.GetChannelWithName(channel.Name)
 	if err != gorm.ErrRecordNotFound && err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return

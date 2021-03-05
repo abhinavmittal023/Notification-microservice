@@ -20,8 +20,8 @@ type UserInfo struct {
 
 // UserListResponse serializer for user list response
 type UserListResponse struct {
-	RecordsAffected		int64	`json:"records_count"`
-	UserInfo			[]UserInfo 	`json:"users"`
+	RecordsAffected int64      `json:"records_count"`
+	UserInfo        []UserInfo `json:"users"`
 }
 
 // UserModelToUserInfo converts the user model to UserInfo struct

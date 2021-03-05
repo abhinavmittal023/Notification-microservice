@@ -20,9 +20,9 @@ func CreateUser(user *models.User) error {
 func CreateUserAndVerify(user *models.User, firstUser bool) (int, error) {
 
 	if !firstUser {
-		user.Verified = true;
+		user.Verified = true
 	}
-	
+
 	tx := db.Get().Begin()
 	defer func() {
 		if r := recover(); r != nil {

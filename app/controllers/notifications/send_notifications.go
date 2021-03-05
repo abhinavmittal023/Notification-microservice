@@ -29,7 +29,7 @@ func PostSendNotifications(c *gin.Context) {
 	}
 	var notification models.Notification
 	err := serializers.NotificationsInfoToNotificationModel(&info, &notification)
-	if err!= nil {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -75,7 +75,7 @@ func PostSendNotifications(c *gin.Context) {
 			recipientNotification := models.RecipientNotifications{
 				NotificationID: uint64(notification.ID),
 				RecipientID:    uint64(recipientModel.ID),
-				ChannelID:      uint64(channel.ID),
+				ChannelName:    channel.Name,
 				Status:         constants.Pending,
 			}
 
@@ -180,7 +180,7 @@ func PostSendNotifications(c *gin.Context) {
 			recipientNotification := models.RecipientNotifications{
 				NotificationID: uint64(notification.ID),
 				RecipientID:    uint64(recipientModel.ID),
-				ChannelID:      uint64(channel.ID),
+				ChannelName:    channel.Name,
 				Status:         constants.Pending,
 			}
 

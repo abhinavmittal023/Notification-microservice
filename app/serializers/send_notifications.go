@@ -22,7 +22,7 @@ type Notifications struct {
 // NotificationsInfoToNotificationModel converts the serializer to model
 func NotificationsInfoToNotificationModel(info *SendNotifications, notification *models.Notification) error {
 	notification.Priority = constants.PriorityTypeToInt(info.Notifications.Priority)
-	if notification.Priority == 0{
+	if notification.Priority == 0 {
 		return errors.New("Invalid Priority")
 	}
 	notification.Title = info.Notifications.Title

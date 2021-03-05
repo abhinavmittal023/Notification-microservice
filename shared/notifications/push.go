@@ -41,15 +41,15 @@ func (push *Push) SendNotification() error {
 	}
 
 	var config serializers.PushConfig
-	err = json.Unmarshal([]byte(channel.Configuration),&config)
+	err = json.Unmarshal([]byte(channel.Configuration), &config)
 
 	var c *fcm.FcmClient
 
-	if err != nil {
+	if err != nil || config.ServerKey == "" {
 		c = fcm.NewFcmClient(configuration.GetResp().PushNotification.ServerKey)
-	}else{
+	} else {
 		c = fcm.NewFcmClient(config.ServerKey)
-	}	
+	}
 
 	c.NewFcmRegIdsMsg([]string{push.To}, data)
 	c.SetNotificationPayload(&NP)
