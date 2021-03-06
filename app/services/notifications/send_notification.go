@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"net/http"
+	"sync"
 
 	apimessage "code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/api_message"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
@@ -13,7 +14,9 @@ import (
 )
 
 // SendAllNotifications functon sends the notification to the specific recipient
-func SendAllNotifications(notification models.Notification, recipientModel models.Recipient, channelList []models.Channel, openAPI *apimessage.OpenAPI) (int, error) {
+func SendAllNotifications(notification models.Notification, recipientModel models.Recipient, channelList []models.Channel, openAPI *apimessage.OpenAPI, wg *sync.WaitGroup, mu *sync.Mutex) (int, error) {
+
+	defer wg.Done()
 
 	channelSent := map[string]bool{}
 
@@ -30,56 +33,56 @@ func SendAllNotifications(notification models.Notification, recipientModel model
 			channelSent["Email"] = true
 			err := recipientnotifications.AddRecipientNotification(&recipientNotification)
 			if err != nil {
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 				return http.StatusInternalServerError, err
 			}
 			email := sendNotification.Email{To: recipientModel.Email, Subject: notification.Title, Message: notification.Body}
 			status, err := send(&recipientNotification, &email)
 			if err != nil {
 				if status == http.StatusInternalServerError {
-					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 					return http.StatusInternalServerError, err
 				}
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 				continue
 			}
-			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true)
+			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true, mu)
 		} else if constants.ChannelType(uint(channel.Type)) == "Push" && recipientModel.PushToken != "" {
 			channelSent["Push"] = true
 			err := recipientnotifications.AddRecipientNotification(&recipientNotification)
 			if err != nil {
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 				return http.StatusInternalServerError, err
 			}
 			push := sendNotification.Push{To: recipientModel.PushToken, Title: notification.Title, Body: notification.Body}
 			status, err := send(&recipientNotification, &push)
 			if err != nil {
 				if status == http.StatusInternalServerError {
-					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 					return http.StatusInternalServerError, err
 				}
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 				continue
 			}
-			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true)
+			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true, mu)
 		} else if constants.ChannelType(uint(channel.Type)) == "Web" && recipientModel.WebToken != "" {
 			channelSent["Web"] = true
 			err := recipientnotifications.AddRecipientNotification(&recipientNotification)
 			if err != nil {
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 				return http.StatusInternalServerError, err
 			}
 			web := sendNotification.Web{To: recipientModel.WebToken, Title: notification.Title, Body: notification.Body}
 			status, err := send(&recipientNotification, &web)
 			if err != nil {
 				if status == http.StatusInternalServerError {
-					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 					return http.StatusInternalServerError, err
 				}
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 				continue
 			}
-			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true)
+			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true, mu)
 		}
 	}
 
@@ -90,7 +93,7 @@ func SendAllNotifications(notification models.Notification, recipientModel model
 			return http.StatusOK, nil
 		}
 		if err != nil {
-			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 			return http.StatusInternalServerError, err
 		}
 
@@ -104,53 +107,56 @@ func SendAllNotifications(notification models.Notification, recipientModel model
 			channelSent["Email"] = true
 			err := recipientnotifications.AddRecipientNotification(&recipientNotification)
 			if err != nil {
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 				return http.StatusInternalServerError, err
 			}
 			email := sendNotification.Email{To: recipientModel.Email, Subject: notification.Title, Message: notification.Body}
 			status, err := send(&recipientNotification, &email)
 			if err != nil {
 				if status == http.StatusInternalServerError {
-					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 					return http.StatusInternalServerError, err
 				}
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
+				return http.StatusOK, nil
 			}
-			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true)
+			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true, mu)
 		} else if constants.ChannelType(uint(channel.Type)) == "Push" && recipientModel.PushToken != "" {
 			channelSent["Push"] = true
 			err := recipientnotifications.AddRecipientNotification(&recipientNotification)
 			if err != nil {
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 				return http.StatusInternalServerError, err
 			}
 			push := sendNotification.Push{To: recipientModel.PushToken, Title: notification.Title, Body: notification.Body}
 			status, err := send(&recipientNotification, &push)
 			if err != nil {
 				if status == http.StatusInternalServerError {
-					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 					return http.StatusInternalServerError, err
 				}
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
+				return http.StatusOK, nil
 			}
-			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true)
+			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true, mu)
 		} else if constants.ChannelType(uint(channel.Type)) == "Web" && recipientModel.WebToken != "" {
 			channelSent["Web"] = true
 			err := recipientnotifications.AddRecipientNotification(&recipientNotification)
 			if err != nil {
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 				return http.StatusInternalServerError, err
 			}
 			web := sendNotification.Web{To: recipientModel.WebToken, Title: notification.Title, Body: notification.Body}
 			status, err := send(&recipientNotification, &web)
 			if err != nil {
 				if status == http.StatusInternalServerError {
-					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
 					return http.StatusInternalServerError, err
 				}
-				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false)
+				openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
+				return http.StatusOK, nil
 			}
-			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true)
+			openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, true, mu)
 		}
 	}
 	return http.StatusOK, nil

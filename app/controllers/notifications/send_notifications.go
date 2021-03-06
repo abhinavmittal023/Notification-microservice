@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"net/http"
+	"sync"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	apimessage "code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/api_message"
@@ -46,6 +47,10 @@ func PostSendNotifications(c *gin.Context) {
 		RecipientIDIncorrect:        []string{},
 		PreferredChannelTypeDeleted: []string{},
 	}
+	var (
+		wg sync.WaitGroup
+		mu sync.Mutex
+	)
 
 	for _, recipient := range info.Notifications.Recipients {
 		recipientModel, err := recipients.GetRecipientWithRecipientID(recipient)
@@ -61,7 +66,9 @@ func PostSendNotifications(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, openAPI)
 			return
 		}
-		notifications.SendAllNotifications(notification, *recipientModel, *channelList, &openAPI)
+		wg.Add(1)
+		go notifications.SendAllNotifications(notification, *recipientModel, *channelList, &openAPI, &wg, &mu)
 	}
+	wg.Wait()
 	c.JSON(http.StatusOK, openAPI)
 }
