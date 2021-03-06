@@ -10,6 +10,7 @@ type OpenAPI struct {
 	NotificationStatus          map[string]OpenAPIChannel `json:"notification_status,omitempty"`
 	RecipientIDIncorrect        []string                  `json:"recipient_id_incorrect,omitempty"`
 	PreferredChannelTypeDeleted []string                  `json:"Preferred_channel_deleted,omitempty"`
+	RepeatedID                  []string                  `json:"recipient_id_repeated,omitempty"`
 }
 
 // OpenAPIChannel is the serializer to show success and failure recipient IDs per channel

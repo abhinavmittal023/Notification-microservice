@@ -105,6 +105,7 @@ func CreatePassword(c *gin.Context) {
 		log.Println("Hashing error for new password", err.Error())
 		return
 	}
+	user.Verified = true
 	user.Password = newPassword
 	err = users.PatchUser(user)
 	if err != nil {

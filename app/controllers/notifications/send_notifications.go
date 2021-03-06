@@ -47,7 +47,9 @@ func PostSendNotifications(c *gin.Context) {
 		NotificationStatus:          make(map[string]apimessage.OpenAPIChannel),
 		RecipientIDIncorrect:        []string{},
 		PreferredChannelTypeDeleted: []string{},
+		RepeatedID:                  []string{},
 	}
+	processedRecipients := map[string]bool{}
 	var (
 		wg sync.WaitGroup
 		mu sync.Mutex = sync.Mutex{}
@@ -57,6 +59,11 @@ func PostSendNotifications(c *gin.Context) {
 	stopChan := make(chan bool)
 	go func() {
 		for _, recipient := range info.Notifications.Recipients {
+			if processedRecipients[recipient] == true {
+				openAPI.RepeatedID = append(openAPI.RepeatedID, recipient)
+				continue
+			}
+			processedRecipients[recipient] = true
 			recipientModel, err := recipients.GetRecipientWithRecipientID(recipient)
 			if err == gorm.ErrRecordNotFound {
 				openAPI.RecipientIDIncorrect = append(openAPI.RecipientIDIncorrect, recipient)
