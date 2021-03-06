@@ -31,7 +31,7 @@ func ValidateToken(tokenString string, tokenType string) (*models.User, error) {
 			log.Println(err)
 			return nil, err
 		}
-		if tokenType == "validation" && userDetails.Verified == true {
+		if tokenType == "validation" && userDetails.Verified {
 			return userDetails, ErrAlreadyVerfied
 		}
 		if token.Valid {

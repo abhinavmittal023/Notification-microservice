@@ -359,7 +359,11 @@ func TestAddUpdateRecipient(t *testing.T) {
 		log.Println(err.Error())
 		t.Fail()
 	}
-	part.Write(fileContents)
+	_, err = part.Write(fileContents)
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	err = writer.Close()
 	if err != nil {
 		log.Println(err.Error())

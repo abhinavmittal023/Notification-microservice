@@ -21,6 +21,7 @@ type OpenAPIChannel struct {
 // AddRecipientID Adds the recipient ID to the success or failure list of the struct
 func (openAPI *OpenAPI) AddRecipientID(ID string, channelName string, success bool, mu *sync.Mutex) {
 	mu.Lock()
+	defer mu.Unlock()
 	channelName = strings.ToLower(channelName)
 	channelStatus, present := openAPI.NotificationStatus[channelName]
 	if !present {
@@ -35,5 +36,4 @@ func (openAPI *OpenAPI) AddRecipientID(ID string, channelName string, success bo
 		channelStatus.Failure = append(channelStatus.Failure, ID)
 	}
 	openAPI.NotificationStatus[channelName] = channelStatus
-	mu.Unlock()
 }

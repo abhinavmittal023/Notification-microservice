@@ -37,7 +37,7 @@ func TestGetRecipientWithID(t *testing.T) {
 	assert.Equal(t, (recipient.Email), gotRecipient.Email)
 	assert.Equal(t, recipient.RecipientID, gotRecipient.RecipientID)
 
-	gotRecipient, gotError = recipients.GetRecipientWithID(uint64(recipient.ID) + 1)
+	_, gotError = recipients.GetRecipientWithID(uint64(recipient.ID) + 1)
 	assert.Equal(t, gotError, gorm.ErrRecordNotFound)
 
 }
@@ -67,7 +67,7 @@ func TestGetRecipientWithRecipientID(t *testing.T) {
 	assert.Equal(t, (recipient.Email), gotRecipient.Email)
 	assert.Equal(t, recipient.RecipientID, gotRecipient.RecipientID)
 
-	gotRecipient, gotError = recipients.GetRecipientWithRecipientID("2")
+	_, gotError = recipients.GetRecipientWithRecipientID("2")
 	assert.Equal(t, gotError, gorm.ErrRecordNotFound)
 
 }
