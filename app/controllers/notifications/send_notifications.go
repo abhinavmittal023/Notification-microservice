@@ -1,6 +1,7 @@
 package notifications
 
 import (
+	"log"
 	"net/http"
 	"sync"
 
@@ -49,26 +50,38 @@ func PostSendNotifications(c *gin.Context) {
 	}
 	var (
 		wg sync.WaitGroup
-		mu sync.Mutex
+		mu sync.Mutex = sync.Mutex{}
 	)
 
-	for _, recipient := range info.Notifications.Recipients {
-		recipientModel, err := recipients.GetRecipientWithRecipientID(recipient)
-		if err == gorm.ErrRecordNotFound {
-			openAPI.RecipientIDIncorrect = append(openAPI.RecipientIDIncorrect, recipient)
-			continue
-		} else if err != nil {
-			c.JSON(http.StatusInternalServerError, openAPI)
-			return
+	errorChan := make(chan error)
+	stopChan := make(chan bool)
+	go func() {
+		for _, recipient := range info.Notifications.Recipients {
+			recipientModel, err := recipients.GetRecipientWithRecipientID(recipient)
+			if err == gorm.ErrRecordNotFound {
+				openAPI.RecipientIDIncorrect = append(openAPI.RecipientIDIncorrect, recipient)
+				continue
+			} else if err != nil {
+				c.JSON(http.StatusInternalServerError, openAPI)
+				return
+			}
+			channelList, err := channels.GetChannelsWithPriorityLessThan(uint(notification.Priority))
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, openAPI)
+				return
+			}
+			wg.Add(1)
+			go notifications.SendAllNotifications(errorChan, stopChan, notification, *recipientModel, *channelList, &openAPI, &wg, &mu)
 		}
-		channelList, err := channels.GetChannelsWithPriorityLessThan(uint(notification.Priority))
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, openAPI)
-			return
-		}
-		wg.Add(1)
-		go notifications.SendAllNotifications(notification, *recipientModel, *channelList, &openAPI, &wg, &mu)
+		wg.Wait()
+		close(errorChan)
+		close(stopChan)
+	}()
+	err = <-errorChan
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, openAPI)
+		return
 	}
-	wg.Wait()
 	c.JSON(http.StatusOK, openAPI)
 }
