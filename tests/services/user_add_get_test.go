@@ -45,7 +45,7 @@ func TestGetUserWithID(t *testing.T) {
 	assert.Equal(t, (user.Email), gotUser.Email)
 	assert.Equal(t, (user.FirstName), gotUser.FirstName)
 
-	gotUser, gotError = users.GetUserWithID(uint64(user.ID) + 1)
+	_, gotError = users.GetUserWithID(uint64(user.ID) + 1)
 	assert.Equal(t, gotError, gorm.ErrRecordNotFound)
 
 }
@@ -102,7 +102,7 @@ func TestGetFirstUser(t *testing.T) {
 		t.Fail()
 	}
 
-	gotUser, gotError = users.GetFirstUser(false)
+	_, gotError = users.GetFirstUser(false)
 
 	assert.Equal(t, gotError, gorm.ErrRecordNotFound)
 

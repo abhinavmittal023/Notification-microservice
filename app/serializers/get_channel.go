@@ -47,8 +47,8 @@ type ChannelListResponse struct {
 }
 
 // ChannelConfigValidation function checks if configuration details are ok and can be deserialized
-func ChannelConfigValidation(channelInfo *ChannelInfo) error{
-	if channelInfo.Type == uint(constants.ChannelIntType()[0]){
+func ChannelConfigValidation(channelInfo *ChannelInfo) error {
+	if channelInfo.Type == uint(constants.ChannelIntType()[0]) {
 		var config EmailConfig
 		err := json.Unmarshal([]byte(channelInfo.Configuration), &config)
 		log.Println(config)
@@ -68,18 +68,18 @@ func ChannelConfigValidation(channelInfo *ChannelInfo) error{
 			return err
 		}
 		return nil
-	}else if channelInfo.Type == uint(constants.ChannelIntType()[1]){
+	} else if channelInfo.Type == uint(constants.ChannelIntType()[1]) {
 		var config PushConfig
 		err := json.Unmarshal([]byte(channelInfo.Configuration), &config)
-		if err != nil || config.ServerKey == ""{
+		if err != nil || config.ServerKey == "" {
 			return fmt.Errorf(constants.Errors().InvalidJSON)
 		}
 		return nil
 	}
 	var config WebConfig
-	
+
 	err := json.Unmarshal([]byte(channelInfo.Configuration), &config)
-	if err != nil || config.ServerKey == ""{
+	if err != nil || config.ServerKey == "" {
 		return fmt.Errorf(constants.Errors().InvalidJSON)
 	}
 	return nil

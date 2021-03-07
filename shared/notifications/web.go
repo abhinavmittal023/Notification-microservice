@@ -48,13 +48,16 @@ func (web *Web) SendNotification() error {
 	var config serializers.WebConfig
 	var serverKey string
 	err = json.Unmarshal([]byte(channel.Configuration), &config)
-	if err != nil || config.ServerKey == ""{
+	if err != nil || config.ServerKey == "" {
 		serverKey = configuration.GetResp().WebNotification.ServerKey
 	} else {
 		serverKey = config.ServerKey
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		return errors.Wrap(err, "Failed to Send Notification")
+	}
 	req.Header.Set("Authorization", fmt.Sprintf("key=%s", serverKey))
 	req.Header.Set("Content-Type", "application/json")
 
@@ -77,7 +80,10 @@ func (web *Web) SendNotification() error {
 	}
 
 	// Unmarshal or Decode the JSON to the interface.
-	json.Unmarshal(body, &result)
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return errors.Wrap(err, "Error Unmarshalling Response")
+	}
 
 	if result["success"] != 1.0 {
 		return errors.New("Notification Sending failed")

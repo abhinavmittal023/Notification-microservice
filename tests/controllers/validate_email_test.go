@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -56,7 +55,7 @@ func TestValidateEmail(t *testing.T) {
 	c.Request = req
 	c.Params = append(c.Params, gin.Param{
 		Key:   "token",
-		Value: fmt.Sprintf("%s", tokenString),
+		Value: tokenString,
 	})
 	auth.ValidateEmail(c)
 	assert.Equal(t, http.StatusFound, w.Code)
@@ -75,7 +74,7 @@ func TestValidateEmail(t *testing.T) {
 	c.Request = req
 	c.Params = append(c.Params, gin.Param{
 		Key:   "token",
-		Value: fmt.Sprintf("%s", tokenString),
+		Value: tokenString,
 	})
 	auth.ValidateEmail(c)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
@@ -98,7 +97,7 @@ func TestValidateEmail(t *testing.T) {
 	c.Request = req
 	c.Params = append(c.Params, gin.Param{
 		Key:   "token",
-		Value: fmt.Sprintf("%s", tokenString),
+		Value: tokenString,
 	})
 	auth.ValidateEmail(c)
 	assert.Equal(t, http.StatusBadRequest, w.Code)

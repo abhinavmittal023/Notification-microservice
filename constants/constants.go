@@ -158,10 +158,9 @@ type Error struct {
 	NoAPIKey                  string
 	InvalidToken              string
 	EmailNameRoleRequired     string
-	InvalidHost				string
-	InvalidPort				string
-	InvalidJSON				string
-	
+	InvalidHost               string
+	InvalidPort               string
+	InvalidJSON               string
 }
 
 // Errors is a function that returns all the error messages
@@ -199,8 +198,8 @@ func Errors() Error {
 		NoAPIKey:                  "No API Key exists",
 		InvalidToken:              "Provided token is invalid",
 		EmailNameRoleRequired:     "Role, Email and Name are required",
-		InvalidHost:				"Host is invalid",
-		InvalidPort:				"Port is invalid",
-		InvalidJSON:				"Invalid JSON",
+		InvalidHost:               "Host is invalid",
+		InvalidPort:               "Port is invalid",
+		InvalidJSON:               "Invalid JSON",
 	}
 }
