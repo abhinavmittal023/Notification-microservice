@@ -33,26 +33,26 @@ func GetFirstRecipient() (*models.Recipient, error) {
 func GetRecipientsCountWithChannelType(channelType uint) (uint64, error) {
 	tx := db.Get().Model(&models.Recipient{})
 	var count uint64
-	if constants.ChannelType(channelType) == "Email"{
+	if constants.ChannelType(channelType) == "Email" {
 		res := tx.Where("email != ''").Count(&count)
 		if res.Error != nil {
-			return 0,res.Error
+			return 0, res.Error
 		}
-		return count,nil
-	}else if constants.ChannelType(channelType) == "Push"{
+		return count, nil
+	} else if constants.ChannelType(channelType) == "Push" {
 		res := tx.Where("push_token != ''").Count(&count)
 		if res.Error != nil {
-			return 0,res.Error
+			return 0, res.Error
 		}
-		return count,nil
-	}else if constants.ChannelType(channelType) == "Web"{
+		return count, nil
+	} else if constants.ChannelType(channelType) == "Web" {
 		res := tx.Where("web_token != ''").Count(&count)
 		if res.Error != nil {
-			return 0,res.Error
+			return 0, res.Error
 		}
-		return count,nil
+		return count, nil
 	}
-	return 0,nil
+	return 0, nil
 }
 
 // GetNextRecipientfromID function gives the details of the next recipient and returns record not found

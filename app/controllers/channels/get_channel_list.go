@@ -66,9 +66,9 @@ func GetAllChannels(c *gin.Context) {
 	var info serializers.ChannelInfo
 
 	for _, channel := range channelList {
-		count,err := recipients.GetRecipientsCountWithChannelType(uint(channel.Type))
-		if err!=nil{
-		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		count, err := recipients.GetRecipientsCountWithChannelType(uint(channel.Type))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		}
 		serializers.ChannelModelToChannelInfoWithRecipientCount(&info, &channel, count)
 		infoArray = append(infoArray, info)

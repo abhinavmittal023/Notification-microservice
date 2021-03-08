@@ -13,7 +13,7 @@ type NotificationsInfo struct {
 	Priority             int                    `json:"priority"`
 	Title                string                 `json:"title"`
 	Body                 string                 `json:"body"`
-	CreatedAt				time.Time			`json:"created_at"`
+	CreatedAt            time.Time              `json:"created_at"`
 	NotificationChannels []NotificationChannels `json:"channels"`
 }
 

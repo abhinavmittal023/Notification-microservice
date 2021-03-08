@@ -20,7 +20,7 @@ type ChannelInfo struct {
 	Type             uint   `json:"type" binding:"required"`
 	Priority         int    `json:"priority" binding:"required"`
 	Configuration    string `json:"configuration," binding:"required"`
-	RecipientsCount		uint64	`json:"recipients"`
+	RecipientsCount  uint64 `json:"recipients"`
 }
 
 // WebConfig serializer to get config info for web channel
