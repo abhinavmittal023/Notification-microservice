@@ -1,6 +1,7 @@
 package channels
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/jinzhu/gorm"
 )
 
@@ -22,8 +24,21 @@ func UpdateChannelRoute(router *gin.RouterGroup) {
 // UpdateChannel controller for put the channels/:id route
 func UpdateChannel(c *gin.Context) {
 	var info serializers.ChannelInfo
-	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().NameTypePriorityRequired})
+	if err := c.BindJSON(&info); err != nil {
+		ve, ok := err.(validator.ValidationErrors)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidDataType})
+			return
+		}
+		var errors []string
+		for _, value := range ve {
+			if value.Tag() != "max" {
+				errors = append(errors, fmt.Sprintf("%s is %s", value.Field(), value.Tag()))
+			} else {
+				errors = append(errors, fmt.Sprintf("%s cannot have more than %s characters", value.Field(), value.Param()))
+			}
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": errors})
 		return
 	}
 	_, found := misc.FindInSlice(constants.ChannelIntType(), int(info.Type))
@@ -64,7 +79,7 @@ func UpdateChannel(c *gin.Context) {
 		return
 	}
 
-	testChannel, err = channels.GetChannelWithType(info.Type)
+	testChannel, err = channels.GetChannelWithType(uint(info.Type))
 	if err != gorm.ErrRecordNotFound && err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return

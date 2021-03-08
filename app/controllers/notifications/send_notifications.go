@@ -29,7 +29,7 @@ func PostSendNotifications(c *gin.Context) {
 	if err := c.BindJSON(&info); err != nil {
 		ve, ok := err.(validator.ValidationErrors)
 		if !ok {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect Data Type Provided"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidDataType})
 			return
 		}
 		var errors []string
@@ -37,7 +37,7 @@ func PostSendNotifications(c *gin.Context) {
 			if value.Tag() != "max" {
 				errors = append(errors, fmt.Sprintf("%s is %s", value.Field(), value.Tag()))
 			} else {
-				errors = append(errors, fmt.Sprintf("%s cannot be more than %s", value.Field(), value.Param()))
+				errors = append(errors, fmt.Sprintf("%s cannot have more than %s characters", value.Field(), value.Param()))
 			}
 		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": errors})

@@ -15,9 +15,9 @@ import (
 // ChannelInfo serializer to get and show channel information
 type ChannelInfo struct {
 	ID               uint   `json:"id"`
-	Name             string `json:"name" binding:"required"`
-	ShortDescription string `json:"short_description,omitempty"`
-	Type             uint   `json:"type" binding:"required"`
+	Name             string `json:"name" binding:"required,max=100"`
+	ShortDescription string `json:"short_description,omitempty" binding:"max=500"`
+	Type             int    `json:"type" binding:"required"`
 	Priority         int    `json:"priority" binding:"required"`
 	Configuration    string `json:"configuration," binding:"required"`
 	RecipientsCount  uint64 `json:"recipients"`
@@ -49,7 +49,7 @@ type ChannelListResponse struct {
 
 // ChannelConfigValidation function checks if configuration details are ok and can be deserialized
 func ChannelConfigValidation(channelInfo *ChannelInfo) error {
-	if channelInfo.Type == uint(constants.ChannelIntType()[0]) {
+	if channelInfo.Type == (constants.ChannelIntType()[0]) {
 		var config EmailConfig
 		err := json.Unmarshal([]byte(channelInfo.Configuration), &config)
 		log.Println(config)
@@ -69,7 +69,7 @@ func ChannelConfigValidation(channelInfo *ChannelInfo) error {
 			return err
 		}
 		return nil
-	} else if channelInfo.Type == uint(constants.ChannelIntType()[1]) {
+	} else if channelInfo.Type == (constants.ChannelIntType()[1]) {
 		var config PushConfig
 		err := json.Unmarshal([]byte(channelInfo.Configuration), &config)
 		if err != nil || config.ServerKey == "" {
@@ -116,7 +116,7 @@ func PortRegexCheck(port string) (int, error) {
 func ChannelInfoToChannelModel(channelInfo *ChannelInfo, channelModel *models.Channel) {
 	channelModel.Name = strings.ToLower(channelInfo.Name)
 	channelModel.ShortDescription = strings.ToLower(channelInfo.ShortDescription)
-	channelModel.Type = int(channelInfo.Type)
+	channelModel.Type = channelInfo.Type
 	channelModel.Priority = channelInfo.Priority
 	channelModel.Configuration = channelInfo.Configuration
 }
@@ -126,7 +126,7 @@ func ChannelModelToChannelInfo(channelInfo *ChannelInfo, channelModel *models.Ch
 	channelInfo.ID = channelModel.ID
 	channelInfo.Name = channelModel.Name
 	channelInfo.ShortDescription = channelModel.ShortDescription
-	channelInfo.Type = uint(channelModel.Type)
+	channelInfo.Type = channelModel.Type
 	channelInfo.Priority = channelModel.Priority
 	channelInfo.Configuration = channelModel.Configuration
 }
@@ -136,7 +136,7 @@ func ChannelModelToChannelInfoWithRecipientCount(channelInfo *ChannelInfo, chann
 	channelInfo.ID = channelModel.ID
 	channelInfo.Name = channelModel.Name
 	channelInfo.ShortDescription = channelModel.ShortDescription
-	channelInfo.Type = uint(channelModel.Type)
+	channelInfo.Type = channelModel.Type
 	channelInfo.Priority = channelModel.Priority
 	channelInfo.Configuration = channelModel.Configuration
 	channelInfo.RecipientsCount = count
