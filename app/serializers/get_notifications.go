@@ -1,5 +1,7 @@
 package serializers
 
+import "time"
+
 // NotificationsResponse serializer to send notifications list
 type NotificationsResponse struct {
 	RecordsAffected   int64               `json:"records_count"`
@@ -11,6 +13,7 @@ type NotificationsInfo struct {
 	Priority             int                    `json:"priority"`
 	Title                string                 `json:"title"`
 	Body                 string                 `json:"body"`
+	CreatedAt            time.Time              `json:"created_at"`
 	NotificationChannels []NotificationChannels `json:"channels"`
 }
 

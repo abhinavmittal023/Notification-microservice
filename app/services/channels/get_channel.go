@@ -72,9 +72,6 @@ func GetAllChannels(pagination *serializers.Pagination, channelFilter *filter.Ch
 	dbG := db.Get()
 	tx := dbG.Model(&models.Channel{})
 
-	if channelFilter.ID != 0 {
-		tx = tx.Where("id = ?", channelFilter.ID)
-	}
 	if channelFilter.Name != "" {
 		tx = tx.Where("name = ?", channelFilter.Name)
 	}
@@ -95,9 +92,6 @@ func GetAllChannelsCount(channelFilter *filter.Channel) (int64, error) {
 	dbG := db.Get()
 	tx := dbG.Model(&models.Channel{})
 
-	if channelFilter.ID != 0 {
-		tx = tx.Where("id = ?", channelFilter.ID)
-	}
 	if channelFilter.Name != "" {
 		tx = tx.Where("name = ?", channelFilter.Name)
 	}

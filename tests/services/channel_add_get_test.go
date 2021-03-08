@@ -134,7 +134,6 @@ func TestGetAllChannels(t *testing.T) {
 	}
 
 	filter := filter.Channel{
-		ID:       0,
 		Name:     "",
 		Type:     0,
 		Priority: 0,
@@ -186,7 +185,6 @@ func TestGetAllChannelsFilters(t *testing.T) {
 	}
 
 	filter := filter.Channel{
-		ID:       0,
 		Name:     "",
 		Type:     1,
 		Priority: 0,

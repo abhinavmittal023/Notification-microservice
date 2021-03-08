@@ -59,7 +59,7 @@ func PostSendNotifications(c *gin.Context) {
 	stopChan := make(chan bool)
 	go func() {
 		for _, recipient := range info.Notifications.Recipients {
-			if processedRecipients[recipient] == true {
+			if processedRecipients[recipient] {
 				openAPI.RepeatedID = append(openAPI.RepeatedID, recipient)
 				continue
 			}
