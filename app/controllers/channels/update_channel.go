@@ -73,6 +73,16 @@ func UpdateChannel(c *gin.Context) {
 		return
 	}
 
+	err = serializers.ChannelConfigValidation(&info)
+
+	if err != nil && err.Error() == constants.Errors().InternalError {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		return
+	} else if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	serializers.ChannelInfoToChannelModel(&info, channel)
 
 	err = channels.PatchChannel(channel)

@@ -3,6 +3,7 @@ package recipients
 import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 )
@@ -26,6 +27,32 @@ func GetFirstRecipient() (*models.Recipient, error) {
 	var recipient models.Recipient
 	res := db.Get().First(&recipient)
 	return &recipient, res.Error
+}
+
+// GetRecipientsCountWithChannelType function gets the information of count of recipients with a given channel type
+func GetRecipientsCountWithChannelType(channelType uint) (uint64, error) {
+	tx := db.Get().Model(&models.Recipient{})
+	var count uint64
+	if constants.ChannelType(channelType) == "Email"{
+		res := tx.Where("email != ''").Count(&count)
+		if res.Error != nil {
+			return 0,res.Error
+		}
+		return count,nil
+	}else if constants.ChannelType(channelType) == "Push"{
+		res := tx.Where("push_token != ''").Count(&count)
+		if res.Error != nil {
+			return 0,res.Error
+		}
+		return count,nil
+	}else if constants.ChannelType(channelType) == "Web"{
+		res := tx.Where("web_token != ''").Count(&count)
+		if res.Error != nil {
+			return 0,res.Error
+		}
+		return count,nil
+	}
+	return 0,nil
 }
 
 // GetNextRecipientfromID function gives the details of the next recipient and returns record not found

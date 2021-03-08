@@ -20,6 +20,7 @@ type ChannelInfo struct {
 	Type             uint   `json:"type" binding:"required"`
 	Priority         int    `json:"priority" binding:"required"`
 	Configuration    string `json:"configuration," binding:"required"`
+	RecipientsCount		uint64	`json:"recipients"`
 }
 
 // WebConfig serializer to get config info for web channel
@@ -128,4 +129,15 @@ func ChannelModelToChannelInfo(channelInfo *ChannelInfo, channelModel *models.Ch
 	channelInfo.Type = uint(channelModel.Type)
 	channelInfo.Priority = channelModel.Priority
 	channelInfo.Configuration = channelModel.Configuration
+}
+
+// ChannelModelToChannelInfoWithRecipientCount function copies the data from channel model to channel serializer
+func ChannelModelToChannelInfoWithRecipientCount(channelInfo *ChannelInfo, channelModel *models.Channel, count uint64) {
+	channelInfo.ID = channelModel.ID
+	channelInfo.Name = channelModel.Name
+	channelInfo.ShortDescription = channelModel.ShortDescription
+	channelInfo.Type = uint(channelModel.Type)
+	channelInfo.Priority = channelModel.Priority
+	channelInfo.Configuration = channelModel.Configuration
+	channelInfo.RecipientsCount = count
 }

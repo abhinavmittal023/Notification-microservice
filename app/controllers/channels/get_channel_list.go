@@ -7,6 +7,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
@@ -65,7 +66,11 @@ func GetAllChannels(c *gin.Context) {
 	var info serializers.ChannelInfo
 
 	for _, channel := range channelList {
-		serializers.ChannelModelToChannelInfo(&info, &channel)
+		count,err := recipients.GetRecipientsCountWithChannelType(uint(channel.Type))
+		if err!=nil{
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		}
+		serializers.ChannelModelToChannelInfoWithRecipientCount(&info, &channel, count)
 		infoArray = append(infoArray, info)
 	}
 
