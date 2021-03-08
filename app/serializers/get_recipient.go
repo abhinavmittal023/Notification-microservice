@@ -6,14 +6,14 @@ import (
 
 // RecipientInfo serializer to bind request data
 type RecipientInfo struct {
-	ID                   uint64 `json:"id"`
-	RecipientID          string `json:"recipient_id"`
-	Email                string `json:"email,omitempty"`
-	PushToken            string `json:"push_token,omitempty"`
-	WebToken             string `json:"web_token,omitempty"`
-	PreferredChannelType uint   `json:"preferred_channel_type,omitempty"`
-	ChannelType          uint   `json:"channel_type,omitempty"`
-	PreferredChannel	ChannelInfo	`json:"preferred_channel,omitempty"`
+	ID                   uint64      `json:"id"`
+	RecipientID          string      `json:"recipient_id"`
+	Email                string      `json:"email,omitempty"`
+	PushToken            string      `json:"push_token,omitempty"`
+	WebToken             string      `json:"web_token,omitempty"`
+	PreferredChannelType uint        `json:"preferred_channel_type,omitempty"`
+	ChannelType          uint        `json:"channel_type,omitempty"`
+	PreferredChannel     ChannelInfo `json:"preferred_channel,omitempty"`
 }
 
 // RecipientModelToRecipientInfo converts the Recipient model to RecipientInfo struct
