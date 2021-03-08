@@ -15,7 +15,7 @@ type SendNotifications struct {
 type Notifications struct {
 	Recipients []string `json:"recipients" binding:"required"`
 	Priority   string   `json:"priority" binding:"required"`
-	Title      string   `json:"title" binding:"required"`
+	Title      string   `json:"title" binding:"required,max=300"`
 	Body       string   `json:"body" binding:"required"`
 }
 
