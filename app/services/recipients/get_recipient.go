@@ -100,7 +100,7 @@ func GetAllRecipients(pagination *serializers.Pagination, recipientFilter *filte
 		tx = tx.Where("web_token = ?", "")
 	}
 
-	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Find(&recipients)
+	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Order("created_at").Find(&recipients)
 	return recipients, res.Error
 }
 

@@ -82,7 +82,7 @@ func GetAllChannels(pagination *serializers.Pagination, channelFilter *filter.Ch
 		tx = tx.Where("priority = ?", channelFilter.Priority)
 	}
 
-	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Find(&channels)
+	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Order("created_at").Find(&channels)
 	return channels, res.Error
 }
 
