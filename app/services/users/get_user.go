@@ -97,7 +97,7 @@ func GetAllUsers(pagination *serializers.Pagination, userFilter *filter.User) ([
 		tx = tx.Where("role = ?", userFilter.Role)
 	}
 
-	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Find(&users)
+	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Order("created_at").Find(&users)
 	return users, res.Error
 }
 
