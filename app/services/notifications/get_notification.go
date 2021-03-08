@@ -21,9 +21,9 @@ func GetAllNotifications(pagination *serializers.Pagination, notificationFilter 
 	var recipient models.Recipient
 
 	type successFailedData struct {
-		ChannelName	string
-		Status		int
-		Count      uint64
+		ChannelName string
+		Status      int
+		Count       uint64
 	}
 
 	if notificationFilter.RecipientID != "" {
@@ -74,54 +74,54 @@ func GetAllNotifications(pagination *serializers.Pagination, notificationFilter 
 		}
 		var prevVal successFailedData
 
-		recipientNotifications = append(recipientNotifications,serializers.NotificationsInfo{
-			Priority: notification.Priority,
-			Title: notification.Title,
-			Body: notification.Body,
+		recipientNotifications = append(recipientNotifications, serializers.NotificationsInfo{
+			Priority:  notification.Priority,
+			Title:     notification.Title,
+			Body:      notification.Body,
 			CreatedAt: notification.CreatedAt,
 		})
 		var notificationChannels []serializers.NotificationChannels
 		idx := 0
 		for _, val := range results {
-			if(prevVal.ChannelName == val.ChannelName){
-				if(val.Status == constants.Success){
+			if prevVal.ChannelName == val.ChannelName {
+				if val.Status == constants.Success {
 					notificationChannels[idx-1] = serializers.NotificationChannels{
 						ChannelName: val.ChannelName,
-						Successful: val.Count,
-						Failure: notificationChannels[idx-1].Failure,
-						Total: val.Count + notificationChannels[idx-1].Failure,
+						Successful:  val.Count,
+						Failure:     notificationChannels[idx-1].Failure,
+						Total:       val.Count + notificationChannels[idx-1].Failure,
 					}
-				}else if(val.Status == constants.Failure){
+				} else if val.Status == constants.Failure {
 					notificationChannels[idx-1] = serializers.NotificationChannels{
 						ChannelName: val.ChannelName,
-						Failure: val.Count,
-						Successful: notificationChannels[idx-1].Successful,
-						Total: val.Count + notificationChannels[idx-1].Successful,
+						Failure:     val.Count,
+						Successful:  notificationChannels[idx-1].Successful,
+						Total:       val.Count + notificationChannels[idx-1].Successful,
 					}
 				}
-			}else{
-				if(val.Status == constants.Success){
-					notificationChannels = append(notificationChannels,serializers.NotificationChannels{
+			} else {
+				if val.Status == constants.Success {
+					notificationChannels = append(notificationChannels, serializers.NotificationChannels{
 						ChannelName: val.ChannelName,
-						Successful: val.Count,
-						Total: val.Count,
+						Successful:  val.Count,
+						Total:       val.Count,
 					})
-				}else if(val.Status == constants.Failure){
-					notificationChannels = append(notificationChannels,serializers.NotificationChannels{
+				} else if val.Status == constants.Failure {
+					notificationChannels = append(notificationChannels, serializers.NotificationChannels{
 						ChannelName: val.ChannelName,
-						Failure: val.Count,
-						Total: val.Count,
+						Failure:     val.Count,
+						Total:       val.Count,
 					})
 				}
-				idx++;
+				idx++
 			}
-			prevVal = val;
+			prevVal = val
 		}
 		recipientNotifications[i] = serializers.NotificationsInfo{
-			Priority: notification.Priority,
-			Title: notification.Title,
-			Body: notification.Body,
-			CreatedAt: notification.CreatedAt,
+			Priority:             notification.Priority,
+			Title:                notification.Title,
+			Body:                 notification.Body,
+			CreatedAt:            notification.CreatedAt,
 			NotificationChannels: notificationChannels,
 		}
 	}
@@ -157,8 +157,8 @@ func GetGraphData(notificationFilter *filter.Notification) (*serializers.GraphDa
 	var recipient models.Recipient
 	var graphData serializers.GraphData
 	type successFailedData struct {
-		Status		int
-		Count      uint64
+		Status int
+		Count  uint64
 	}
 
 	if notificationFilter.RecipientID != "" {
@@ -213,24 +213,24 @@ func GetGraphData(notificationFilter *filter.Notification) (*serializers.GraphDa
 
 		idx := 0
 		for _, val := range results {
-			if(idx == 1){
-				if(val.Status == constants.Success){
+			if idx == 1 {
+				if val.Status == constants.Success {
 					graphData.Successful[i] = graphData.Successful[i] + val.Count
 					graphData.Total[i] = graphData.Total[i] + val.Count
-				}else if(val.Status == constants.Failure){
+				} else if val.Status == constants.Failure {
 					graphData.Failed[i] = graphData.Failed[i] + val.Count
 					graphData.Total[i] = graphData.Total[i] + val.Count
 				}
-			}else{
+			} else {
 				graphData.Total = append(graphData.Total, val.Count)
-				if(val.Status == constants.Success){
+				if val.Status == constants.Success {
 					graphData.Successful = append(graphData.Successful, val.Count)
 					graphData.Failed = append(graphData.Failed, 0)
-				}else if(val.Status == constants.Failure){
+				} else if val.Status == constants.Failure {
 					graphData.Successful = append(graphData.Successful, 0)
 					graphData.Failed = append(graphData.Failed, val.Count)
 				}
-				idx++;
+				idx++
 			}
 		}
 	}
