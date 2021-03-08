@@ -87,7 +87,6 @@ func GetAllRecipient(c *gin.Context) {
 			info.PreferredChannel = channelInfo
 			info.ChannelType = uint(channel.Type)
 		}
-		log.Println(info.PreferredChannel)
 		infoArray = append(infoArray, info)
 	}
 
