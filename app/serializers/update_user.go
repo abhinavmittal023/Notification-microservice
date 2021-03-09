@@ -9,14 +9,14 @@ import (
 // ChangeCredentialsInfo serializer to bind request data
 type ChangeCredentialsInfo struct {
 	ID    uint64 `json:"-"`
-	Email string `json:"email" binding:"required"`
+	Email string `json:"email" binding:"required,max=320"`
 	Role  int    `json:"role" binding:"required"`
 }
 
 // ChangePasswordInfo serializer to bind request data
 type ChangePasswordInfo struct {
-	OldPassword string `json:"old_password"`
-	NewPassword string `json:"new_password" binding:"required"`
+	OldPassword string `json:"old_password" binding:"max=128"`
+	NewPassword string `json:"new_password" binding:"required,max=128"`
 }
 
 // ChangeCredentialsInfoToUserModel converts ChangeEmailInfo serializer to User model

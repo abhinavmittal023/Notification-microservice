@@ -1,7 +1,6 @@
 package constants
 
 import (
-	"log"
 	"strings"
 )
 
@@ -50,6 +49,15 @@ const (
 	// ID defines the key for saving the user_id to the request
 	ID = "user_id"
 
+	// MaxEmail specifies maximum length of the email
+	MaxEmail = 320
+
+	// MaxPushToken specifies the maximum length of the push token
+	MaxPushToken = 255
+
+	// MaxWebToken specifies the maximum length of the web token
+	MaxWebToken = 255
+
 	// LoginPath stores the url of the login page of the front-end
 	LoginPath = "http://localhost:4200/users/login"
 
@@ -73,7 +81,6 @@ func CSVHeaders() []string {
 // ChannelTypeToInt converts channel type to its uint counterpart
 func ChannelTypeToInt(channel string) uint {
 	channel = strings.ToLower(channel)
-	log.Println(channel)
 	if channel == "email" {
 		return 1
 	} else if channel == "push" {
@@ -126,80 +133,70 @@ func TokenType() struct {
 
 // Error is the struct used to store the error messages
 type Error struct {
-	InternalError             string
-	UnAuthorized              string
-	CredentialsMismatch       string
-	InvalidID                 string
-	IDNotInRecords            string
-	EmailAlreadyPresent       string
-	RefreshTokenRequired      string
-	EmailPasswordRequired     string
-	EmailNotVerified          string
-	EmailPasswordNameRequired string
-	FileFormatError           string
-	InvalidCSVFile            string
-	EmailRoleRequired         string
-	NewPasswordRequired       string
-	OldPasswordRequired       string
-	OldPasswordIncorrect      string
-	InvalidRole               string
-	InvalidEmail              string
-	NameTypePriorityRequired  string
-	InvalidType               string
-	InvalidFilter             string
-	InvalidPagination         string
-	InvalidPriority           string
-	ChannelTypePresent        string
-	NotificationInfoRequired  string
-	RecipientIDIncorrect      string
-	ChannelNamePresent        string
-	NextPrevNonBool           string
-	NextPrevBothProvided      string
-	NoAPIKey                  string
-	InvalidToken              string
-	EmailNameRoleRequired     string
-	InvalidHost               string
-	InvalidPort               string
-	InvalidJSON               string
+	InternalError         string
+	UnAuthorized          string
+	CredentialsMismatch   string
+	InvalidID             string
+	IDNotInRecords        string
+	EmailAlreadyPresent   string
+	RefreshTokenRequired  string
+	EmailPasswordRequired string
+	EmailNotVerified      string
+	FileFormatError       string
+	InvalidCSVFile        string
+	OldPasswordRequired   string
+	OldPasswordIncorrect  string
+	InvalidRole           string
+	InvalidEmail          string
+	InvalidType           string
+	InvalidFilter         string
+	InvalidPagination     string
+	InvalidPriority       string
+	ChannelTypePresent    string
+	RecipientIDIncorrect  string
+	ChannelNamePresent    string
+	NextPrevNonBool       string
+	NextPrevBothProvided  string
+	NoAPIKey              string
+	InvalidToken          string
+	InvalidHost           string
+	InvalidPort           string
+	InvalidJSON           string
+	InvalidDataType       string
 }
 
 // Errors is a function that returns all the error messages
 func Errors() Error {
 	return Error{
-		InternalError:             "Internal Server Error",
-		UnAuthorized:              "Unauthorized for the Route",
-		CredentialsMismatch:       "Email and Password don't match",
-		InvalidID:                 "ID should be a unsigned integer",
-		IDNotInRecords:            "ID is not in the database",
-		EmailAlreadyPresent:       "Email ID is Already Present",
-		RefreshTokenRequired:      "Refresh Token is required",
-		EmailPasswordRequired:     "Email and Password are required",
-		EmailNotVerified:          "Email ID is not verified",
-		EmailPasswordNameRequired: "Email, Password and First Name are required",
-		FileFormatError:           "File Format Error",
-		InvalidCSVFile:            "Invalid CSV File",
-		EmailRoleRequired:         "Email and Role are required",
-		OldPasswordIncorrect:      "Old Password is Incorrect",
-		NewPasswordRequired:       "New Password is required",
-		OldPasswordRequired:       "Old Password is required",
-		InvalidRole:               "Invalid Role is provided",
-		InvalidEmail:              "Email ID is invalid",
-		NameTypePriorityRequired:  "Name, Type and Priority are required",
-		InvalidType:               "Invalid Type Provided",
-		InvalidFilter:             "Invalid Filter Parameters",
-		InvalidPagination:         "Invalid Limit and Offset",
-		InvalidPriority:           "Invalid Priority Provided",
-		ChannelTypePresent:        "Channel with Provided Type already exists",
-		NotificationInfoRequired:  "Notification Info is required",
-		RecipientIDIncorrect:      "Recipient ID incorrect",
-		ChannelNamePresent:        "Channel with Provided Name already exists",
-		NextPrevNonBool:           "Non boolean next or prev provided",
-		NextPrevBothProvided:      "Provide either next or previous",
-		NoAPIKey:                  "No API Key exists",
-		InvalidToken:              "Provided token is invalid",
-		EmailNameRoleRequired:     "Role, Email and Name are required",
-		InvalidHost:               "Host is invalid",
-		InvalidPort:               "Port is invalid",
-		InvalidJSON:               "Invalid JSON",
+		InternalError:         "Internal Server Error",
+		UnAuthorized:          "Unauthorized for the Route",
+		CredentialsMismatch:   "Email and Password don't match",
+		InvalidID:             "ID should be a unsigned integer",
+		IDNotInRecords:        "ID is not in the database",
+		EmailAlreadyPresent:   "Email ID is Already Present",
+		RefreshTokenRequired:  "Refresh Token is required",
+		EmailPasswordRequired: "Email and Password are required",
+		EmailNotVerified:      "Email ID is not verified",
+		FileFormatError:       "File Format Error",
+		InvalidCSVFile:        "Invalid CSV File",
+		OldPasswordIncorrect:  "Old Password is Incorrect",
+		OldPasswordRequired:   "Old Password is required",
+		InvalidRole:           "Invalid Role is provided",
+		InvalidEmail:          "Email ID is invalid",
+		InvalidType:           "Invalid Type Provided",
+		InvalidFilter:         "Invalid Filter Parameters",
+		InvalidPagination:     "Invalid Limit and Offset",
+		InvalidPriority:       "Invalid Priority Provided",
+		ChannelTypePresent:    "Channel with Provided Type already exists",
+		RecipientIDIncorrect:  "Recipient ID incorrect",
+		ChannelNamePresent:    "Channel with Provided Name already exists",
+		NextPrevNonBool:       "Non boolean next or prev provided",
+		NextPrevBothProvided:  "Provide either next or previous",
+		NoAPIKey:              "No API Key exists",
+		InvalidToken:          "Provided token is invalid",
+		InvalidHost:           "Host is invalid",
+		InvalidPort:           "Port is invalid",
+		InvalidJSON:           "Invalid JSON",
+		InvalidDataType:       "Invalid Data Type Provided",
 	}
 }
