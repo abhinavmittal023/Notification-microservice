@@ -17,6 +17,7 @@
     }
   },
   "email_notification": {
+    "from": "<displayed_email_id>",
     "email": "<email_id>",
     "password": "",
     "smtp_host": "127.0.0.1",
