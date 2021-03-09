@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/auth"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/jinzhu/gorm"
 )
 
@@ -95,8 +97,21 @@ func CreatePassword(c *gin.Context) {
 	}
 
 	var info serializers.ChangePasswordInfo
-	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().NewPasswordRequired})
+	if err := c.BindJSON(&info); err != nil {
+		ve, ok := err.(validator.ValidationErrors)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidDataType})
+			return
+		}
+		var errors []string
+		for _, value := range ve {
+			if value.Tag() != "max" {
+				errors = append(errors, fmt.Sprintf("%s is %s", value.Field(), value.Tag()))
+			} else {
+				errors = append(errors, fmt.Sprintf("%s cannot have more than %s characters", value.Field(), value.Param()))
+			}
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": errors})
 		return
 	}
 	newPassword, err := hash.Message(info.NewPassword, configuration.GetResp().PasswordHash)

@@ -41,7 +41,21 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *s
 			invalid = true
 		}
 
+		if len(recipientRecord.PushToken) > constants.MaxPushToken {
+			errorMap = append(errorMap, fmt.Sprintf("Push Token cannot be more than %v characters long", constants.MaxPushToken))
+			invalid = true
+		}
+
+		if len(recipientRecord.WebToken) > constants.MaxWebToken {
+			errorMap = append(errorMap, fmt.Sprintf("web Token cannot be more than %v characters long", constants.MaxWebToken))
+			invalid = true
+		}
+
 		if recipientRecord.Email != "" {
+			if len(recipientRecord.Email) > constants.MaxEmail {
+				errorMap = append(errorMap, fmt.Sprintf("Email cannot be more than %v characters long", constants.MaxEmail))
+				invalid = true
+			}
 			status, err := serializers.EmailRegexCheck(recipientRecord.Email)
 
 			if err != nil {

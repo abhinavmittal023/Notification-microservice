@@ -1,6 +1,7 @@
 package authorization
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/hash"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 // SignUpRoute is used to sign up users
@@ -22,8 +24,21 @@ func SignUpRoute(router *gin.RouterGroup) {
 // SignUp Controller for /signup route
 func SignUp(c *gin.Context) {
 	var info serializers.SignupInfo
-	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().EmailPasswordNameRequired})
+	if err := c.BindJSON(&info); err != nil {
+		ve, ok := err.(validator.ValidationErrors)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidDataType})
+			return
+		}
+		var errors []string
+		for _, value := range ve {
+			if value.Tag() != "max" {
+				errors = append(errors, fmt.Sprintf("%s is %s", value.Field(), value.Tag()))
+			} else {
+				errors = append(errors, fmt.Sprintf("%s cannot have more than %s characters", value.Field(), value.Param()))
+			}
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": errors})
 		return
 	}
 	info.Email = strings.ToLower(info.Email)

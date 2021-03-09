@@ -1,6 +1,7 @@
 package notifications
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -13,6 +14,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/jinzhu/gorm"
 )
 
@@ -24,8 +26,21 @@ func PostSendNotificationsRoute(router *gin.RouterGroup) {
 // PostSendNotifications controller is used to send notifications from notifications route
 func PostSendNotifications(c *gin.Context) {
 	var info serializers.SendNotifications
-	if c.BindJSON(&info) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().NotificationInfoRequired})
+	if err := c.BindJSON(&info); err != nil {
+		ve, ok := err.(validator.ValidationErrors)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidDataType})
+			return
+		}
+		var errors []string
+		for _, value := range ve {
+			if value.Tag() != "max" {
+				errors = append(errors, fmt.Sprintf("%s is %s", value.Field(), value.Tag()))
+			} else {
+				errors = append(errors, fmt.Sprintf("%s cannot have more than %s characters", value.Field(), value.Param()))
+			}
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": errors})
 		return
 	}
 	var notification models.Notification
