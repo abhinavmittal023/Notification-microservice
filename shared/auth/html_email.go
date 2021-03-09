@@ -19,7 +19,8 @@ import (
 
 // SendHTMLEmail sends validation email to new
 func SendHTMLEmail(to []string, user *models.User, message string, subject string, resetPassword bool) error {
-	from := configuration.GetResp().EmailNotification.Email
+	fromEmail := configuration.GetResp().EmailNotification.Email
+	from := configuration.GetResp().EmailNotification.From
 	password := configuration.GetResp().EmailNotification.Password
 	smtpHost := configuration.GetResp().EmailNotification.SMTPHost
 	smtpPort := configuration.GetResp().EmailNotification.SMTPPort
@@ -75,7 +76,7 @@ func SendHTMLEmail(to []string, user *models.User, message string, subject strin
 	}
 
 	// Authentication
-	auth := smtp.PlainAuth("", from, password, addr)
+	auth := smtp.PlainAuth("", fromEmail, password, addr)
 
 	//  Sending email.
 	err = smtp.SendMail(addr, auth, from, to, body.Bytes())

@@ -36,6 +36,7 @@ type PushConfig struct {
 // EmailConfig serializer to get config info for email channel
 type EmailConfig struct {
 	Email    string `json:"email" binding:"required"`
+	From	string	`json:"from"`
 	Password string `json:"password" binding:"required"`
 	SMTPHost string `json:"smtp_host" binding:"required"`
 	SMTPPort string `json:"smtp_port" binding:"required"`
@@ -52,7 +53,6 @@ func ChannelConfigValidation(channelInfo *ChannelInfo) error {
 	if channelInfo.Type == uint(constants.ChannelIntType()[0]) {
 		var config EmailConfig
 		err := json.Unmarshal([]byte(channelInfo.Configuration), &config)
-		log.Println(config)
 		if err != nil || config.Email == "" || config.SMTPHost == "" || config.SMTPPort == "" {
 			return fmt.Errorf(constants.Errors().InvalidJSON)
 		}

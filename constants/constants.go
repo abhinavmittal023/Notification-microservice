@@ -66,7 +66,7 @@ func ChannelType(index uint) string {
 // CSVHeaders is a function that returns the headers of our csv file
 func CSVHeaders() []string {
 	return []string{
-		"ID", "Email", "PushToken", "WebToken", "PreferredChannelType",
+		"ThirdPartyID", "Email", "PushToken", "WebToken", "PreferredChannelType",
 	}
 }
 
