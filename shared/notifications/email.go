@@ -40,27 +40,33 @@ func (email *Email) SendNotification() error {
 		log.Println(err.Error())
 		return errors.Wrap(err, constants.Errors().InternalError)
 	}
-	var from, smtpHost, smtpPort string
+	var from, fromEmail, smtpHost, smtpPort string
 	var password string
 	var config serializers.EmailConfig
 	err = json.Unmarshal([]byte(channel.Configuration), &config)
 	if err != nil || config.Email == "" || config.SMTPHost == "" || config.SMTPPort == "" {
-		from = configuration.GetResp().EmailNotification.Email
+		fromEmail = configuration.GetResp().EmailNotification.Email
+		from = configuration.GetResp().EmailNotification.From
 		password = configuration.GetResp().EmailNotification.Password
 		smtpHost = configuration.GetResp().EmailNotification.SMTPHost
 		smtpPort = configuration.GetResp().EmailNotification.SMTPPort
 	} else {
-		from = strings.ToLower(config.Email)
+		fromEmail = strings.ToLower(config.Email)
+		from = config.From
+		if from == ""{
+			from = fromEmail
+		}
 		password = config.Password
 		smtpHost = config.SMTPHost
 		smtpPort = config.SMTPPort
 	}
 	addr := smtpHost + ":" + smtpPort
+	
 	msg := []byte("Subject: " + email.Subject + "\r\n" +
 		"\r\n" + email.Message + "\r\n")
 
 	// Authentication
-	auth := smtp.PlainAuth("", from, password, addr)
+	auth := smtp.PlainAuth("", fromEmail, password, addr)
 
 	//  Sending email.
 	err = smtp.SendMail(addr, auth, from, []string{email.To}, msg)

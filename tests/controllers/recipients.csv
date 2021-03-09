@@ -1,4 +1,4 @@
-ID,Email,PushToken,WebToken,PreferredChannelType
+ThirdPartyID,Email,PushToken,WebToken,PreferredChannelType
 1,abcd1@gmail.com,abde,egfh,
 2,abcd2@gmail.com,abde,egfh,
 3,abcd3@gmail.com,abde,egfh,

@@ -48,6 +48,7 @@ type Database struct {
 // EmailNotification struct stores the validation email id info
 type EmailNotification struct {
 	Email    string `json:"email"`
+	From     string	`json:"from"`
 	Password string `json:"password"`
 	SMTPHost string `json:"smtp_host"`
 	SMTPPort string `json:"smtp_port"`

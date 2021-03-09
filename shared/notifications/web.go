@@ -48,7 +48,7 @@ func (web *Web) SendNotification() error {
 	var config serializers.WebConfig
 	var serverKey string
 	err = json.Unmarshal([]byte(channel.Configuration), &config)
-	if err != nil || config.ServerKey == "" {
+	if err != nil || config.ServerKey == "" || config.ServerKey == "sample" {
 		serverKey = configuration.GetResp().WebNotification.ServerKey
 	} else {
 		serverKey = config.ServerKey
