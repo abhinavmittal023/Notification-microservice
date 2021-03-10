@@ -61,10 +61,10 @@ func TestGetAllChannels(t *testing.T) {
 	}
 
 	for i := range channelsList {
-		assert.Equal(t, float64(channelsList[len(channelsList)-1-i].ID), got["channels"].([]interface{})[i].(map[string]interface{})["id"])
-		assert.Equal(t, (channelsList[len(channelsList)-1-i].Name), got["channels"].([]interface{})[i].(map[string]interface{})["name"])
-		assert.Equal(t, float64(channelsList[len(channelsList)-1-i].Priority), got["channels"].([]interface{})[i].(map[string]interface{})["priority"])
-		assert.Equal(t, float64(channelsList[len(channelsList)-1-i].Type), got["channels"].([]interface{})[i].(map[string]interface{})["type"])
+		assert.Equal(t, float64(channelsList[i].ID), got["channels"].([]interface{})[i].(map[string]interface{})["id"])
+		assert.Equal(t, (channelsList[i].Name), got["channels"].([]interface{})[i].(map[string]interface{})["name"])
+		assert.Equal(t, float64(channelsList[i].Priority), got["channels"].([]interface{})[i].(map[string]interface{})["priority"])
+		assert.Equal(t, float64(channelsList[i].Type), got["channels"].([]interface{})[i].(map[string]interface{})["type"])
 	}
 }
 
@@ -116,10 +116,10 @@ func TestGetAllChannelsPagination(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, len(got["channels"].([]interface{})), 1)
-	assert.Equal(t, float64(channelsList[len(channelsList)-1].ID), got["channels"].([]interface{})[0].(map[string]interface{})["id"])
-	assert.Equal(t, (channelsList[len(channelsList)-1].Name), got["channels"].([]interface{})[0].(map[string]interface{})["name"])
-	assert.Equal(t, float64(channelsList[len(channelsList)-1].Type), got["channels"].([]interface{})[0].(map[string]interface{})["type"])
-	assert.Equal(t, float64(channelsList[len(channelsList)-1].Priority), got["channels"].([]interface{})[0].(map[string]interface{})["priority"])
+	assert.Equal(t, float64(channelsList[0].ID), got["channels"].([]interface{})[0].(map[string]interface{})["id"])
+	assert.Equal(t, (channelsList[0].Name), got["channels"].([]interface{})[0].(map[string]interface{})["name"])
+	assert.Equal(t, float64(channelsList[0].Type), got["channels"].([]interface{})[0].(map[string]interface{})["type"])
+	assert.Equal(t, float64(channelsList[0].Priority), got["channels"].([]interface{})[0].(map[string]interface{})["priority"])
 
 	w = httptest.NewRecorder()
 	c, _ = gin.CreateTestContext(w)
@@ -141,10 +141,10 @@ func TestGetAllChannelsPagination(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, len(got["channels"].([]interface{})), 1)
-	assert.Equal(t, float64(channelsList[len(channelsList)-2].ID), got["channels"].([]interface{})[0].(map[string]interface{})["id"])
-	assert.Equal(t, (channelsList[len(channelsList)-2].Name), got["channels"].([]interface{})[0].(map[string]interface{})["name"])
-	assert.Equal(t, float64(channelsList[len(channelsList)-2].Type), got["channels"].([]interface{})[0].(map[string]interface{})["type"])
-	assert.Equal(t, float64(channelsList[len(channelsList)-2].Priority), got["channels"].([]interface{})[0].(map[string]interface{})["priority"])
+	assert.Equal(t, float64(channelsList[1].ID), got["channels"].([]interface{})[0].(map[string]interface{})["id"])
+	assert.Equal(t, (channelsList[1].Name), got["channels"].([]interface{})[0].(map[string]interface{})["name"])
+	assert.Equal(t, float64(channelsList[1].Type), got["channels"].([]interface{})[0].(map[string]interface{})["type"])
+	assert.Equal(t, float64(channelsList[1].Priority), got["channels"].([]interface{})[0].(map[string]interface{})["priority"])
 }
 
 func TestAddChannel(t *testing.T) {
@@ -154,7 +154,7 @@ func TestAddChannel(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
-	data := []byte(`{"name": "email","type": 1,"priority": 1}`)
+	data := []byte(`{"name": "email","type": 1,"priority": 1, "configuration": { "email": "no-reply@notificationmicroservice.com" ,"password": "", "smtp_host": "127.0.0.1", "smtp_port": "1025" }}`)
 
 	req, err := http.NewRequest("POST", "", bytes.NewReader(data))
 	if err != nil {
@@ -164,7 +164,7 @@ func TestAddChannel(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	c.Request = req
 	channels.AddChannel(c)
-
+	log.Println(w)
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	w = httptest.NewRecorder() // For Channel with same provided type
