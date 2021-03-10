@@ -144,10 +144,10 @@ func TestGetAllChannels(t *testing.T) {
 	assert.Equal(t, len(gotChannel), 3)
 
 	for i := range channelsList {
-		assert.Equal(t, channelsList[len(channelsList)-1-i].ID, gotChannel[i].ID)
-		assert.Equal(t, channelsList[len(channelsList)-1-i].Name, gotChannel[i].Name)
-		assert.Equal(t, (channelsList[len(channelsList)-1-i].Type), gotChannel[i].Type)
-		assert.Equal(t, (channelsList[len(channelsList)-1-i].Priority), gotChannel[i].Priority)
+		assert.Equal(t, channelsList[i].ID, gotChannel[i].ID)
+		assert.Equal(t, channelsList[i].Name, gotChannel[i].Name)
+		assert.Equal(t, (channelsList[i].Type), gotChannel[i].Type)
+		assert.Equal(t, (channelsList[i].Priority), gotChannel[i].Priority)
 	}
 }
 

@@ -240,9 +240,9 @@ func TestGetAllUsers(t *testing.T) {
 	assert.Equal(t, len(gotUser), 3)
 
 	for i := range usersList {
-		assert.Equal(t, usersList[len(usersList)-1-i].ID, gotUser[i].ID)
-		assert.Equal(t, (usersList[len(usersList)-1-i].Email), gotUser[i].Email)
-		assert.Equal(t, (usersList[len(usersList)-1-i].FirstName), gotUser[i].FirstName)
+		assert.Equal(t, usersList[i].ID, gotUser[i].ID)
+		assert.Equal(t, (usersList[i].Email), gotUser[i].Email)
+		assert.Equal(t, (usersList[i].FirstName), gotUser[i].FirstName)
 	}
 }
 
@@ -305,10 +305,10 @@ func TestGetAllUsersFilters(t *testing.T) {
 	assert.Equal(t, gotError, nil)
 	assert.Equal(t, len(gotUser), 1)
 
-	assert.Equal(t, usersList[2].ID, gotUser[0].ID)
-	assert.Equal(t, (usersList[2].Email), gotUser[0].Email)
-	assert.Equal(t, (usersList[2].FirstName), gotUser[0].FirstName)
-	assert.Equal(t, (usersList[2].Role), gotUser[0].Role)
+	assert.Equal(t, usersList[1].ID, gotUser[0].ID)
+	assert.Equal(t, (usersList[1].Email), gotUser[0].Email)
+	assert.Equal(t, (usersList[1].FirstName), gotUser[0].FirstName)
+	assert.Equal(t, (usersList[1].Role), gotUser[0].Role)
 }
 
 func TestCreateUser(t *testing.T) {

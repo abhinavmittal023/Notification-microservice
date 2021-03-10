@@ -120,11 +120,11 @@ func TestGetAllRecipients(t *testing.T) {
 	assert.Equal(t, len(gotRecipient), 3)
 
 	for i := range recipientList {
-		assert.Equal(t, recipientList[len(recipientList)-1-i].ID, gotRecipient[i].ID)
-		assert.Equal(t, (recipientList[len(recipientList)-1-i].RecipientID), gotRecipient[i].RecipientID)
-		assert.Equal(t, (recipientList[len(recipientList)-1-i].Email), gotRecipient[i].Email)
-		assert.Equal(t, (recipientList[len(recipientList)-1-i].WebToken), gotRecipient[i].WebToken)
-		assert.Equal(t, (recipientList[len(recipientList)-1-i].PushToken), gotRecipient[i].PushToken)
+		assert.Equal(t, recipientList[i].ID, gotRecipient[i].ID)
+		assert.Equal(t, (recipientList[i].RecipientID), gotRecipient[i].RecipientID)
+		assert.Equal(t, (recipientList[i].Email), gotRecipient[i].Email)
+		assert.Equal(t, (recipientList[i].WebToken), gotRecipient[i].WebToken)
+		assert.Equal(t, (recipientList[i].PushToken), gotRecipient[i].PushToken)
 	}
 
 }
@@ -176,10 +176,10 @@ func TestGetAllRecipientsFilter(t *testing.T) {
 	assert.Equal(t, gotError, nil)
 	assert.Equal(t, len(gotRecipient), 1)
 
-	assert.Equal(t, recipientList[1].ID, gotRecipient[0].ID)
-	assert.Equal(t, (recipientList[1].RecipientID), gotRecipient[0].RecipientID)
-	assert.Equal(t, (recipientList[1].Email), gotRecipient[0].Email)
-	assert.Equal(t, (recipientList[1].WebToken), gotRecipient[0].WebToken)
-	assert.Equal(t, (recipientList[1].PushToken), gotRecipient[0].PushToken)
+	assert.Equal(t, recipientList[2].ID, gotRecipient[0].ID)
+	assert.Equal(t, (recipientList[2].RecipientID), gotRecipient[0].RecipientID)
+	assert.Equal(t, (recipientList[2].Email), gotRecipient[0].Email)
+	assert.Equal(t, (recipientList[2].WebToken), gotRecipient[0].WebToken)
+	assert.Equal(t, (recipientList[2].PushToken), gotRecipient[0].PushToken)
 
 }
