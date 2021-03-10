@@ -155,10 +155,10 @@ func TestAddChannel(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
-	data,err := json.Marshal(&serializers.ChannelInfo{
-		Name: "email",
-		Type: 1,
-		Priority: 1,
+	data, err := json.Marshal(&serializers.ChannelInfo{
+		Name:          "email",
+		Type:          1,
+		Priority:      1,
 		Configuration: `{ "email": "no-reply@notificationmicroservice.com" ,"password": "", "smtp_host": "127.0.0.1", "smtp_port": "1025" }`,
 	})
 
@@ -420,10 +420,10 @@ func TestUpdateChannel(t *testing.T) {
 	}
 
 	channel := models.Channel{
-		Name:     "email",
-		Type:     1,
+		Name:          "email",
+		Type:          1,
 		Configuration: `{ "email": "no-reply@notificationmicroservice.com" ,"password": "", "smtp_host": "127.0.0.1", "smtp_port": "1025" }`,
-		Priority: 1,
+		Priority:      1,
 	}
 	if err := SeedOneChannel(&channel); err != nil {
 		log.Println(err)
@@ -432,11 +432,11 @@ func TestUpdateChannel(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	data,err := json.Marshal(&serializers.ChannelInfo{
-		Name: "email",
-		Type: 1,
+	data, err := json.Marshal(&serializers.ChannelInfo{
+		Name:          "email",
+		Type:          1,
 		Configuration: `{ "email": "no-reply@notificationmicroservice.com" ,"password": "", "smtp_host": "127.0.0.1", "smtp_port": "1025" }`,
-		Priority: 2,
+		Priority:      2,
 	})
 	if err != nil {
 		log.Println(err.Error())
