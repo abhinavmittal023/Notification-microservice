@@ -53,7 +53,7 @@ func (email *Email) SendNotification() error {
 	} else {
 		fromEmail = strings.ToLower(config.Email)
 		from = config.From
-		if from == ""{
+		if from == "" {
 			from = fromEmail
 		}
 		password = config.Password
@@ -61,7 +61,7 @@ func (email *Email) SendNotification() error {
 		smtpPort = config.SMTPPort
 	}
 	addr := smtpHost + ":" + smtpPort
-	
+
 	msg := []byte("Subject: " + email.Subject + "\r\n" +
 		"\r\n" + email.Message + "\r\n")
 

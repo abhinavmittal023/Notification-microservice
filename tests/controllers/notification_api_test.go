@@ -14,7 +14,7 @@ import (
 	"github.com/go-playground/assert/v2"
 )
 
-func TestNotificationAPI(t *testing.T){
+func TestNotificationAPI(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
@@ -45,19 +45,19 @@ func TestNotificationAPI(t *testing.T){
 			RecipientID: "abcd1",
 			Email:       "abcd@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
 			RecipientID: "abcd2",
 			Email:       "abcd1@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
 			RecipientID: "abcd3",
 			Email:       "abcd2@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 	}
 
@@ -91,9 +91,9 @@ func TestNotificationAPI(t *testing.T){
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})),3)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["web"].(map[string]interface{})["failure"].([]interface{})),3)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})),3)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})), 3)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["web"].(map[string]interface{})["failure"].([]interface{})), 3)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})), 3)
 
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
@@ -125,19 +125,19 @@ func TestNotificationAPI(t *testing.T){
 			RecipientID: "abcd1",
 			Email:       "abcd@gmail.com",
 			PushToken:   "cocfhBKISHaVzgP1wJP4G5:APA91bHftEr1al_cM0BYTb3V4hWEhX1l3d1hwkilIbAQrD7mVCukXMWORwKvDhqerozC24qkYQF4gTQ4-sP4T4W0CA5zgQbmjdpZ6shVLkw3F9FgYFq1DtUtycjbt5-Dn0D03p3xdfp9",
-			WebToken: "dSgDQp8SpCoNWcqMR0yph4:APA91bEbTpWZgLLTzhL-Bk4jw-emjyGAg_HHkwuNhuqXYniqPmD5vBuk69lk-WCtkeYqm0c0dF3J07XZU2ZEaSbdXyfEadt2afEU9KMBl1Bv0v7dZvueDagUl__UsCK4rocevlCU_A1w",
+			WebToken:    "dSgDQp8SpCoNWcqMR0yph4:APA91bEbTpWZgLLTzhL-Bk4jw-emjyGAg_HHkwuNhuqXYniqPmD5vBuk69lk-WCtkeYqm0c0dF3J07XZU2ZEaSbdXyfEadt2afEU9KMBl1Bv0v7dZvueDagUl__UsCK4rocevlCU_A1w",
 		},
 		{
 			RecipientID: "abcd2",
 			Email:       "abcd1@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
 			RecipientID: "abcd3",
 			Email:       "abcd2@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 	}
 
@@ -171,14 +171,14 @@ func TestNotificationAPI(t *testing.T){
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})),3)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["web"].(map[string]interface{})["success"].([]interface{})),1)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["web"].(map[string]interface{})["failure"].([]interface{})),2)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["success"].([]interface{})),1)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})),2)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})), 3)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["web"].(map[string]interface{})["success"].([]interface{})), 1)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["web"].(map[string]interface{})["failure"].([]interface{})), 2)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["success"].([]interface{})), 1)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})), 2)
 }
 
-func TestNotificationAPIWithIncorrectRecipientID(t *testing.T){
+func TestNotificationAPIWithIncorrectRecipientID(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
@@ -209,19 +209,19 @@ func TestNotificationAPIWithIncorrectRecipientID(t *testing.T){
 			RecipientID: "abcd1",
 			Email:       "abcd@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
 			RecipientID: "abcd2",
 			Email:       "abcd1@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
 			RecipientID: "abcd3",
 			Email:       "abcd2@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 	}
 
@@ -255,13 +255,13 @@ func TestNotificationAPIWithIncorrectRecipientID(t *testing.T){
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})),3)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["web"].(map[string]interface{})["failure"].([]interface{})),3)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})),3)
-	assert.Equal(t,len(got["recipient_id_incorrect"].([]interface{})),1)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})), 3)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["web"].(map[string]interface{})["failure"].([]interface{})), 3)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})), 3)
+	assert.Equal(t, len(got["recipient_id_incorrect"].([]interface{})), 1)
 }
 
-func TestNotificationAPIWithPreferredChannelType(t *testing.T){
+func TestNotificationAPIWithPreferredChannelType(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
@@ -292,19 +292,19 @@ func TestNotificationAPIWithPreferredChannelType(t *testing.T){
 			RecipientID: "abcd1",
 			Email:       "abcd@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
 			RecipientID: "abcd2",
 			Email:       "abcd1@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
-			RecipientID: "abcd3",
-			Email:       "abcd2@gmail.com",
-			PushToken:   "abcd",
-			WebToken: "abcd",
+			RecipientID:          "abcd3",
+			Email:                "abcd2@gmail.com",
+			PushToken:            "abcd",
+			WebToken:             "abcd",
 			PreferredChannelType: 1,
 		},
 	}
@@ -339,12 +339,12 @@ func TestNotificationAPIWithPreferredChannelType(t *testing.T){
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})),1)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})),3)
-	assert.Equal(t,len(got["recipient_id_incorrect"].([]interface{})),1)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})), 1)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})), 3)
+	assert.Equal(t, len(got["recipient_id_incorrect"].([]interface{})), 1)
 }
 
-func TestNotificationAPIWithPreferredChannelDeleted(t *testing.T){
+func TestNotificationAPIWithPreferredChannelDeleted(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
@@ -370,19 +370,19 @@ func TestNotificationAPIWithPreferredChannelDeleted(t *testing.T){
 			RecipientID: "abcd1",
 			Email:       "abcd@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
 			RecipientID: "abcd2",
 			Email:       "abcd1@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
-			RecipientID: "abcd3",
-			Email:       "abcd2@gmail.com",
-			PushToken:   "abcd",
-			WebToken: "abcd",
+			RecipientID:          "abcd3",
+			Email:                "abcd2@gmail.com",
+			PushToken:            "abcd",
+			WebToken:             "abcd",
 			PreferredChannelType: 1,
 		},
 	}
@@ -417,12 +417,12 @@ func TestNotificationAPIWithPreferredChannelDeleted(t *testing.T){
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t,len(got["Preferred_channel_deleted"].([]interface{})),1)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})),3)
-	assert.Equal(t,len(got["recipient_id_incorrect"].([]interface{})),1)
+	assert.Equal(t, len(got["Preferred_channel_deleted"].([]interface{})), 1)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})), 3)
+	assert.Equal(t, len(got["recipient_id_incorrect"].([]interface{})), 1)
 }
 
-func TestNotificationAPIWithChannelNotExist(t *testing.T){
+func TestNotificationAPIWithChannelNotExist(t *testing.T) {
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
 	}
@@ -448,19 +448,19 @@ func TestNotificationAPIWithChannelNotExist(t *testing.T){
 			RecipientID: "abcd1",
 			Email:       "abcd@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
 			RecipientID: "abcd2",
 			Email:       "abcd1@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
-			RecipientID: "abcd3",
-			Email:       "abcd2@gmail.com",
-			PushToken:   "abcd",
-			WebToken: "abcd",
+			RecipientID:          "abcd3",
+			Email:                "abcd2@gmail.com",
+			PushToken:            "abcd",
+			WebToken:             "abcd",
 			PreferredChannelType: 1,
 		},
 	}
@@ -495,8 +495,8 @@ func TestNotificationAPIWithChannelNotExist(t *testing.T){
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})),1)
-	assert.Equal(t,len(got["recipient_id_incorrect"].([]interface{})),1)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})), 1)
+	assert.Equal(t, len(got["recipient_id_incorrect"].([]interface{})), 1)
 
 	if err := RefreshAllTables(); err != nil {
 		t.Fail()
@@ -523,19 +523,19 @@ func TestNotificationAPIWithChannelNotExist(t *testing.T){
 			RecipientID: "abcd1",
 			Email:       "abcd@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
 			RecipientID: "abcd2",
 			Email:       "abcd1@gmail.com",
 			PushToken:   "abcd",
-			WebToken: "abcd",
+			WebToken:    "abcd",
 		},
 		{
-			RecipientID: "abcd3",
-			Email:       "abcd2@gmail.com",
-			PushToken:   "abcd",
-			WebToken: "abcd",
+			RecipientID:          "abcd3",
+			Email:                "abcd2@gmail.com",
+			PushToken:            "abcd",
+			WebToken:             "abcd",
 			PreferredChannelType: 1,
 		},
 	}
@@ -570,7 +570,7 @@ func TestNotificationAPIWithChannelNotExist(t *testing.T){
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})),1)
-	assert.Equal(t,len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})),3)
-	assert.Equal(t,len(got["recipient_id_incorrect"].([]interface{})),1)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["email"].(map[string]interface{})["success"].([]interface{})), 1)
+	assert.Equal(t, len(got["notification_status"].(map[string]interface{})["push"].(map[string]interface{})["failure"].([]interface{})), 3)
+	assert.Equal(t, len(got["recipient_id_incorrect"].([]interface{})), 1)
 }
