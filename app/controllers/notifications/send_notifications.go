@@ -66,13 +66,16 @@ func PostSendNotifications(c *gin.Context) {
 	}
 	processedRecipients := map[string]bool{}
 	var (
-		wg sync.WaitGroup
-		mu sync.Mutex = sync.Mutex{}
+		wg1 sync.WaitGroup
+		wg2 sync.WaitGroup
+		mu  sync.Mutex = sync.Mutex{}
 	)
 
 	errorChan := make(chan error)
 	stopChan := make(chan bool)
+	wg1.Add(1)
 	go func() {
+		defer wg1.Done()
 		for _, recipient := range info.Notifications.Recipients {
 			if processedRecipients[recipient] {
 				openAPI.RepeatedID = append(openAPI.RepeatedID, recipient)
@@ -92,18 +95,21 @@ func PostSendNotifications(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, openAPI)
 				return
 			}
-			wg.Add(1)
-			go notifications.SendAllNotifications(errorChan, stopChan, notification, *recipientModel, *channelList, &openAPI, &wg, &mu)
+			wg2.Add(1)
+			go notifications.SendAllNotifications(errorChan, stopChan, notification, *recipientModel, *channelList, &openAPI, &wg2, &mu)
 		}
-		wg.Wait()
+		wg2.Wait()
 		close(errorChan)
 		close(stopChan)
 	}()
 	err = <-errorChan
 	if err != nil {
+		stopChan <- true
+		wg1.Wait()
 		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, openAPI)
 		return
 	}
+	wg1.Wait()
 	c.JSON(http.StatusOK, openAPI)
 }

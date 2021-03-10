@@ -18,6 +18,12 @@ func SendAllNotifications(errChan chan error, stopChan chan bool, notification m
 
 	defer wg.Done()
 
+	select {
+	case <-stopChan:
+		return
+	default:
+	}
+
 	channelSent := map[string]bool{}
 
 	for _, channel := range channelList {
