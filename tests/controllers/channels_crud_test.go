@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/assert/v2"
@@ -154,7 +155,12 @@ func TestAddChannel(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
-	data := []byte(`{"name": "email","type": 1,"priority": 1, "configuration": { "email": "no-reply@notificationmicroservice.com" ,"password": "", "smtp_host": "127.0.0.1", "smtp_port": "1025" }}`)
+	data,err := json.Marshal(&serializers.ChannelInfo{
+		Name: "email",
+		Type: 1,
+		Priority: 1,
+		Configuration: `{ "email": "no-reply@notificationmicroservice.com" ,"password": "", "smtp_host": "127.0.0.1", "smtp_port": "1025" }`,
+	})
 
 	req, err := http.NewRequest("POST", "", bytes.NewReader(data))
 	if err != nil {
@@ -164,7 +170,6 @@ func TestAddChannel(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	c.Request = req
 	channels.AddChannel(c)
-	log.Println(w)
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	w = httptest.NewRecorder() // For Channel with same provided type
@@ -417,6 +422,7 @@ func TestUpdateChannel(t *testing.T) {
 	channel := models.Channel{
 		Name:     "email",
 		Type:     1,
+		Configuration: `{ "email": "no-reply@notificationmicroservice.com" ,"password": "", "smtp_host": "127.0.0.1", "smtp_port": "1025" }`,
 		Priority: 1,
 	}
 	if err := SeedOneChannel(&channel); err != nil {
@@ -426,7 +432,16 @@ func TestUpdateChannel(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	data := []byte(`{"name": "email","type": 2, "priority": 1}`)
+	data,err := json.Marshal(&serializers.ChannelInfo{
+		Name: "email",
+		Type: 1,
+		Configuration: `{ "email": "no-reply@notificationmicroservice.com" ,"password": "", "smtp_host": "127.0.0.1", "smtp_port": "1025" }`,
+		Priority: 2,
+	})
+	if err != nil {
+		log.Println(err.Error())
+		t.Fail()
+	}
 	req, err := http.NewRequest("Put", "", bytes.NewReader(data))
 	if err != nil {
 		log.Println(err.Error())

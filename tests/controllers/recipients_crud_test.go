@@ -240,10 +240,10 @@ func TestGetAllRecipients(t *testing.T) {
 	recipientRecords := got["recipient_records"].([]interface{})
 
 	for i := range recipientRecords {
-		assert.Equal(t, float64(recipientsList[len(recipientsList)-1-i].ID), recipientRecords[i].(map[string]interface{})["id"])
-		assert.Equal(t, (recipientsList[len(recipientsList)-1-i].Email), recipientRecords[i].(map[string]interface{})["email"])
-		assert.Equal(t, recipientsList[len(recipientsList)-1-i].RecipientID, recipientRecords[i].(map[string]interface{})["recipient_id"])
-		assert.Equal(t, recipientsList[len(recipientsList)-1-i].PushToken, recipientRecords[i].(map[string]interface{})["push_token"])
+		assert.Equal(t, float64(recipientsList[i].ID), recipientRecords[i].(map[string]interface{})["id"])
+		assert.Equal(t, (recipientsList[i].Email), recipientRecords[i].(map[string]interface{})["email"])
+		assert.Equal(t, recipientsList[i].RecipientID, recipientRecords[i].(map[string]interface{})["recipient_id"])
+		assert.Equal(t, recipientsList[i].PushToken, recipientRecords[i].(map[string]interface{})["push_token"])
 	}
 }
 
@@ -296,10 +296,10 @@ func TestGetAllRecipientsPagination(t *testing.T) {
 	}
 	recipientRecords := got["recipient_records"].([]interface{})
 	assert.Equal(t, len(recipientRecords), 1)
-	assert.Equal(t, float64(recipientsList[len(recipientsList)-1].ID), recipientRecords[0].(map[string]interface{})["id"])
-	assert.Equal(t, recipientsList[len(recipientsList)-1].RecipientID, recipientRecords[0].(map[string]interface{})["recipient_id"])
-	assert.Equal(t, (recipientsList[len(recipientsList)-1].Email), recipientRecords[0].(map[string]interface{})["email"])
-	assert.Equal(t, (recipientsList[len(recipientsList)-1].PushToken), recipientRecords[0].(map[string]interface{})["push_token"])
+	assert.Equal(t, float64(recipientsList[0].ID), recipientRecords[0].(map[string]interface{})["id"])
+	assert.Equal(t, recipientsList[0].RecipientID, recipientRecords[0].(map[string]interface{})["recipient_id"])
+	assert.Equal(t, (recipientsList[0].Email), recipientRecords[0].(map[string]interface{})["email"])
+	assert.Equal(t, (recipientsList[0].PushToken), recipientRecords[0].(map[string]interface{})["push_token"])
 
 	w = httptest.NewRecorder()
 	c, _ = gin.CreateTestContext(w)
@@ -322,10 +322,10 @@ func TestGetAllRecipientsPagination(t *testing.T) {
 	}
 	recipientRecords = got["recipient_records"].([]interface{})
 	assert.Equal(t, len(recipientRecords), 1)
-	assert.Equal(t, float64(recipientsList[len(recipientsList)-2].ID), recipientRecords[0].(map[string]interface{})["id"])
-	assert.Equal(t, recipientsList[len(recipientsList)-2].RecipientID, recipientRecords[0].(map[string]interface{})["recipient_id"])
-	assert.Equal(t, (recipientsList[len(recipientsList)-2].Email), recipientRecords[0].(map[string]interface{})["email"])
-	assert.Equal(t, (recipientsList[len(recipientsList)-2].PushToken), recipientRecords[0].(map[string]interface{})["push_token"])
+	assert.Equal(t, float64(recipientsList[1].ID), recipientRecords[0].(map[string]interface{})["id"])
+	assert.Equal(t, recipientsList[1].RecipientID, recipientRecords[0].(map[string]interface{})["recipient_id"])
+	assert.Equal(t, (recipientsList[1].Email), recipientRecords[0].(map[string]interface{})["email"])
+	assert.Equal(t, (recipientsList[1].PushToken), recipientRecords[0].(map[string]interface{})["push_token"])
 }
 
 func TestAddUpdateRecipient(t *testing.T) {

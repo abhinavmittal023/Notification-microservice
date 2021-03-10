@@ -79,7 +79,8 @@ func SendHTMLEmail(to []string, user *models.User, message string, subject strin
 	auth := smtp.PlainAuth("", fromEmail, password, addr)
 
 	//  Sending email.
-	err = smtp.SendMail(addr, auth, from, to, body.Bytes())
+	_ = auth
+	err = smtp.SendMail(addr, nil, from, to, body.Bytes())
 	if err != nil {
 		log.Println("Unable to send email", err.Error())
 		return errors.Wrap(err, "Unable to send email")

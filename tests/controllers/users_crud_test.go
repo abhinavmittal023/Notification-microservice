@@ -79,9 +79,9 @@ func TestGetAllUsers(t *testing.T) {
 	}
 
 	for i := range usersList {
-		assert.Equal(t, float64(usersList[len(usersList)-1-i].ID), got["users"].([]interface{})[i].(map[string]interface{})["user_id"])
-		assert.Equal(t, (usersList[len(usersList)-1-i].Email), got["users"].([]interface{})[i].(map[string]interface{})["email"])
-		assert.Equal(t, (usersList[len(usersList)-1-i].FirstName), got["users"].([]interface{})[i].(map[string]interface{})["first_name"])
+		assert.Equal(t, float64(usersList[i].ID), got["users"].([]interface{})[i].(map[string]interface{})["user_id"])
+		assert.Equal(t, (usersList[i].Email), got["users"].([]interface{})[i].(map[string]interface{})["email"])
+		assert.Equal(t, (usersList[i].FirstName), got["users"].([]interface{})[i].(map[string]interface{})["first_name"])
 	}
 }
 
@@ -146,9 +146,9 @@ func TestGetAllUsersPagination(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, len(got["users"].([]interface{})), 1)
-	assert.Equal(t, float64(usersList[len(usersList)-1].ID), got["users"].([]interface{})[0].(map[string]interface{})["user_id"])
-	assert.Equal(t, (usersList[len(usersList)-1].Email), got["users"].([]interface{})[0].(map[string]interface{})["email"])
-	assert.Equal(t, (usersList[len(usersList)-1].FirstName), got["users"].([]interface{})[0].(map[string]interface{})["first_name"])
+	assert.Equal(t, float64(usersList[0].ID), got["users"].([]interface{})[0].(map[string]interface{})["user_id"])
+	assert.Equal(t, (usersList[0].Email), got["users"].([]interface{})[0].(map[string]interface{})["email"])
+	assert.Equal(t, (usersList[0].FirstName), got["users"].([]interface{})[0].(map[string]interface{})["first_name"])
 
 	w = httptest.NewRecorder()
 	c, _ = gin.CreateTestContext(w)
@@ -170,9 +170,9 @@ func TestGetAllUsersPagination(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, len(got["users"].([]interface{})), 1)
-	assert.Equal(t, float64(usersList[len(usersList)-2].ID), got["users"].([]interface{})[0].(map[string]interface{})["user_id"])
-	assert.Equal(t, (usersList[len(usersList)-2].Email), got["users"].([]interface{})[0].(map[string]interface{})["email"])
-	assert.Equal(t, (usersList[len(usersList)-2].FirstName), got["users"].([]interface{})[0].(map[string]interface{})["first_name"])
+	assert.Equal(t, float64(usersList[1].ID), got["users"].([]interface{})[0].(map[string]interface{})["user_id"])
+	assert.Equal(t, (usersList[1].Email), got["users"].([]interface{})[0].(map[string]interface{})["email"])
+	assert.Equal(t, (usersList[1].FirstName), got["users"].([]interface{})[0].(map[string]interface{})["first_name"])
 }
 
 func TestAddUser(t *testing.T) {
