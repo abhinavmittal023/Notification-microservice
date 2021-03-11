@@ -58,6 +58,9 @@ const (
 	// MaxWebToken specifies the maximum length of the web token
 	MaxWebToken = 255
 
+	// MaxRecipientID specifies the maximum length of the Recipient ID
+	MaxRecipientID = 100
+
 	// LoginPath stores the url of the login page of the front-end
 	LoginPath = "http://localhost:4200/users/login"
 

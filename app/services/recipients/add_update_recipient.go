@@ -37,7 +37,12 @@ func AddUpdateRecipients(recipientRecords *[]serializers.RecipientInfo) (int, *s
 		var errorMap []string
 
 		if recipientRecord.RecipientID == "" {
-			errorMap = append(errorMap, "Recipient ID should not be empty")
+			errorMap = append(errorMap, "Third Party ID should not be empty")
+			invalid = true
+		}
+
+		if len(recipientRecord.RecipientID) > constants.MaxRecipientID {
+			errorMap = append(errorMap, fmt.Sprintf("Third Party ID cannot be more than %v characters long", constants.MaxRecipientID))
 			invalid = true
 		}
 
