@@ -45,19 +45,19 @@ run_mail_catcher:
 
 run_controller_test:
 	@echo "Running all unit tests for controllers" 
-	go test ./tests/controllers/... 
+	go test -count=1 ./tests/controllers/... 
 
 run_services_test:
 	@echo "Running all unit tests for services"
-	go test ./tests/services/...
+	go test -count=1 ./tests/services/...
 
 run_controller_test_verbose:
 	@echo "Running all unit tests for controllers with verbose" 
-	go test ./tests/controllers/... -v
+	go test -count=1 ./tests/controllers/... -v
 
 run_services_test_verbose:
 	@echo "Running all unit tests for services with verbose"
-	go test ./tests/services/... -v
+	go test -count=1 ./tests/services/... -v
 
 run_unit_tests_verbose: run_services_test_verbose run_controller_test_verbose 
 
