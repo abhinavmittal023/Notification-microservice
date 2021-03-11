@@ -3,88 +3,66 @@ package channels
 import (
 	"log"
 	"net/http"
-	"strconv"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
-	miscquery "code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/misc_query"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
-// GetChannelRoute is used to get a channel from the database given its id
+// GetChannelRoute is used to get channel from the database
 func GetChannelRoute(router *gin.RouterGroup) {
-	router.GET(":id", GetChannel)
+	router.GET("/available", GetAvailableChannels)
 }
 
-// GetChannel function is a controller for get channels/:id route
-func GetChannel(c *gin.Context) {
+// GetAvailableChannels is the controller
+func GetAvailableChannels(c *gin.Context) {
 
-	channelID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	var pagination = serializers.Pagination{}
+	var channelFilter = filter.Channel{}
+	channelList, err := channels.GetAllChannels(&pagination, &channelFilter)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": constants.Errors().InvalidID,
-		})
-		return
-	}
-
-	var iteratorInfo miscquery.Iterator
-	err = c.BindQuery(&iteratorInfo)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": constants.Errors().NextPrevNonBool,
-		})
-		return
-	}
-
-	if iteratorInfo.Next && iteratorInfo.Previous {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": constants.Errors().NextPrevBothProvided,
-		})
-		return
-	}
-
-	var channel *models.Channel
-	if iteratorInfo.Next {
-		channel, err = channels.GetNextChannelfromID(channelID)
-	} else if iteratorInfo.Previous {
-		channel, err = channels.GetPreviousChannelfromID(channelID)
-	} else {
-		channel, err = channels.GetChannelWithID(uint(channelID))
-	}
-
-	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": constants.Errors().IDNotInRecords,
-		})
-		return
-	} else if err != nil {
-		log.Println(err.Error())
+		log.Println("find all channels query error", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
-	firstRecord, err := channels.GetFirstChannel()
+	channelTypes := constants.ChannelIntType()
+	var takenChannelTypes []int
+	for _, channel := range channelList {
+		if len(channelTypes) == 0 {
+			break
+		}
+		index, found := misc.FindInSlice(channelTypes, channel.Type)
+		if !found {
+			log.Println("Not found channel type from db in constants")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+			return
+		}
+		takenChannelTypes = append(takenChannelTypes, channel.Type)
+		channelTypes[index], channelTypes[len(channelTypes)-1] = channelTypes[len(channelTypes)-1], channelTypes[index]
+		channelTypes = channelTypes[:len(channelTypes)-1]
+	}
+	channelsInfo, err := channels.GetChannelConfig(channelTypes)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("JSON marshalling error", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": constants.Errors().InternalError,
+		})
 		return
 	}
-	prevAvail := firstRecord.ID != channel.ID
-
-	lastRecord, err := channels.GetLastChannel()
+	takenChannelsInfo, err := channels.GetChannelConfig(takenChannelTypes)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		log.Println("JSON marshalling error", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": constants.Errors().InternalError,
+		})
 		return
 	}
-	nextAvail := lastRecord.ID != channel.ID
-
-	channelInfo := serializers.ChannelModelToChannelInfo(channel)
-
 	c.JSON(http.StatusOK, gin.H{
-		"channel_details": channelInfo,
-		"next":            nextAvail,
-		"previous":        prevAvail,
+		"available_channels": channelsInfo,
+		"taken_channels":     takenChannelsInfo,
 	})
 }

@@ -1,8 +1,12 @@
 package channels
 
 import (
+	"encoding/json"
+
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/configuration"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 )
@@ -81,8 +85,10 @@ func GetAllChannels(pagination *serializers.Pagination, channelFilter *filter.Ch
 	if channelFilter.Priority != 0 {
 		tx = tx.Where("priority = ?", channelFilter.Priority)
 	}
-
-	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Order("created_at").Find(&channels)
+	if pagination.Limit != 0 {
+		tx = tx.Offset(pagination.Offset).Limit(pagination.Limit)
+	}
+	res := tx.Order("created_at").Find(&channels)
 	return channels, res.Error
 }
 
@@ -105,4 +111,34 @@ func GetAllChannelsCount(channelFilter *filter.Channel) (int64, error) {
 	var count int64
 	res := tx.Count(&count)
 	return count, res.Error
+}
+
+// GetChannelConfig service gets the channel configuration of all provided channel types
+func GetChannelConfig(channelTypes []int) (map[int]string, error) {
+	channelsInfo := map[int]string{}
+	for _, value := range channelTypes {
+		switch constants.ChannelType(uint(value)) {
+		case "Email":
+			channelConfig, err := json.Marshal(configuration.GetResp().EmailNotification)
+			if err != nil {
+				return nil, err
+			}
+			channelsInfo[value] = string(channelConfig)
+		case "Web":
+			webConfig := configuration.GetResp().WebNotification
+			webConfig.URL = ""
+			channelConfigJSON, err := json.Marshal(webConfig)
+			if err != nil {
+				return nil, err
+			}
+			channelsInfo[value] = string(channelConfigJSON)
+		case "Push":
+			channelConfig, err := json.Marshal(configuration.GetResp().PushNotification)
+			if err != nil {
+				return nil, err
+			}
+			channelsInfo[value] = string(channelConfig)
+		}
+	}
+	return channelsInfo, nil
 }

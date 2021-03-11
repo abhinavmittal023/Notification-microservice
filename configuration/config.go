@@ -23,7 +23,7 @@ type PushNotification struct {
 // WebNotification stores the required info for sending web notifications
 type WebNotification struct {
 	ServerKey string `json:"server_key"`
-	URL       string `json:"url"`
+	URL       string `json:"url,omitempty"`
 }
 
 // Server struct stores the server information

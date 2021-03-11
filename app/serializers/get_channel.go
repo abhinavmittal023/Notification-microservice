@@ -19,7 +19,7 @@ type ChannelInfo struct {
 	ShortDescription string `json:"short_description,omitempty" binding:"max=500"`
 	Type             int    `json:"type" binding:"required"`
 	Priority         int    `json:"priority" binding:"required"`
-	Configuration    string `json:"configuration," binding:"required"`
+	Configuration    string `json:"configuration,omitempty"`
 	RecipientsCount  uint64 `json:"recipients"`
 }
 
@@ -118,7 +118,9 @@ func ChannelInfoToChannelModel(channelInfo *ChannelInfo, channelModel *models.Ch
 	channelModel.ShortDescription = strings.ToLower(channelInfo.ShortDescription)
 	channelModel.Type = channelInfo.Type
 	channelModel.Priority = channelInfo.Priority
-	channelModel.Configuration = channelInfo.Configuration
+	if channelInfo.Configuration != "" {
+		channelModel.Configuration = channelInfo.Configuration
+	}
 }
 
 // ChannelModelToChannelInfo function copies the data from channel model to channel serializer
@@ -129,7 +131,6 @@ func ChannelModelToChannelInfo(channelModel *models.Channel) *ChannelInfo {
 	channelInfo.ShortDescription = channelModel.ShortDescription
 	channelInfo.Type = channelModel.Type
 	channelInfo.Priority = channelModel.Priority
-	channelInfo.Configuration = channelModel.Configuration
 	return &channelInfo
 }
 
@@ -141,7 +142,6 @@ func ChannelModelToChannelInfoWithRecipientCount(channelModel *models.Channel, c
 	channelInfo.ShortDescription = channelModel.ShortDescription
 	channelInfo.Type = channelModel.Type
 	channelInfo.Priority = channelModel.Priority
-	channelInfo.Configuration = channelModel.Configuration
 	channelInfo.RecipientsCount = count
 	return &channelInfo
 }
