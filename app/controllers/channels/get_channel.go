@@ -80,8 +80,7 @@ func GetChannel(c *gin.Context) {
 	}
 	nextAvail := lastRecord.ID != channel.ID
 
-	var channelInfo serializers.ChannelInfo
-	serializers.ChannelModelToChannelInfo(&channelInfo, channel)
+	channelInfo := serializers.ChannelModelToChannelInfo(channel)
 
 	c.JSON(http.StatusOK, gin.H{
 		"channel_details": channelInfo,

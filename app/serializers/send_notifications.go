@@ -20,12 +20,13 @@ type Notifications struct {
 }
 
 // NotificationsInfoToNotificationModel converts the serializer to model
-func NotificationsInfoToNotificationModel(info *SendNotifications, notification *models.Notification) error {
+func NotificationsInfoToNotificationModel(info *SendNotifications) (*models.Notification, error) {
+	var notification *models.Notification
 	notification.Priority = constants.PriorityTypeToInt(info.Notifications.Priority)
 	if notification.Priority == 0 {
-		return errors.New("Invalid Priority")
+		return nil, errors.New("Invalid Priority")
 	}
 	notification.Title = info.Notifications.Title
 	notification.Body = info.Notifications.Body
-	return nil
+	return notification, nil
 }

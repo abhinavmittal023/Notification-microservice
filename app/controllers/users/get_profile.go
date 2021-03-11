@@ -37,8 +37,7 @@ func GetUserProfile(c *gin.Context) {
 		return
 	}
 
-	var info serializers.UserInfo
-	serializers.UserModelToUserInfo(&info, user)
+	info := serializers.UserModelToUserInfo(user)
 
-	c.JSON(http.StatusOK, info)
+	c.JSON(http.StatusOK, *info)
 }

@@ -63,6 +63,18 @@ const (
 
 	// ResetPasswordPath stores the url of the reset password page of the front-end
 	ResetPasswordPath = "http://localhost:4200/users/password/reset/"
+
+	// SubjectNewUser is the email subject to be sent to new user
+	SubjectNewUser = "Verify Email Address"
+
+	// SubjectResetPassword is the email subject to be sent while resetting the password
+	SubjectResetPassword = "Reset Password"
+
+	// MessageNewUser is the email message to be sent to new user
+	MessageNewUser = "Thanks for using Notification Microservice! We need to verify your email address. Please do so by clicking on the following link:"
+
+	// MessageResetPassword is the email message to be sent while resetting the password
+	MessageResetPassword = "We have received a Request to reset your password. Do so by clicking on this link:"
 )
 
 // ChannelType is a function mapping type field of channel to its string counterpart.
@@ -198,5 +210,19 @@ func Errors() Error {
 		InvalidPort:           "Port is invalid",
 		InvalidJSON:           "Invalid JSON",
 		InvalidDataType:       "Invalid Data Type Provided",
+	}
+}
+
+// EmailType is a function for all email types
+func EmailType() struct {
+	ResetPassword int
+	Validation    int
+} {
+	return struct {
+		ResetPassword int
+		Validation    int
+	}{
+		ResetPassword: 1,
+		Validation:    2,
 	}
 }

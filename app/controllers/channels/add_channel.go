@@ -49,7 +49,6 @@ func AddChannel(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidPriority})
 		return
 	}
-	var channel models.Channel
 	err := serializers.ChannelConfigValidation(&info)
 
 	if err != nil && err.Error() == constants.Errors().InternalError {
@@ -60,6 +59,7 @@ func AddChannel(c *gin.Context) {
 		return
 	}
 
+	var channel models.Channel
 	serializers.ChannelInfoToChannelModel(&info, &channel)
 
 	_, err = channels.GetChannelWithName(channel.Name)
@@ -87,6 +87,6 @@ func AddChannel(c *gin.Context) {
 		return
 	}
 
-	serializers.ChannelModelToChannelInfo(&info, &channel)
-	c.JSON(http.StatusOK, info)
+	channelInfo := serializers.ChannelModelToChannelInfo(&channel)
+	c.JSON(http.StatusOK, *channelInfo)
 }

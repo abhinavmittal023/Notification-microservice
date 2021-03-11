@@ -77,11 +77,9 @@ func GetRecipient(c *gin.Context) {
 	}
 	nextAvail := lastRecord.ID != recipient.ID
 
-	var info serializers.RecipientInfo
-	serializers.RecipientModelToRecipientInfo(&info, recipient)
+	info := serializers.RecipientModelToRecipientInfo(recipient)
 
 	if info.PreferredChannelType != 0 {
-		var channelInfo serializers.ChannelInfo
 		channel, err := channels.GetChannelWithType(uint(info.PreferredChannelType))
 		if err == gorm.ErrRecordNotFound {
 			// TODO: Should the PreferredChannelID field be cleared or just hidden
@@ -100,12 +98,12 @@ func GetRecipient(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 			return
 		}
-		serializers.ChannelModelToChannelInfo(&channelInfo, channel)
+		channelInfo := serializers.ChannelModelToChannelInfo(channel)
 		c.JSON(http.StatusOK, gin.H{
 			"recipient_details": info,
 			"next":              nextAvail,
 			"previous":          prevAvail,
-			"preferred_channel": channelInfo,
+			"preferred_channel": *channelInfo,
 		})
 		return
 	}

@@ -12,7 +12,6 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/notifications"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/jinzhu/gorm"
@@ -43,15 +42,14 @@ func PostSendNotifications(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": errors})
 		return
 	}
-	var notification models.Notification
-	err := serializers.NotificationsInfoToNotificationModel(&info, &notification)
+	notification, err := serializers.NotificationsInfoToNotificationModel(&info)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
-	err = notifications.AddNotification(&notification)
+	err = notifications.AddNotification(notification)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": constants.Errors().InternalError,
@@ -96,7 +94,7 @@ func PostSendNotifications(c *gin.Context) {
 				return
 			}
 			wg2.Add(1)
-			go notifications.SendAllNotifications(errorChan, stopChan, notification, *recipientModel, *channelList, &openAPI, &wg2, &mu)
+			go notifications.SendAllNotifications(errorChan, stopChan, *notification, *recipientModel, *channelList, &openAPI, &wg2, &mu)
 		}
 		wg2.Wait()
 		close(errorChan)

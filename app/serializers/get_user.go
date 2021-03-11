@@ -25,7 +25,8 @@ type UserListResponse struct {
 }
 
 // UserModelToUserInfo converts the user model to UserInfo struct
-func UserModelToUserInfo(info *UserInfo, user *models.User) {
+func UserModelToUserInfo(user *models.User) *UserInfo {
+	var info UserInfo
 	info.ID = user.ID
 	info.FirstName = user.FirstName
 	info.LastName = user.LastName
@@ -34,4 +35,5 @@ func UserModelToUserInfo(info *UserInfo, user *models.User) {
 	info.Role = user.Role
 	info.CreatedAt = user.CreatedAt
 	info.UpdatedAt = user.UpdatedAt
+	return &info
 }

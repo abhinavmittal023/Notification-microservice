@@ -18,7 +18,7 @@ import (
 )
 
 // SendHTMLEmail sends validation email to new
-func SendHTMLEmail(to []string, user *models.User, message string, subject string, resetPassword bool) error {
+func SendHTMLEmail(to []string, user *models.User, message string, subject string, option int) error {
 	fromEmail := configuration.GetResp().EmailNotification.Email
 	from := configuration.GetResp().EmailNotification.From
 	password := configuration.GetResp().EmailNotification.Password
@@ -29,14 +29,14 @@ func SendHTMLEmail(to []string, user *models.User, message string, subject strin
 	var err error
 	var link string
 
-	if !resetPassword {
+	if option == constants.EmailType().Validation {
 		token, err = GenerateValidationToken(uint64(user.ID), configuration.GetResp().Token.ExpiryTime.ValidationToken)
 		if err != nil {
 			log.Println("Validation Token Generation error")
 			return errors.Wrap(err, "Unable to generate validation token")
 		}
 		link = fmt.Sprintf("http://%s:%s/api/v1/auth/token/%s", configuration.GetResp().Server.Domain, configuration.GetResp().Server.Port, token)
-	} else {
+	} else if option == constants.EmailType().ResetPassword {
 		token, err = services.CreateToken(user)
 		if err != nil {
 			log.Println("Reset Token Generation error")
@@ -66,9 +66,11 @@ func SendHTMLEmail(to []string, user *models.User, message string, subject strin
 	err = t.Execute(&body, struct {
 		Link    string
 		Message string
+		Name    string
 	}{
 		Link:    link,
 		Message: message,
+		Name:    fmt.Sprintf("%s %s", strings.Title(user.FirstName), strings.Title(user.LastName)),
 	})
 	if err != nil {
 		log.Println("Unable to write to template")
@@ -79,7 +81,8 @@ func SendHTMLEmail(to []string, user *models.User, message string, subject strin
 	auth := smtp.PlainAuth("", fromEmail, password, addr)
 
 	//  Sending email.
-	err = smtp.SendMail(addr, auth, from, to, body.Bytes())
+	_ = auth
+	err = smtp.SendMail(addr, nil, from, to, body.Bytes())
 	if err != nil {
 		log.Println("Unable to send email", err.Error())
 		return errors.Wrap(err, "Unable to send email")
