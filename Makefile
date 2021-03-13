@@ -62,3 +62,7 @@ run_services_test_verbose:
 run_unit_tests_verbose: run_services_test_verbose run_controller_test_verbose 
 
 run_unit_tests: run_services_test run_controller_test
+
+run_benchmark:
+	@echo "Running Benchmark"
+	go test  ./tests/benchmark/ -bench=.

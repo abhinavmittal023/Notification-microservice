@@ -14,7 +14,7 @@ import (
 )
 
 // SendAllNotifications functon sends the notification to the specific recipient
-func SendAllNotifications(errChan chan error, stopChan chan bool, notification models.Notification, recipientModel models.Recipient, channelList []models.Channel, openAPI *apimessage.OpenAPI, wg *sync.WaitGroup, mu *sync.Mutex) {
+func SendAllNotifications(errChan chan error, stopChan chan bool, notification models.Notification, recipientModel models.Recipient, channelList []models.Channel, openAPI *apimessage.OpenAPI, notificationInterface sendNotification.NewNotification, wg *sync.WaitGroup, mu *sync.Mutex) {
 
 	defer wg.Done()
 
@@ -47,8 +47,8 @@ func SendAllNotifications(errChan chan error, stopChan chan bool, notification m
 					return
 				}
 			}
-			email := sendNotification.Email{To: recipientModel.Email, Subject: notification.Title, Message: notification.Body}
-			status, err := send(&recipientNotification, &email)
+			email := sendNotification.Email{}
+			status, err := notificationInterface.New(&recipientNotification, recipientModel.Email, notification.Title, notification.Body, &email)
 			if err != nil {
 				if status == http.StatusInternalServerError {
 					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
@@ -75,8 +75,8 @@ func SendAllNotifications(errChan chan error, stopChan chan bool, notification m
 					return
 				}
 			}
-			push := sendNotification.Push{To: recipientModel.PushToken, Title: notification.Title, Body: notification.Body}
-			status, err := send(&recipientNotification, &push)
+			push := sendNotification.Push{}
+			status, err := notificationInterface.New(&recipientNotification, recipientModel.PushToken, notification.Title, notification.Body, &push)
 			if err != nil {
 				if status == http.StatusInternalServerError {
 					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
@@ -103,8 +103,8 @@ func SendAllNotifications(errChan chan error, stopChan chan bool, notification m
 					return
 				}
 			}
-			web := sendNotification.Web{To: recipientModel.WebToken, Title: notification.Title, Body: notification.Body}
-			status, err := send(&recipientNotification, &web)
+			web := sendNotification.Web{}
+			status, err := notificationInterface.New(&recipientNotification, recipientModel.WebToken, notification.Title, notification.Body, &web)
 			if err != nil {
 				if status == http.StatusInternalServerError {
 					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
@@ -156,8 +156,8 @@ func SendAllNotifications(errChan chan error, stopChan chan bool, notification m
 					return
 				}
 			}
-			email := sendNotification.Email{To: recipientModel.Email, Subject: notification.Title, Message: notification.Body}
-			status, err := send(&recipientNotification, &email)
+			email := sendNotification.Email{}
+			status, err := notificationInterface.New(&recipientNotification, recipientModel.Email, notification.Title, notification.Body, &email)
 			if err != nil {
 				if status == http.StatusInternalServerError {
 					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
@@ -184,8 +184,8 @@ func SendAllNotifications(errChan chan error, stopChan chan bool, notification m
 					return
 				}
 			}
-			push := sendNotification.Push{To: recipientModel.PushToken, Title: notification.Title, Body: notification.Body}
-			status, err := send(&recipientNotification, &push)
+			push := sendNotification.Push{}
+			status, err := notificationInterface.New(&recipientNotification, recipientModel.PushToken, notification.Title, notification.Body, &push)
 			if err != nil {
 				if status == http.StatusInternalServerError {
 					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
@@ -212,8 +212,8 @@ func SendAllNotifications(errChan chan error, stopChan chan bool, notification m
 					return
 				}
 			}
-			web := sendNotification.Web{To: recipientModel.WebToken, Title: notification.Title, Body: notification.Body}
-			status, err := send(&recipientNotification, &web)
+			web := sendNotification.Web{}
+			status, err := notificationInterface.New(&recipientNotification, recipientModel.WebToken, notification.Title, notification.Body, &web)
 			if err != nil {
 				if status == http.StatusInternalServerError {
 					openAPI.AddRecipientID(recipientModel.RecipientID, channel.Name, false, mu)
@@ -232,21 +232,15 @@ func SendAllNotifications(errChan chan error, stopChan chan bool, notification m
 	}
 }
 
-func send(recipientNotification *models.RecipientNotifications, notification sendNotification.Notifications) (int, error) {
+func SendToRecipients(channelList []models.Channel, recipientList []models.Recipient, openAPI *apimessage.OpenAPI, errorChan chan error, stopChan chan bool, notification models.Notification, notificationInterface sendNotification.NewNotification, mainWaitGroup *sync.WaitGroup) {
 
-	err := notification.SendNotification()
-	if err != nil {
-		recipientNotification.Status = constants.Failure
-		err2 := recipientnotifications.PatchRecipientNotification(recipientNotification)
-		if err2 != nil {
-			return http.StatusInternalServerError, err2
-		}
-		return http.StatusOK, err
+	defer mainWaitGroup.Done()
+	var recipientWaitGroup sync.WaitGroup
+	var mu sync.Mutex = sync.Mutex{}
+	for _, recipient := range recipientList {
+		recipientWaitGroup.Add(1)
+		go SendAllNotifications(errorChan, stopChan, notification, recipient, channelList, openAPI, notificationInterface, &recipientWaitGroup, &mu)
 	}
-	recipientNotification.Status = constants.Success
-	err = recipientnotifications.PatchRecipientNotification(recipientNotification)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-	return http.StatusOK, nil
+	recipientWaitGroup.Wait()
+	errorChan <- nil
 }
