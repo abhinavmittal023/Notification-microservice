@@ -184,6 +184,7 @@ func GetGraphData(notificationFilter *filter.Notification) (*serializers.GraphDa
 		return nil, res.Error
 	}
 
+	graphIndex := 0
 	for i, value := range notificationID {
 
 		tx = dbG.Model(&models.Notification{})
@@ -192,7 +193,21 @@ func GetGraphData(notificationFilter *filter.Notification) (*serializers.GraphDa
 		if res.Error != nil {
 			return nil, res.Error
 		}
-		graphData.UpdatedAt = append(graphData.UpdatedAt, notification.UpdatedAt.Truncate(time.Minute))
+
+		var truncatedTime time.Time
+		if ((notificationFilter.To.Unix() - notificationFilter.From.Unix()) / 3600) > 24 {
+			truncatedTime = notification.UpdatedAt.Truncate(time.Hour * 24)
+		} else {
+			truncatedTime = notification.UpdatedAt.Truncate(time.Hour)
+		}
+		if i > 0 {
+			if graphData.UpdatedAt[len(graphData.UpdatedAt)-1] != truncatedTime {
+				graphData.UpdatedAt = append(graphData.UpdatedAt, truncatedTime)
+				graphIndex++
+			}
+		} else {
+			graphData.UpdatedAt = append(graphData.UpdatedAt, truncatedTime)
+		}
 
 		tx = dbG.Model(&models.RecipientNotifications{})
 		if notificationFilter.RecipientID != "" {
@@ -215,11 +230,11 @@ func GetGraphData(notificationFilter *filter.Notification) (*serializers.GraphDa
 		for _, val := range results {
 			if idx == 1 {
 				if val.Status == constants.Success {
-					graphData.Successful[i] = graphData.Successful[i] + val.Count
-					graphData.Total[i] = graphData.Total[i] + val.Count
+					graphData.Successful[graphIndex] = graphData.Successful[graphIndex] + val.Count
+					graphData.Total[graphIndex] = graphData.Total[graphIndex] + val.Count
 				} else if val.Status == constants.Failure {
-					graphData.Failed[i] = graphData.Failed[i] + val.Count
-					graphData.Total[i] = graphData.Total[i] + val.Count
+					graphData.Failed[graphIndex] = graphData.Failed[graphIndex] + val.Count
+					graphData.Total[graphIndex] = graphData.Total[graphIndex] + val.Count
 				}
 			} else {
 				graphData.Total = append(graphData.Total, val.Count)
