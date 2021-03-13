@@ -66,7 +66,7 @@ func BenchmarkNotifications10000(b *testing.B) {
 		go notifications.SendToRecipients(channelsList, recipientList, &openAPI, errorChan, stopChan, notification, sendNotification.MockNotification{}, &wg)
 		err := <-errorChan
 		if err != nil {
-			stopChan <- true
+			close(stopChan)
 			wg.Wait()
 			log.Println(err.Error())
 			b.Fail()
@@ -128,7 +128,7 @@ func BenchmarkNotifications1000(b *testing.B) {
 		go notifications.SendToRecipients(channelsList, recipientList, &openAPI, errorChan, stopChan, notification, sendNotification.MockNotification{}, &wg)
 		err := <-errorChan
 		if err != nil {
-			stopChan <- true
+			close(stopChan)
 			wg.Wait()
 			log.Println(err.Error())
 			b.Fail()
@@ -190,7 +190,7 @@ func BenchmarkNotifications100(b *testing.B) {
 		go notifications.SendToRecipients(channelsList, recipientList, &openAPI, errorChan, stopChan, notification, sendNotification.MockNotification{}, &wg)
 		err := <-errorChan
 		if err != nil {
-			stopChan <- true
+			close(stopChan)
 			wg.Wait()
 			log.Println(err.Error())
 			b.Fail()

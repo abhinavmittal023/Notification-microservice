@@ -105,7 +105,7 @@ func PostSendNotifications(c *gin.Context) {
 	go notifications.SendToRecipients(*channelList, recipientList, &openAPI, errorChan, stopChan, *notification, sendNotification.CreateNotification{}, &wg1)
 	err = <-errorChan
 	if err != nil {
-		stopChan <- true
+		close(stopChan)
 		wg1.Wait()
 		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, openAPI)

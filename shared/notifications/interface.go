@@ -19,8 +19,10 @@ type NewNotification interface {
 	New(recipientNotification *models.RecipientNotifications, to string, title string, body string, notificationType Notifications) (int, error)
 }
 
+// CreateNotification is a struct that implements NewNotification Interface
 type CreateNotification struct{}
 
+// New is the function to send real notifications
 func (notification CreateNotification) New(recipientNotification *models.RecipientNotifications, to string, title string, body string, notificationType Notifications) (int, error) {
 	notificationType.New(to, title, body)
 	err := notificationType.SendNotification()
@@ -40,8 +42,10 @@ func (notification CreateNotification) New(recipientNotification *models.Recipie
 	return http.StatusOK, nil
 }
 
+// MockNotification is the struct that implements the NewNotification interface
 type MockNotification struct{}
 
+// New is the function that mocks notification send service
 func (notification MockNotification) New(recipientNotification *models.RecipientNotifications, to string, title string, body string, notificationType Notifications) (int, error) {
 	return http.StatusOK, nil
 }
