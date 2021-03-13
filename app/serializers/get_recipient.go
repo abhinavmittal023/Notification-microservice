@@ -17,11 +17,13 @@ type RecipientInfo struct {
 }
 
 // RecipientModelToRecipientInfo converts the Recipient model to RecipientInfo struct
-func RecipientModelToRecipientInfo(info *RecipientInfo, recipient *models.Recipient) {
+func RecipientModelToRecipientInfo(recipient *models.Recipient) *RecipientInfo {
+	var info RecipientInfo
 	info.ID = uint64(recipient.ID)
 	info.RecipientID = recipient.RecipientID
 	info.Email = recipient.Email
 	info.PushToken = recipient.PushToken
 	info.WebToken = recipient.WebToken
 	info.PreferredChannelType = recipient.PreferredChannelType
+	return &info
 }

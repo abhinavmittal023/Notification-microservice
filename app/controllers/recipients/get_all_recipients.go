@@ -67,10 +67,8 @@ func GetAllRecipient(c *gin.Context) {
 	warning := ""
 
 	for _, recipient := range recipientArray {
-		var info serializers.RecipientInfo
-		serializers.RecipientModelToRecipientInfo(&info, &recipient)
+		info := serializers.RecipientModelToRecipientInfo(&recipient)
 		if info.PreferredChannelType != 0 {
-			var channelInfo serializers.ChannelInfo
 			channel, err := channels.GetChannelWithType(uint(info.PreferredChannelType))
 			if err == gorm.ErrRecordNotFound {
 				// TODO: Should the PreferredChannelID field be cleared or just hidden
@@ -83,11 +81,11 @@ func GetAllRecipient(c *gin.Context) {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 				return
 			}
-			serializers.ChannelModelToChannelInfo(&channelInfo, channel)
-			info.PreferredChannel = channelInfo
+			channelInfo := serializers.ChannelModelToChannelInfo(channel)
+			info.PreferredChannel = *channelInfo
 			info.ChannelType = uint(channel.Type)
 		}
-		infoArray = append(infoArray, info)
+		infoArray = append(infoArray, *info)
 	}
 
 	if warning != "" {

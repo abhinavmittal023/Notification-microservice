@@ -62,11 +62,11 @@ func GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	var info serializers.UserInfo
+	var info *serializers.UserInfo
 
 	for _, user := range usersArray {
-		serializers.UserModelToUserInfo(&info, &user)
-		infoArray = append(infoArray, info)
+		info = serializers.UserModelToUserInfo(&user)
+		infoArray = append(infoArray, *info)
 	}
 
 	userListResponse = serializers.UserListResponse{

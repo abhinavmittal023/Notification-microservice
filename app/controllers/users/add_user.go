@@ -68,7 +68,7 @@ func AddUser(c *gin.Context) {
 		return
 	}
 
-	serializers.AddUserInfoToUserModel(&info, user)
+	user = serializers.AddUserInfoToUserModel(&info)
 	status, err = users.CreateUserAndVerify(user, false)
 	if err != nil {
 		c.JSON(status, gin.H{

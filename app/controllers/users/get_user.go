@@ -79,11 +79,10 @@ func GetUser(c *gin.Context) {
 	}
 	nextAvail := lastRecord.ID != user.ID
 
-	var info serializers.UserInfo
-	serializers.UserModelToUserInfo(&info, user)
+	info := serializers.UserModelToUserInfo(user)
 
 	c.JSON(http.StatusOK, gin.H{
-		"user_details": info,
+		"user_details": *info,
 		"next":         nextAvail,
 		"previous":     prevAvail,
 	})

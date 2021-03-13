@@ -34,10 +34,12 @@ type AddUserInfo struct {
 }
 
 // AddUserInfoToUserModel converts AddUserInfo serializer to User model
-func AddUserInfoToUserModel(info *AddUserInfo, user *models.User) {
+func AddUserInfoToUserModel(info *AddUserInfo) *models.User {
+	var user models.User
 	user.FirstName = strings.ToLower(info.FirstName)
 	user.LastName = strings.ToLower(info.LastName)
 	user.Email = strings.ToLower(info.Email)
 	user.Verified = false
 	user.Role = info.Role
+	return &user
 }

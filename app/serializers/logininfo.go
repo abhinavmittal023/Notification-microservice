@@ -5,10 +5,8 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
-	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 )
 
 // LoginInfo serializer to bind request data
@@ -25,12 +23,6 @@ type LoginInfo struct {
 type LoginResponse struct {
 	LoginInfo    LoginInfo    `json:"user_details"`
 	RefreshToken RefreshToken `json:"token_details"`
-}
-
-// LoginInfoToUserModel converts LoginInfo serializer to User model
-func LoginInfoToUserModel(info LoginInfo, user *models.User) {
-	user.Email = strings.ToLower(info.Email)
-	user.Password = info.Password
 }
 
 // EmailRegexCheck checks for email id in valid format

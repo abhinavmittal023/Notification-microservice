@@ -48,9 +48,7 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	message := "We have received a Request to reset your password. Do so by clicking on this link:"
-	subject := "Reset Password"
-	err = auth.SendHTMLEmail([]string{user.Email}, user, message, subject, true)
+	err = auth.SendHTMLEmail([]string{user.Email}, user, constants.MessageResetPassword, constants.SubjectResetPassword, constants.EmailType().ResetPassword)
 	if err != nil {
 		log.Println("SMTP Error", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
