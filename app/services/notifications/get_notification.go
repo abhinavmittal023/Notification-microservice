@@ -8,6 +8,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	"github.com/jinzhu/gorm"
 )
 
 type notificationData struct {
@@ -24,6 +25,12 @@ func GetAllNotifications(pagination *serializers.Pagination, notificationFilter 
 		ChannelName string
 		Status      int
 		Count       uint64
+	}
+
+	type recipientInfo struct{
+		RecipientID	string
+		ChannelName	string
+		Status		uint64
 	}
 
 	if notificationFilter.RecipientID != "" {
@@ -117,6 +124,9 @@ func GetAllNotifications(pagination *serializers.Pagination, notificationFilter 
 			}
 			prevVal = val
 		}
+
+		var recipientsInfo []recipientInfo
+
 		recipientNotifications[i] = serializers.NotificationsInfo{
 			Priority:             notification.Priority,
 			Title:                notification.Title,
@@ -124,8 +134,38 @@ func GetAllNotifications(pagination *serializers.Pagination, notificationFilter 
 			CreatedAt:            notification.CreatedAt,
 			NotificationChannels: notificationChannels,
 		}
-	}
+		res = dbG.Table("recipients").Select("recipients.recipient_id,channel_name,status").Joins("join recipient_notifications on recipients.id = recipient_notifications.recipient_id").Where("recipient_notifications.notification_id = ?",value.NotificationID).Order("recipients.recipient_id").Scan(&recipientsInfo)
 
+		if res.Error == gorm.ErrRecordNotFound {
+			continue;
+		}else if res.Error != nil{
+			return nil, res.Error
+		}
+		var prevRecipient recipientInfo
+		var recipients []serializers.Recipients
+		idx = 0
+		for _,val := range recipientsInfo{
+			if prevRecipient.RecipientID == val.RecipientID{
+				recipients[idx-1].Channels = append(recipients[idx-1].Channels,serializers.Channels{
+					ChannelName: val.ChannelName,
+					Status: val.Status,
+				})
+			}else{
+				recipients = append(recipients, serializers.Recipients{
+					RecipientID: val.RecipientID,
+					Channels: []serializers.Channels{
+						{
+							ChannelName: val.ChannelName,
+							Status: val.Status,
+						},
+					},
+				})
+				idx++
+			}
+			prevRecipient = val
+		}
+		recipientNotifications[i].Recipients = recipients
+	}
 	return recipientNotifications, nil
 }
 
