@@ -33,5 +33,7 @@ func Init(url string) error {
 	}
 	// get db connection handle
 	dbHandle = dbG.DB()
+	dbHandle.SetMaxOpenConns(99)
+	dbHandle.SetMaxIdleConns(10)
 	return nil
 }

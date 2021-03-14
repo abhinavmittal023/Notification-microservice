@@ -118,13 +118,13 @@ func GetChannelConfig(channelTypes []int) (map[int]string, error) {
 	channelsInfo := map[int]string{}
 	for _, value := range channelTypes {
 		switch constants.ChannelType(uint(value)) {
-		case "Email":
+		case constants.ChannelType(1):
 			channelConfig, err := json.Marshal(configuration.GetResp().EmailNotification)
 			if err != nil {
 				return nil, err
 			}
 			channelsInfo[value] = string(channelConfig)
-		case "Web":
+		case constants.ChannelType(3):
 			webConfig := configuration.GetResp().WebNotification
 			webConfig.URL = ""
 			channelConfigJSON, err := json.Marshal(webConfig)
@@ -132,7 +132,7 @@ func GetChannelConfig(channelTypes []int) (map[int]string, error) {
 				return nil, err
 			}
 			channelsInfo[value] = string(channelConfigJSON)
-		case "Push":
+		case constants.ChannelType(2):
 			channelConfig, err := json.Marshal(configuration.GetResp().PushNotification)
 			if err != nil {
 				return nil, err

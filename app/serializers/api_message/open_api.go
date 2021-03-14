@@ -19,10 +19,24 @@ type OpenAPIChannel struct {
 	Failure []string `json:"failure,omitempty"`
 }
 
+const (
+	// PreferredChannelTypeDeleted is the first enum member for message options
+	PreferredChannelTypeDeleted = iota + 1
+	// Success is the second enum member for message options
+	Success
+	// Failure is the second enum member for message options
+	Failure
+)
+
+// Message is the struct for OpenAPI message channel
+type Message struct {
+	ID          string
+	Option      int
+	ChannelName string
+}
+
 // AddRecipientID Adds the recipient ID to the success or failure list of the struct
-func (openAPI *OpenAPI) AddRecipientID(ID string, channelName string, success bool, mu *sync.Mutex) {
-	mu.Lock()
-	defer mu.Unlock()
+func (openAPI *OpenAPI) AddRecipientID(ID string, channelName string, success bool) {
 	channelName = strings.ToLower(channelName)
 	channelStatus, present := openAPI.NotificationStatus[channelName]
 	if !present {
@@ -37,4 +51,30 @@ func (openAPI *OpenAPI) AddRecipientID(ID string, channelName string, success bo
 		channelStatus.Failure = append(channelStatus.Failure, ID)
 	}
 	openAPI.NotificationStatus[channelName] = channelStatus
+}
+
+// AddStatus is the function used to add some message to the openAPI based on messageOption
+func (openAPI *OpenAPI) AddStatus(stopChan chan bool, messageChan chan Message, mainWaitGroup *sync.WaitGroup) {
+
+	defer mainWaitGroup.Done()
+
+	var message Message
+	for ok := true; ok; {
+		select {
+		case <-stopChan:
+			return
+		case message, ok = <-messageChan:
+			if !ok {
+				break
+			}
+			if message.Option == PreferredChannelTypeDeleted {
+				openAPI.PreferredChannelTypeDeleted = append(openAPI.PreferredChannelTypeDeleted, message.ID)
+			} else if message.Option == Success {
+				openAPI.AddRecipientID(message.ID, message.ChannelName, true)
+			} else if message.Option == Failure {
+				openAPI.AddRecipientID(message.ID, message.ChannelName, false)
+			}
+		default:
+		}
+	}
 }

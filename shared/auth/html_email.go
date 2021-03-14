@@ -66,10 +66,12 @@ func SendHTMLEmail(to []string, user *models.User, message string, subject strin
 	err = t.Execute(&body, struct {
 		Link    string
 		Message string
+		Subject string
 		Name    string
 	}{
 		Link:    link,
 		Message: message,
+		Subject: subject,
 		Name:    fmt.Sprintf("%s %s", strings.Title(user.FirstName), strings.Title(user.LastName)),
 	})
 	if err != nil {

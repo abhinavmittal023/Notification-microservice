@@ -22,8 +22,8 @@ type Web struct {
 	Body  string
 }
 
-// NewNotification creates fills the values in the struct with the provided ones
-func (web *Web) NewNotification(to string, title string, body string) {
+// New creates fills the values in the struct with the provided ones
+func (web *Web) New(to string, title string, body string) {
 	web.Body = body
 	web.Title = title
 	web.To = to

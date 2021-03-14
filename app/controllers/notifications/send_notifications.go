@@ -12,6 +12,8 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/notifications"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/recipients"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	sendNotification "code.jtg.tools/ayush.singhal/notifications-microservice/shared/notifications"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/jinzhu/gorm"
@@ -62,47 +64,48 @@ func PostSendNotifications(c *gin.Context) {
 		PreferredChannelTypeDeleted: []string{},
 		RepeatedID:                  []string{},
 	}
-	processedRecipients := map[string]bool{}
+
 	var (
 		wg1 sync.WaitGroup
-		wg2 sync.WaitGroup
-		mu  sync.Mutex = sync.Mutex{}
 	)
+	processedRecipients := map[string]bool{}
+	recipientList := []models.Recipient{}
+
+	for _, recipient := range info.Notifications.Recipients {
+		if processedRecipients[recipient] {
+			openAPI.RepeatedID = append(openAPI.RepeatedID, recipient)
+			continue
+		}
+		processedRecipients[recipient] = true
+		recipientModel, err := recipients.GetRecipientWithRecipientID(recipient)
+		if err == gorm.ErrRecordNotFound {
+			openAPI.RecipientIDIncorrect = append(openAPI.RecipientIDIncorrect, recipient)
+			continue
+		} else if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": constants.Errors().InternalError,
+			})
+			return
+		}
+		recipientList = append(recipientList, *recipientModel)
+	}
+
+	channelList, err := channels.GetChannelsWithPriorityLessThan(uint(notification.Priority))
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": constants.Errors().InternalError,
+		})
+		return
+	}
 
 	errorChan := make(chan error)
 	stopChan := make(chan bool)
 	wg1.Add(1)
-	go func() {
-		defer wg1.Done()
-		for _, recipient := range info.Notifications.Recipients {
-			if processedRecipients[recipient] {
-				openAPI.RepeatedID = append(openAPI.RepeatedID, recipient)
-				continue
-			}
-			processedRecipients[recipient] = true
-			recipientModel, err := recipients.GetRecipientWithRecipientID(recipient)
-			if err == gorm.ErrRecordNotFound {
-				openAPI.RecipientIDIncorrect = append(openAPI.RecipientIDIncorrect, recipient)
-				continue
-			} else if err != nil {
-				c.JSON(http.StatusInternalServerError, openAPI)
-				return
-			}
-			channelList, err := channels.GetChannelsWithPriorityLessThan(uint(notification.Priority))
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, openAPI)
-				return
-			}
-			wg2.Add(1)
-			go notifications.SendAllNotifications(errorChan, stopChan, *notification, *recipientModel, *channelList, &openAPI, &wg2, &mu)
-		}
-		wg2.Wait()
-		close(errorChan)
-		close(stopChan)
-	}()
+	go notifications.SendToRecipients(*channelList, recipientList, &openAPI, errorChan, stopChan, *notification, sendNotification.CreateNotification{}, &wg1)
 	err = <-errorChan
 	if err != nil {
-		stopChan <- true
+		close(stopChan)
 		wg1.Wait()
 		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, openAPI)
