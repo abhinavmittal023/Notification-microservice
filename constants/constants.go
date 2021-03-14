@@ -74,10 +74,10 @@ const (
 	SubjectResetPassword = "Reset Password"
 
 	// MessageNewUser is the email message to be sent to new user
-	MessageNewUser = "Thanks for using Notification Microservice! We need to verify your email address. Please do so by clicking on the following link:"
+	MessageNewUser = "Thanks for choosing Notification Microservice! We need to verify your email address to get you started. Please do so by clicking on this button:"
 
 	// MessageResetPassword is the email message to be sent while resetting the password
-	MessageResetPassword = "We have received a Request to reset your password. Do so by clicking on this link:"
+	MessageResetPassword = "We have received a Request to reset your password. Do so by clicking on this button:"
 )
 
 // ChannelType is a function mapping type field of channel to its string counterpart.
