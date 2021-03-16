@@ -12,12 +12,12 @@ func RefreshAllTables() error {
 
 	dbG := db.Get()
 
-	err := dbG.DropTableIfExists(&models.User{}, &models.Recipient{}, &models.Notification{}, &models.Organisation{}, &models.Channel{}, &models.RecipientNotifications{}).Error
+	err := dbG.DropTableIfExists(&models.User{}, &models.Recipient{}, &models.Notification{}, &models.Organisation{}, &models.Channel{}, &models.RecipientNotifications{}, &models.Logs{}).Error
 	if err != nil {
 		return err
 	}
 
-	err = dbG.AutoMigrate(&models.User{}, &models.Recipient{}, &models.Notification{}, &models.Organisation{}, &models.Channel{}, &models.RecipientNotifications{}).Error
+	err = dbG.AutoMigrate(&models.User{}, &models.Recipient{}, &models.Notification{}, &models.Organisation{}, &models.Channel{}, &models.RecipientNotifications{}, &models.Logs{}).Error
 	if err != nil {
 		return err
 	}

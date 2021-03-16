@@ -24,16 +24,12 @@ func UpdateUserRoute(router *gin.RouterGroup) {
 
 // UpdateUser Controller for put /users/:id/update route
 func UpdateUser(c *gin.Context) {
-	f, err := li.OpenFile()
-	if err != nil {
-		// Cannot open log file. Logging to stderr
-		fmt.Println(err)
-	}
-	defer f.Close()
+	f := li.GetFile()
+	var err error
 	var standardLogger = li.NewLogger()
 	standardLogger.SetOutput(f)
 	var info serializers.ChangeCredentialsInfo
-	if err = c.BindJSON(&info); err != nil {
+	if err := c.BindJSON(&info); err != nil {
 		ve, ok := err.(validator.ValidationErrors)
 		if !ok {
 			c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidDataType})
