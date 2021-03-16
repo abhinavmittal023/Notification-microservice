@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/logs"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	li "code.jtg.tools/ayush.singhal/notifications-microservice/shared/logwrapper"
@@ -38,16 +39,16 @@ func DeleteUser(c *gin.Context) {
 		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		standardLogger.InternalServerError("Get User with ID in delete user")
+		standardLogger.InternalServerError(err.Error())
 		return
 	}
 
 	err = users.DeleteUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		standardLogger.InternalServerError(fmt.Sprintf("Delete User with email %s from database", user.Email))
+		standardLogger.InternalServerError(err.Error())
 		return
 	}
-	standardLogger.EntityDeleted(fmt.Sprintf("user with email %s", user.Email))
+	logs.AddLogs(constants.InfoLog,fmt.Sprintf("User with email %s deleted",user.Email))
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
