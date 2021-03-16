@@ -84,6 +84,6 @@ func AddUser(c *gin.Context) {
 		})
 		return
 	}
-	logs.AddLogs(constants.InfoLog,fmt.Sprintf("User with email %s added",user.Email))
+	logs.AddLogs(constants.InfoLog, fmt.Sprintf("User with email %s added", user.Email))
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

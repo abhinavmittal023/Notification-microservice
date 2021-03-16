@@ -93,8 +93,8 @@ func ChannelType(index uint) string {
 }
 
 // LogLevels is a function that returns the log levels
-func LogLevels(index uint)string{
-	return []string{"Info","Error"}[int(index-1)]
+func LogLevels(index uint) string {
+	return []string{"Info", "Error"}[int(index-1)]
 }
 
 // CSVHeaders is a function that returns the headers of our csv file

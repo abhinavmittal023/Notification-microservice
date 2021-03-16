@@ -9,6 +9,6 @@ type Logs struct {
 
 // LogsListResponse serializer for logs list response
 type LogsListResponse struct {
-	RecordsAffected int64         `json:"records_count"`
-	LogInfo     []Logs 			`json:"logs"`
+	RecordsAffected int64  `json:"records_count"`
+	LogInfo         []Logs `json:"logs"`
 }

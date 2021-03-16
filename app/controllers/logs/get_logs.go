@@ -44,7 +44,7 @@ func GetLogs(c *gin.Context) {
 	var infoArray []serializers.Logs
 	logsListResponse := serializers.LogsListResponse{
 		RecordsAffected: recordsCount,
-		LogInfo:     	infoArray,
+		LogInfo:         infoArray,
 	}
 	if recordsCount == 0 {
 		c.JSON(http.StatusOK, logsListResponse)
@@ -55,16 +55,16 @@ func GetLogs(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
-	for _,log := range logsList{
+	for _, log := range logsList {
 		infoArray = append(infoArray, serializers.Logs{
 			Level: constants.LogLevels(log.Level),
-			Time: log.CreatedAt.String(),
-			Msg: log.Msg,
+			Time:  log.CreatedAt.String(),
+			Msg:   log.Msg,
 		})
 	}
 	logsListResponse = serializers.LogsListResponse{
 		RecordsAffected: recordsCount,
-		LogInfo:     infoArray,
+		LogInfo:         infoArray,
 	}
 
 	c.JSON(http.StatusOK, logsListResponse)

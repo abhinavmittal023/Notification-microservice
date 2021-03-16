@@ -49,6 +49,6 @@ func DeleteUser(c *gin.Context) {
 		standardLogger.InternalServerError(err.Error())
 		return
 	}
-	logs.AddLogs(constants.InfoLog,fmt.Sprintf("User with email %s deleted",user.Email))
+	logs.AddLogs(constants.InfoLog, fmt.Sprintf("User with email %s deleted", user.Email))
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

@@ -54,7 +54,7 @@ func DeleteChannel(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
-	logs.AddLogs(constants.InfoLog,fmt.Sprintf("Channel %s deleted",channel.Name))
+	logs.AddLogs(constants.InfoLog, fmt.Sprintf("Channel %s deleted", channel.Name))
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})

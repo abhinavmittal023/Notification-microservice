@@ -99,7 +99,7 @@ func AddChannel(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
-	logs.AddLogs(constants.InfoLog,fmt.Sprintf("Channel %s added",channel.Name))
+	logs.AddLogs(constants.InfoLog, fmt.Sprintf("Channel %s added", channel.Name))
 	channelInfo := serializers.ChannelModelToChannelInfo(&channel)
 	c.JSON(http.StatusOK, *channelInfo)
 }

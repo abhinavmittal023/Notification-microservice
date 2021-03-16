@@ -122,7 +122,7 @@ func UpdateChannel(c *gin.Context) {
 		return
 	}
 
-	logs.AddLogs(constants.InfoLog,fmt.Sprintf("Channel %s updated",channel.Name))
+	logs.AddLogs(constants.InfoLog, fmt.Sprintf("Channel %s updated", channel.Name))
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})
