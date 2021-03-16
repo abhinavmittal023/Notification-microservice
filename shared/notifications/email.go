@@ -63,8 +63,7 @@ func (email *Email) SendNotification() error {
 	auth := smtp.PlainAuth("", fromEmail, password, addr)
 
 	//  Sending email.
-	_ = auth
-	err = smtp.SendMail(addr, nil, from, []string{email.To}, msg)
+	err = smtp.SendMail(addr, auth, from, []string{email.To}, msg)
 	if err != nil {
 		return errors.Wrap(err, "Unable to send email")
 	}
