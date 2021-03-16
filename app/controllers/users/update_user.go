@@ -2,7 +2,6 @@ package users
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -10,6 +9,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
+	li "code.jtg.tools/ayush.singhal/notifications-microservice/shared/logwrapper"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -23,9 +23,16 @@ func UpdateUserRoute(router *gin.RouterGroup) {
 
 // UpdateUser Controller for put /users/:id/update route
 func UpdateUser(c *gin.Context) {
+	f,err := li.OpenFile()
+	if err != nil {
+		// Cannot open log file. Logging to stderr
+		fmt.Println(err)
+	}
+	defer f.Close()
+	var standardLogger = li.NewLogger()
+	standardLogger.SetOutput(f)
 	var info serializers.ChangeCredentialsInfo
-	var err error
-	if err := c.BindJSON(&info); err != nil {
+	if err = c.BindJSON(&info); err != nil {
 		ve, ok := err.(validator.ValidationErrors)
 		if !ok {
 			c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().InvalidDataType})
@@ -70,7 +77,7 @@ func UpdateUser(c *gin.Context) {
 	testUser, err := users.GetUserWithEmail(info.Email)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("GetUserWithEmail service error", err.Error())
+		standardLogger.InternalServerError("Get User with email in update user")
 		return
 	} else if testUser.ID != uint(info.ID) && err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -84,7 +91,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Get user with id query error", err.Error())
+		standardLogger.InternalServerError("Get User with id in update user")
 		return
 	}
 
@@ -92,8 +99,10 @@ func UpdateUser(c *gin.Context) {
 	err = users.PatchUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("Update User service error", err.Error())
+		standardLogger.InternalServerError("Patch User to database")
 		return
 	}
+	standardLogger.EntityUpdated(fmt.Sprintf("user with email %s",user.Email))
+
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

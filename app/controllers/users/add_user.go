@@ -9,6 +9,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
+	li "code.jtg.tools/ayush.singhal/notifications-microservice/shared/logwrapper"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -22,6 +23,14 @@ func AddUserRoute(router *gin.RouterGroup) {
 
 // AddUser Controller for post /users/ route
 func AddUser(c *gin.Context) {
+	f,err := li.OpenFile()
+	if err != nil {
+		// Cannot open log file. Logging to stderr
+		fmt.Println(err)
+	}
+	defer f.Close()
+	var standardLogger = li.NewLogger()
+	standardLogger.SetOutput(f)
 	var info serializers.AddUserInfo
 	if err := c.BindJSON(&info); err != nil {
 		ve, ok := err.(validator.ValidationErrors)
@@ -76,5 +85,6 @@ func AddUser(c *gin.Context) {
 		})
 		return
 	}
+	standardLogger.EntityAdded(fmt.Sprintf("user with email %s",user.Email))
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

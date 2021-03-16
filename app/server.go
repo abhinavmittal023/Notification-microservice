@@ -4,6 +4,7 @@ import (
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/auth"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/authorization"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/logs"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/notifications"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/recipients"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/controllers/users"
@@ -75,6 +76,9 @@ func InitServer() error {
 	channels.UpdateChannelRoute(channelSystemAdminGroup)
 	channels.DeleteChannelRoute(channelSystemAdminGroup)
 	channels.GetChannelRoute(channelGroup)
+
+	logGroup := v1.Group("/logs", middlewares.AuthorizeJWT(),middlewares.CheckIfSystemAdmin())
+	logs.GetLogsRoute(logGroup)
 
 	apiKeyGroup := v1.Group("/api-key", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())
 	notifications.GetAPILastRoute(apiKeyGroup)
