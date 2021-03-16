@@ -20,12 +20,8 @@ func DeleteChannelRoute(router *gin.RouterGroup) {
 
 // DeleteChannel function is a controller for delete channels/:id route
 func DeleteChannel(c *gin.Context) {
-	f, err := li.OpenFile()
-	if err != nil {
-		// Cannot open log file. Logging to stderr
-		fmt.Println(err)
-	}
-	defer f.Close()
+	f := li.GetFile()
+	var err error
 	var standardLogger = li.NewLogger()
 	standardLogger.SetOutput(f)
 	channelID, err := strconv.ParseUint(c.Param("id"), 10, 64)

@@ -24,12 +24,8 @@ func UpdateChannelRoute(router *gin.RouterGroup) {
 
 // UpdateChannel controller for put the channels/:id route
 func UpdateChannel(c *gin.Context) {
-	f, err := li.OpenFile()
-	if err != nil {
-		// Cannot open log file. Logging to stderr
-		fmt.Println(err)
-	}
-	defer f.Close()
+	f := li.GetFile()
+	var err error
 	var standardLogger = li.NewLogger()
 	standardLogger.SetOutput(f)
 	var info serializers.ChannelInfo

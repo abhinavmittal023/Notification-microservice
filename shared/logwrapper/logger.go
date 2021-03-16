@@ -6,6 +6,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var logfile *os.File = nil
+
 // Event stores messages to log later, from our standard interface
 type Event struct {
 	id      int
@@ -33,7 +35,13 @@ func OpenFile() (*os.File, error) {
 	var filename string = "logfile.log"
 	// Create the log file if doesn't exist. And append to it if it already exists.
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+	logfile = f
 	return f, err
+}
+
+// GetFile function gets the opened file pointer for log file
+func GetFile() *os.File {
+	return logfile
 }
 
 // Declare variables to store log messages as new Events

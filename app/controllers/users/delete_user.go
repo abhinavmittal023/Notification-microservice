@@ -20,12 +20,8 @@ func DeleteUserRoute(router *gin.RouterGroup) {
 
 // DeleteUser Controller for delete /users/:id route
 func DeleteUser(c *gin.Context) {
-	f, err := li.OpenFile()
-	if err != nil {
-		// Cannot open log file. Logging to stderr
-		fmt.Println(err)
-	}
-	defer f.Close()
+	f := li.GetFile()
+	var err error
 	var standardLogger = li.NewLogger()
 	standardLogger.SetOutput(f)
 	userID, err := strconv.ParseUint(c.Param("id"), 10, 64)

@@ -23,12 +23,7 @@ func AddUserRoute(router *gin.RouterGroup) {
 
 // AddUser Controller for post /users/ route
 func AddUser(c *gin.Context) {
-	f, err := li.OpenFile()
-	if err != nil {
-		// Cannot open log file. Logging to stderr
-		fmt.Println(err)
-	}
-	defer f.Close()
+	f := li.GetFile()
 	var standardLogger = li.NewLogger()
 	standardLogger.SetOutput(f)
 	var info serializers.AddUserInfo
@@ -72,6 +67,7 @@ func AddUser(c *gin.Context) {
 		return
 	}
 	if err != gorm.ErrRecordNotFound {
+		standardLogger.Errorln("Get user Service error", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
