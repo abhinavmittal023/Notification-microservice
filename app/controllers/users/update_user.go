@@ -23,7 +23,7 @@ func UpdateUserRoute(router *gin.RouterGroup) {
 
 // UpdateUser Controller for put /users/:id/update route
 func UpdateUser(c *gin.Context) {
-	f,err := li.OpenFile()
+	f, err := li.OpenFile()
 	if err != nil {
 		// Cannot open log file. Logging to stderr
 		fmt.Println(err)
@@ -102,7 +102,7 @@ func UpdateUser(c *gin.Context) {
 		standardLogger.InternalServerError("Patch User to database")
 		return
 	}
-	standardLogger.EntityUpdated(fmt.Sprintf("user with email %s",user.Email))
+	standardLogger.EntityUpdated(fmt.Sprintf("user with email %s", user.Email))
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

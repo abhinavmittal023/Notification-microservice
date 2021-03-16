@@ -22,7 +22,7 @@ func AddChannelRoute(router *gin.RouterGroup) {
 
 // AddChannel controller for the post channels/ route
 func AddChannel(c *gin.Context) {
-	f,err := li.OpenFile()
+	f, err := li.OpenFile()
 	if err != nil {
 		// Cannot open log file. Logging to stderr
 		fmt.Println(err)
@@ -99,7 +99,7 @@ func AddChannel(c *gin.Context) {
 		return
 	}
 
-	standardLogger.EntityAdded(fmt.Sprintf("channel %s",channel.Name))
+	standardLogger.EntityAdded(fmt.Sprintf("channel %s", channel.Name))
 	channelInfo := serializers.ChannelModelToChannelInfo(&channel)
 	c.JSON(http.StatusOK, *channelInfo)
 }

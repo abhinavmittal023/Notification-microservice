@@ -23,7 +23,7 @@ func AddUserRoute(router *gin.RouterGroup) {
 
 // AddUser Controller for post /users/ route
 func AddUser(c *gin.Context) {
-	f,err := li.OpenFile()
+	f, err := li.OpenFile()
 	if err != nil {
 		// Cannot open log file. Logging to stderr
 		fmt.Println(err)
@@ -85,6 +85,6 @@ func AddUser(c *gin.Context) {
 		})
 		return
 	}
-	standardLogger.EntityAdded(fmt.Sprintf("user with email %s",user.Email))
+	standardLogger.EntityAdded(fmt.Sprintf("user with email %s", user.Email))
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

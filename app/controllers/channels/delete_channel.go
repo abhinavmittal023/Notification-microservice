@@ -19,7 +19,7 @@ func DeleteChannelRoute(router *gin.RouterGroup) {
 
 // DeleteChannel function is a controller for delete channels/:id route
 func DeleteChannel(c *gin.Context) {
-	f,err := li.OpenFile()
+	f, err := li.OpenFile()
 	if err != nil {
 		// Cannot open log file. Logging to stderr
 		fmt.Println(err)
@@ -49,11 +49,11 @@ func DeleteChannel(c *gin.Context) {
 
 	err = channels.DeleteChannel(channel)
 	if err != nil {
-		standardLogger.InternalServerError(fmt.Sprintf("Delete Channel %s from database",channel.Name))
+		standardLogger.InternalServerError(fmt.Sprintf("Delete Channel %s from database", channel.Name))
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
-	standardLogger.EntityDeleted(fmt.Sprintf("channel %s",channel.Name))
+	standardLogger.EntityDeleted(fmt.Sprintf("channel %s", channel.Name))
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})

@@ -20,20 +20,20 @@ func GetLogsRoute(router *gin.RouterGroup) {
 // GetLogs Controller for get /logs/ route
 func GetLogs(c *gin.Context) {
 	file, err := os.Open("logfile.log")
- 
+
 	if err != nil {
 		fmt.Println("Failed to open logfile")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 	}
- 
+
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
 	var txtlines []string
- 
+
 	for scanner.Scan() {
 		txtlines = append(txtlines, scanner.Text())
 	}
- 
+
 	file.Close()
 	var logs []serializers.Logs
 	var log serializers.Logs
@@ -45,5 +45,5 @@ func GetLogs(c *gin.Context) {
 		}
 		logs = append(logs, log)
 	}
-	c.JSON(http.StatusOK,logs)
+	c.JSON(http.StatusOK, logs)
 }

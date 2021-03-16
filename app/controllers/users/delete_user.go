@@ -19,7 +19,7 @@ func DeleteUserRoute(router *gin.RouterGroup) {
 
 // DeleteUser Controller for delete /users/:id route
 func DeleteUser(c *gin.Context) {
-	f,err := li.OpenFile()
+	f, err := li.OpenFile()
 	if err != nil {
 		// Cannot open log file. Logging to stderr
 		fmt.Println(err)
@@ -36,7 +36,7 @@ func DeleteUser(c *gin.Context) {
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{"error": constants.Errors().IDNotInRecords})
 		return
-	}else if err != nil {
+	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		standardLogger.InternalServerError("Get User with ID in delete user")
 		return
@@ -45,9 +45,9 @@ func DeleteUser(c *gin.Context) {
 	err = users.DeleteUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		standardLogger.InternalServerError(fmt.Sprintf("Delete User with email %s from database",user.Email))
+		standardLogger.InternalServerError(fmt.Sprintf("Delete User with email %s from database", user.Email))
 		return
 	}
-	standardLogger.EntityDeleted(fmt.Sprintf("user with email %s",user.Email))
+	standardLogger.EntityDeleted(fmt.Sprintf("user with email %s", user.Email))
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

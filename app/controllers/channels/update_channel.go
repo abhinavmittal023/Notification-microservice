@@ -23,7 +23,7 @@ func UpdateChannelRoute(router *gin.RouterGroup) {
 
 // UpdateChannel controller for put the channels/:id route
 func UpdateChannel(c *gin.Context) {
-	f,err := li.OpenFile()
+	f, err := li.OpenFile()
 	if err != nil {
 		// Cannot open log file. Logging to stderr
 		fmt.Println(err)
@@ -121,7 +121,7 @@ func UpdateChannel(c *gin.Context) {
 		return
 	}
 
-	standardLogger.EntityUpdated(fmt.Sprintf("channel %s",channel.Name))
+	standardLogger.EntityUpdated(fmt.Sprintf("channel %s", channel.Name))
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})

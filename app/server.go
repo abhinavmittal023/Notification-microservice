@@ -77,7 +77,7 @@ func InitServer() error {
 	channels.DeleteChannelRoute(channelSystemAdminGroup)
 	channels.GetChannelRoute(channelGroup)
 
-	logGroup := v1.Group("/logs", middlewares.AuthorizeJWT(),middlewares.CheckIfSystemAdmin())
+	logGroup := v1.Group("/logs", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())
 	logs.GetLogsRoute(logGroup)
 
 	apiKeyGroup := v1.Group("/api-key", middlewares.AuthorizeJWT(), middlewares.CheckIfSystemAdmin())

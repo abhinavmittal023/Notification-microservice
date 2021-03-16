@@ -27,10 +27,10 @@ func GetAllNotifications(pagination *serializers.Pagination, notificationFilter 
 		Count       uint64
 	}
 
-	type recipientInfo struct{
-		RecipientID	string
-		ChannelName	string
-		Status		uint64
+	type recipientInfo struct {
+		RecipientID string
+		ChannelName string
+		Status      uint64
 	}
 
 	if notificationFilter.RecipientID != "" {
@@ -134,29 +134,29 @@ func GetAllNotifications(pagination *serializers.Pagination, notificationFilter 
 			CreatedAt:            notification.CreatedAt,
 			NotificationChannels: notificationChannels,
 		}
-		res = dbG.Table("recipients").Select("recipients.recipient_id,channel_name,status").Joins("join recipient_notifications on recipients.id = recipient_notifications.recipient_id").Where("recipient_notifications.notification_id = ?",value.NotificationID).Order("recipients.recipient_id").Scan(&recipientsInfo)
+		res = dbG.Table("recipients").Select("recipients.recipient_id,channel_name,status").Joins("join recipient_notifications on recipients.id = recipient_notifications.recipient_id").Where("recipient_notifications.notification_id = ?", value.NotificationID).Order("recipients.recipient_id").Scan(&recipientsInfo)
 
 		if res.Error == gorm.ErrRecordNotFound {
-			continue;
-		}else if res.Error != nil{
+			continue
+		} else if res.Error != nil {
 			return nil, res.Error
 		}
 		var prevRecipient recipientInfo
 		var recipients []serializers.Recipients
 		idx = 0
-		for _,val := range recipientsInfo{
-			if prevRecipient.RecipientID == val.RecipientID{
-				recipients[idx-1].Channels = append(recipients[idx-1].Channels,serializers.Channels{
+		for _, val := range recipientsInfo {
+			if prevRecipient.RecipientID == val.RecipientID {
+				recipients[idx-1].Channels = append(recipients[idx-1].Channels, serializers.Channels{
 					ChannelName: val.ChannelName,
-					Status: val.Status,
+					Status:      val.Status,
 				})
-			}else{
+			} else {
 				recipients = append(recipients, serializers.Recipients{
 					RecipientID: val.RecipientID,
 					Channels: []serializers.Channels{
 						{
 							ChannelName: val.ChannelName,
-							Status: val.Status,
+							Status:      val.Status,
 						},
 					},
 				})

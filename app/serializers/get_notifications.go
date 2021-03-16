@@ -15,19 +15,19 @@ type NotificationsInfo struct {
 	Body                 string                 `json:"body"`
 	CreatedAt            time.Time              `json:"created_at"`
 	NotificationChannels []NotificationChannels `json:"channels"`
-	Recipients				[]Recipients				`json:"recipients"`
+	Recipients           []Recipients           `json:"recipients"`
 }
 
 // Recipients serializer to get and show recipients information
 type Recipients struct {
-	RecipientID		string	`json:"recipient_id"`
-	Channels []Channels		`json:"channels"`
+	RecipientID string     `json:"recipient_id"`
+	Channels    []Channels `json:"channels"`
 }
 
 // Channels serializer to get and show channels information
 type Channels struct {
 	ChannelName string `json:"name"`
-	Status		uint64	`json:"status"`
+	Status      uint64 `json:"status"`
 }
 
 // NotificationChannels serializer to get and show channels information
