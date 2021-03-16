@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/logs"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	li "code.jtg.tools/ayush.singhal/notifications-microservice/shared/logwrapper"
@@ -77,7 +78,7 @@ func UpdateUser(c *gin.Context) {
 	testUser, err := users.GetUserWithEmail(info.Email)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		standardLogger.InternalServerError("Get User with email in update user")
+		standardLogger.InternalServerError(err.Error())
 		return
 	} else if testUser.ID != uint(info.ID) && err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -91,7 +92,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		standardLogger.InternalServerError("Get User with id in update user")
+		standardLogger.InternalServerError(err.Error())
 		return
 	}
 
@@ -99,10 +100,10 @@ func UpdateUser(c *gin.Context) {
 	err = users.PatchUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		standardLogger.InternalServerError("Patch User to database")
+		standardLogger.InternalServerError(err.Error())
 		return
 	}
-	standardLogger.EntityUpdated(fmt.Sprintf("user with email %s", user.Email))
+	logs.AddLogs(constants.InfoLog, fmt.Sprintf("User with email %s updated", user.Email))
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

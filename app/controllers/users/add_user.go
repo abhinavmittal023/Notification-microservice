@@ -2,11 +2,11 @@ package users
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/logs"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/users"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	li "code.jtg.tools/ayush.singhal/notifications-microservice/shared/logwrapper"
@@ -73,7 +73,6 @@ func AddUser(c *gin.Context) {
 	}
 	if err != gorm.ErrRecordNotFound {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-		log.Println("GetUserWithEmail service error", err.Error())
 		return
 	}
 
@@ -85,6 +84,6 @@ func AddUser(c *gin.Context) {
 		})
 		return
 	}
-	standardLogger.EntityAdded(fmt.Sprintf("user with email %s", user.Email))
+	logs.AddLogs(constants.InfoLog, fmt.Sprintf("User with email %s added", user.Email))
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }

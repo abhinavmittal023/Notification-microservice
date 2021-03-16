@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/logs"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	li "code.jtg.tools/ayush.singhal/notifications-microservice/shared/logwrapper"
 	"github.com/gin-gonic/gin"
@@ -42,18 +43,18 @@ func DeleteChannel(c *gin.Context) {
 		})
 		return
 	} else if err != nil {
-		standardLogger.InternalServerError("Get Channel with ID in delete channel")
+		standardLogger.InternalServerError(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
 	err = channels.DeleteChannel(channel)
 	if err != nil {
-		standardLogger.InternalServerError(fmt.Sprintf("Delete Channel %s from database", channel.Name))
+		standardLogger.InternalServerError(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
-	standardLogger.EntityDeleted(fmt.Sprintf("channel %s", channel.Name))
+	logs.AddLogs(constants.InfoLog, fmt.Sprintf("Channel %s deleted", channel.Name))
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})

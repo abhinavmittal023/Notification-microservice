@@ -1,13 +1,11 @@
 package logs
 
 import (
-	"bufio"
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/logs"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"github.com/gin-gonic/gin"
 )
@@ -19,33 +17,55 @@ func GetLogsRoute(router *gin.RouterGroup) {
 
 // GetLogs Controller for get /logs/ route
 func GetLogs(c *gin.Context) {
-	file, err := os.Open("logfile.log")
-
+	var err error
+	var pagination serializers.Pagination
+	err = c.BindQuery(&pagination)
 	if err != nil {
-		fmt.Println("Failed to open logfile")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": constants.Errors().InvalidPagination,
+		})
 		return
 	}
 
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	var txtlines []string
-
-	for scanner.Scan() {
-		txtlines = append(txtlines, scanner.Text())
+	var logFilter filter.Logs
+	err = c.BindQuery(&logFilter)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": constants.Errors().InvalidFilter,
+		})
+		return
 	}
 
-	file.Close()
-	var logs []serializers.Logs
-	var log serializers.Logs
-	for _, eachline := range txtlines {
-		data := []byte(eachline)
-		if err := json.Unmarshal(data, &log); err != nil {
-			fmt.Println(err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
-			return
-		}
-		logs = append(logs, log)
+	recordsCount, err := logs.GetAllLogsCount(&logFilter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		return
 	}
-	c.JSON(http.StatusOK, logs)
+	var infoArray []serializers.Logs
+	logsListResponse := serializers.LogsListResponse{
+		RecordsAffected: recordsCount,
+		LogInfo:         infoArray,
+	}
+	if recordsCount == 0 {
+		c.JSON(http.StatusOK, logsListResponse)
+		return
+	}
+	logsList, err := logs.GetAllLogs(&pagination, &logFilter)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		return
+	}
+	for _, log := range logsList {
+		infoArray = append(infoArray, serializers.Logs{
+			Level: constants.LogLevels(log.Level),
+			Time:  log.CreatedAt.String(),
+			Msg:   log.Msg,
+		})
+	}
+	logsListResponse = serializers.LogsListResponse{
+		RecordsAffected: recordsCount,
+		LogInfo:         infoArray,
+	}
+
+	c.JSON(http.StatusOK, logsListResponse)
 }

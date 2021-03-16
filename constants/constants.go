@@ -26,6 +26,12 @@ const (
 	// AdminRole defines the role value for system admin in the database
 	AdminRole = 1
 
+	// InfoLog defines the loglevel info
+	InfoLog = 1
+
+	// ErrorLog defines the loglevel error
+	ErrorLog = 2
+
 	// MaxPriority Defines the maximum priority of channel
 	MaxPriority = 3
 
@@ -84,6 +90,11 @@ const (
 // We are using a function as golang doesn't allow complex types to be constants
 func ChannelType(index uint) string {
 	return []string{"Email", "Push", "Web"}[int(index-1)]
+}
+
+// LogLevels is a function that returns the log levels
+func LogLevels(index uint) string {
+	return []string{"Info", "Error"}[int(index-1)]
 }
 
 // CSVHeaders is a function that returns the headers of our csv file

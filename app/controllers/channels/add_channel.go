@@ -6,6 +6,7 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/logs"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
 	li "code.jtg.tools/ayush.singhal/notifications-microservice/shared/logwrapper"
@@ -61,7 +62,7 @@ func AddChannel(c *gin.Context) {
 		err := serializers.ChannelConfigValidation(&info)
 
 		if err != nil && err.Error() == constants.Errors().InternalError {
-			standardLogger.InternalServerError("Regex check in channel config validation in create channel")
+			standardLogger.InternalServerError(err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 			return
 		} else if err != nil {
@@ -74,7 +75,7 @@ func AddChannel(c *gin.Context) {
 
 	_, err = channels.GetChannelWithName(channel.Name)
 	if err != gorm.ErrRecordNotFound && err != nil {
-		standardLogger.InternalServerError("Check unique channel name in create channel")
+		standardLogger.InternalServerError(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	} else if err != gorm.ErrRecordNotFound {
@@ -84,7 +85,7 @@ func AddChannel(c *gin.Context) {
 
 	_, err = channels.GetChannelWithType(uint(info.Type))
 	if err != gorm.ErrRecordNotFound && err != nil {
-		standardLogger.InternalServerError("Check unique channel type in create channel")
+		standardLogger.InternalServerError(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	} else if err != gorm.ErrRecordNotFound {
@@ -94,12 +95,11 @@ func AddChannel(c *gin.Context) {
 
 	err = channels.AddChannel(&channel)
 	if err != nil {
-		standardLogger.InternalServerError("Add Channel to database")
+		standardLogger.InternalServerError(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
-
-	standardLogger.EntityAdded(fmt.Sprintf("channel %s", channel.Name))
+	logs.AddLogs(constants.InfoLog, fmt.Sprintf("Channel %s added", channel.Name))
 	channelInfo := serializers.ChannelModelToChannelInfo(&channel)
 	c.JSON(http.StatusOK, *channelInfo)
 }

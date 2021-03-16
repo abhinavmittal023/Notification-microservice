@@ -8,6 +8,7 @@ import (
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/channels"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/services/logs"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
 	li "code.jtg.tools/ayush.singhal/notifications-microservice/shared/logwrapper"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/shared/misc"
@@ -74,14 +75,14 @@ func UpdateChannel(c *gin.Context) {
 		})
 		return
 	} else if err != nil {
-		standardLogger.InternalServerError("Get Channel ID in update channel")
+		standardLogger.InternalServerError(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
 	testChannel, err := channels.GetChannelWithName(strings.ToLower(info.Name))
 	if err != gorm.ErrRecordNotFound && err != nil {
-		standardLogger.InternalServerError("Get Channel Name in update channel")
+		standardLogger.InternalServerError(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	} else if testChannel.ID != channel.ID && err != gorm.ErrRecordNotFound {
@@ -91,7 +92,7 @@ func UpdateChannel(c *gin.Context) {
 
 	testChannel, err = channels.GetChannelWithType(uint(info.Type))
 	if err != gorm.ErrRecordNotFound && err != nil {
-		standardLogger.InternalServerError("Get Channel Type in update channel")
+		standardLogger.InternalServerError(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	} else if testChannel.ID != channel.ID && err != gorm.ErrRecordNotFound {
@@ -103,7 +104,7 @@ func UpdateChannel(c *gin.Context) {
 		err := serializers.ChannelConfigValidation(&info)
 
 		if err != nil && err.Error() == constants.Errors().InternalError {
-			standardLogger.InternalServerError("Regex check in channel config validation in update channel")
+			standardLogger.InternalServerError(err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 			return
 		} else if err != nil {
@@ -116,12 +117,12 @@ func UpdateChannel(c *gin.Context) {
 
 	err = channels.PatchChannel(channel)
 	if err != nil {
-		standardLogger.InternalServerError("Patch Channel to database")
+		standardLogger.InternalServerError(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
 		return
 	}
 
-	standardLogger.EntityUpdated(fmt.Sprintf("channel %s", channel.Name))
+	logs.AddLogs(constants.InfoLog, fmt.Sprintf("Channel %s updated", channel.Name))
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})
