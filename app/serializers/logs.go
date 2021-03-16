@@ -4,8 +4,8 @@ import "time"
 
 // Logs serializer to bind logs data
 type Logs struct {
-	Level string `json:"level"`
-	Msg   string `json:"msg"`
+	Level string    `json:"level"`
+	Msg   string    `json:"msg"`
 	Time  time.Time `json:"time"`
 }
 
