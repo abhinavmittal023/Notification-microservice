@@ -2,6 +2,7 @@ package logs
 
 import (
 	"net/http"
+	"time"
 
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
 	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
@@ -58,7 +59,7 @@ func GetLogs(c *gin.Context) {
 	for _, log := range logsList {
 		infoArray = append(infoArray, serializers.Logs{
 			Level: constants.LogLevels(log.Level),
-			Time:  log.CreatedAt.String(),
+			Time:  log.CreatedAt.UTC().Truncate(time.Second),
 			Msg:   log.Msg,
 		})
 	}
