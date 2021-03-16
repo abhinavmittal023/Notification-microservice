@@ -28,6 +28,7 @@ func NewLogger() *StandardLogger {
 	return standardLogger
 }
 
+// OpenFile function opens or creates the log file
 func OpenFile() (*os.File, error) {
 	var filename string = "logfile.log"
 	// Create the log file if doesn't exist. And append to it if it already exists.
