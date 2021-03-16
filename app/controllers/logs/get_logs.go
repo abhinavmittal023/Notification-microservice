@@ -24,6 +24,7 @@ func GetLogs(c *gin.Context) {
 	if err != nil {
 		fmt.Println("Failed to open logfile")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+		return
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -42,6 +43,7 @@ func GetLogs(c *gin.Context) {
 		if err := json.Unmarshal(data, &log); err != nil {
 			fmt.Println(err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": constants.Errors().InternalError})
+			return
 		}
 		logs = append(logs, log)
 	}
