@@ -21,13 +21,16 @@ func CheckIfFirst(c *gin.Context) {
 	_, err := users.GetFirstUser(true)
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
+			"status": "Allowed",
 		})
 		return
 	} else if err != nil {
 		log.Println(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": constants.Errors().InternalError,
+		})
 	}
-	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-		"error": constants.Errors().UnAuthorized,
+	c.AbortWithStatusJSON(http.StatusOK, gin.H{
+		"status": "Not Allowed",
 	})
 }
