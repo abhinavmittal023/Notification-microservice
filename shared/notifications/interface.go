@@ -20,32 +20,35 @@ type NewNotification interface {
 }
 
 // CreateNotification is a struct that implements NewNotification Interface
-type CreateNotification struct{}
+type CreateNotification struct {
+	Retry int
+}
 
 // New is the function to send real notifications
 func (notification CreateNotification) New(recipientNotification *models.RecipientNotifications, to string, title string, body string, notificationType Notifications) (int, error) {
 	notificationType.New(to, title, body)
-	err := notificationType.SendNotification()
-	if err != nil {
-		recipientNotification.Status = constants.Failure
-		err2 := recipientnotifications.PatchRecipientNotification(recipientNotification)
-		if err2 != nil {
-			return http.StatusInternalServerError, err2
+	indx := 0
+	var err error = nil
+	for ok := true; ok; ok = indx <= notification.Retry {
+		err = notificationType.SendNotification()
+		if err != nil {
+			recipientNotification.Status = constants.Failure
+			err2 := recipientnotifications.PatchRecipientNotification(recipientNotification)
+			if err2 != nil {
+				indx = notification.Retry
+				return http.StatusInternalServerError, err2
+			}
+			indx++
+		} else {
+			recipientNotification.Status = constants.Success
+			err2 := recipientnotifications.PatchRecipientNotification(recipientNotification)
+			if err2 != nil {
+				indx = notification.Retry
+				return http.StatusInternalServerError, err2
+			}
+			indx = notification.Retry
+			return http.StatusOK, nil
 		}
-		return http.StatusOK, err
 	}
-	recipientNotification.Status = constants.Success
-	err = recipientnotifications.PatchRecipientNotification(recipientNotification)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-	return http.StatusOK, nil
-}
-
-// MockNotification is the struct that implements the NewNotification interface
-type MockNotification struct{}
-
-// New is the function that mocks notification send service
-func (notification MockNotification) New(recipientNotification *models.RecipientNotifications, to string, title string, body string, notificationType Notifications) (int, error) {
-	return http.StatusOK, nil
+	return http.StatusOK, err
 }
