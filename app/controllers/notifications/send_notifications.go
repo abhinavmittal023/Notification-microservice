@@ -102,7 +102,7 @@ func PostSendNotifications(c *gin.Context) {
 	errorChan := make(chan error)
 	stopChan := make(chan bool)
 	wg1.Add(1)
-	go notifications.SendToRecipients(*channelList, recipientList, &openAPI, errorChan, stopChan, *notification, sendNotification.CreateNotification{}, &wg1)
+	go notifications.SendToRecipients(*channelList, recipientList, &openAPI, errorChan, stopChan, *notification, sendNotification.CreateNotification{Retry: info.Notifications.Retry}, &wg1)
 	err = <-errorChan
 	if err != nil {
 		close(stopChan)

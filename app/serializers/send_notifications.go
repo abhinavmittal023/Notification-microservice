@@ -17,6 +17,7 @@ type Notifications struct {
 	Priority   string   `json:"priority" binding:"required"`
 	Title      string   `json:"title" binding:"required,max=300"`
 	Body       string   `json:"body" binding:"required"`
+	Retry      int      `json:"retry"`
 }
 
 // NotificationsInfoToNotificationModel converts the serializer to model
