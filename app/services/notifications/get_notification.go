@@ -1,0 +1,293 @@
+package notifications
+
+import (
+	"time"
+
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/app/serializers/filter"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/constants"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db"
+	"code.jtg.tools/ayush.singhal/notifications-microservice/db/models"
+	"github.com/jinzhu/gorm"
+)
+
+type notificationData struct {
+	NotificationID uint64
+}
+
+// GetAllNotifications gets all the notifications from the database and returns []serializers.NotificationsInfo, err
+func GetAllNotifications(pagination *serializers.Pagination, notificationFilter *filter.Notification) ([]serializers.NotificationsInfo, error) {
+	dbG := db.Get()
+	var recipientNotifications []serializers.NotificationsInfo
+	var recipient models.Recipient
+
+	type successFailedData struct {
+		ChannelName string
+		Status      int
+		Count       uint64
+	}
+
+	type recipientInfo struct {
+		RecipientID string
+		ChannelName string
+		Status      uint64
+	}
+
+	if notificationFilter.RecipientID != "" {
+		err := dbG.Table("recipients").Select("id").Where("recipient_id = ?", notificationFilter.RecipientID).Find(&recipient).Error
+		if err != nil {
+			return nil, err
+		}
+	}
+	var notificationID []notificationData
+	tx := dbG.Model(&models.RecipientNotifications{})
+	if notificationFilter.RecipientID != "" {
+		tx = tx.Where("recipient_id = ?", recipient.ID)
+	}
+	if notificationFilter.ChannelName != "" {
+		tx = tx.Where("channel_name = ?", notificationFilter.ChannelName)
+	}
+	if !notificationFilter.From.IsZero() && !notificationFilter.To.IsZero() {
+		tx = tx.Where("updated_at BETWEEN ? AND ?", notificationFilter.From, notificationFilter.To)
+	}
+	res := tx.Offset(pagination.Offset).Limit(pagination.Limit).Select("distinct(notification_id)").Order("notification_id").Scan(&notificationID)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	for i, value := range notificationID {
+
+		tx = dbG.Model(&models.RecipientNotifications{})
+		if notificationFilter.RecipientID != "" {
+			tx = tx.Where("recipient_id = ?", recipient.ID)
+		}
+		if notificationFilter.ChannelName != "" {
+			tx = tx.Where("channel_name = ?", notificationFilter.ChannelName)
+		}
+		if !notificationFilter.From.IsZero() && !notificationFilter.To.IsZero() {
+			tx = tx.Where("updated_at BETWEEN ? AND ?", notificationFilter.From, notificationFilter.To)
+		}
+		results := []successFailedData{}
+
+		res = tx.Select("channel_name, status, count(*) as count").Where("notification_id = ?", value.NotificationID).Group("channel_name,status").Order("channel_name").Scan(&results)
+		if res.Error != nil {
+			return nil, res.Error
+		}
+		tx = dbG.Model(&models.Notification{})
+		var notification models.Notification
+		res = tx.Where("id = ?", value.NotificationID).Find(&notification)
+		if res.Error != nil {
+			return nil, res.Error
+		}
+		var prevVal successFailedData
+
+		recipientNotifications = append(recipientNotifications, serializers.NotificationsInfo{
+			Priority:  notification.Priority,
+			Title:     notification.Title,
+			Body:      notification.Body,
+			CreatedAt: notification.CreatedAt,
+		})
+		var notificationChannels []serializers.NotificationChannels
+		idx := 0
+		for _, val := range results {
+			if prevVal.ChannelName == val.ChannelName {
+				if val.Status == constants.Success {
+					notificationChannels[idx-1] = serializers.NotificationChannels{
+						ChannelName: val.ChannelName,
+						Successful:  val.Count,
+						Failure:     notificationChannels[idx-1].Failure,
+						Total:       val.Count + notificationChannels[idx-1].Failure,
+					}
+				} else if val.Status == constants.Failure {
+					notificationChannels[idx-1] = serializers.NotificationChannels{
+						ChannelName: val.ChannelName,
+						Failure:     val.Count,
+						Successful:  notificationChannels[idx-1].Successful,
+						Total:       val.Count + notificationChannels[idx-1].Successful,
+					}
+				}
+			} else {
+				if val.Status == constants.Success {
+					notificationChannels = append(notificationChannels, serializers.NotificationChannels{
+						ChannelName: val.ChannelName,
+						Successful:  val.Count,
+						Total:       val.Count,
+					})
+				} else if val.Status == constants.Failure {
+					notificationChannels = append(notificationChannels, serializers.NotificationChannels{
+						ChannelName: val.ChannelName,
+						Failure:     val.Count,
+						Total:       val.Count,
+					})
+				}
+				idx++
+			}
+			prevVal = val
+		}
+
+		var recipientsInfo []recipientInfo
+
+		recipientNotifications[i] = serializers.NotificationsInfo{
+			Priority:             notification.Priority,
+			Title:                notification.Title,
+			Body:                 notification.Body,
+			CreatedAt:            notification.CreatedAt,
+			NotificationChannels: notificationChannels,
+		}
+		res = dbG.Table("recipients").Select("recipients.recipient_id,channel_name,status").Joins("join recipient_notifications on recipients.id = recipient_notifications.recipient_id").Where("recipient_notifications.notification_id = ?", value.NotificationID).Order("recipients.recipient_id").Scan(&recipientsInfo)
+
+		if res.Error == gorm.ErrRecordNotFound {
+			continue
+		} else if res.Error != nil {
+			return nil, res.Error
+		}
+		var prevRecipient recipientInfo
+		var recipients []serializers.Recipients
+		idx = 0
+		for _, val := range recipientsInfo {
+			if prevRecipient.RecipientID == val.RecipientID {
+				recipients[idx-1].Channels = append(recipients[idx-1].Channels, serializers.Channels{
+					ChannelName: val.ChannelName,
+					Status:      val.Status,
+				})
+			} else {
+				recipients = append(recipients, serializers.Recipients{
+					RecipientID: val.RecipientID,
+					Channels: []serializers.Channels{
+						{
+							ChannelName: val.ChannelName,
+							Status:      val.Status,
+						},
+					},
+				})
+				idx++
+			}
+			prevRecipient = val
+		}
+		recipientNotifications[i].Recipients = recipients
+	}
+	return recipientNotifications, nil
+}
+
+// GetAllNotificationsCount gets all the notifications count from the database and returns records count,err
+func GetAllNotificationsCount(notificationFilter *filter.Notification) (int64, error) {
+
+	dbG := db.Get()
+	tx := dbG.Model(&models.RecipientNotifications{})
+	if notificationFilter.RecipientID != "" {
+		tx = tx.Where("recipient_id = ?", db.Get().Table("recipients").Select("id").Where("recipient_id = ?", notificationFilter.RecipientID).SubQuery())
+	}
+	if notificationFilter.ChannelName != "" {
+		tx = tx.Where("channel_name = ?", notificationFilter.ChannelName)
+	}
+	if !notificationFilter.From.IsZero() && !notificationFilter.To.IsZero() {
+		tx = tx.Where("updated_at BETWEEN ? AND ?", notificationFilter.From, notificationFilter.To)
+	}
+
+	var count struct {
+		Count int64
+	}
+	res := tx.Select("count(distinct(notification_id)) as count").Scan(&count)
+	return count.Count, res.Error
+}
+
+// GetGraphData is used to get the required graph data
+func GetGraphData(notificationFilter *filter.Notification) (*serializers.GraphData, error) {
+	dbG := db.Get()
+	var recipient models.Recipient
+	var graphData serializers.GraphData
+	type successFailedData struct {
+		Status int
+		Count  uint64
+	}
+
+	if notificationFilter.RecipientID != "" {
+		err := dbG.Table("recipients").Select("id").Where("recipient_id = ?", notificationFilter.RecipientID).Find(&recipient).Error
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var notificationID []notificationData
+	tx := dbG.Model(&models.RecipientNotifications{})
+	if notificationFilter.RecipientID != "" {
+		tx = tx.Where("recipient_id = ?", recipient.ID)
+	}
+	if notificationFilter.ChannelName != "" {
+		tx = tx.Where("channel_name = ?", notificationFilter.ChannelName)
+	}
+	if !notificationFilter.From.IsZero() && !notificationFilter.To.IsZero() {
+		tx = tx.Where("updated_at BETWEEN ? AND ?", notificationFilter.From, notificationFilter.To)
+	}
+	res := tx.Select("distinct(notification_id)").Order("notification_id").Scan(&notificationID)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	graphIndex := 0
+	for i, value := range notificationID {
+
+		tx = dbG.Model(&models.Notification{})
+		var notification models.Notification
+		res = tx.Where("id = ?", value.NotificationID).Find(&notification)
+		if res.Error != nil {
+			return nil, res.Error
+		}
+
+		var truncatedTime time.Time
+		if ((notificationFilter.To.Unix() - notificationFilter.From.Unix()) / 3600) > 24 {
+			truncatedTime = notification.UpdatedAt.Truncate(time.Hour * 24)
+		} else {
+			truncatedTime = notification.UpdatedAt.Truncate(time.Hour)
+		}
+		if i > 0 {
+			if graphData.UpdatedAt[len(graphData.UpdatedAt)-1] != truncatedTime {
+				graphData.UpdatedAt = append(graphData.UpdatedAt, truncatedTime)
+				graphIndex++
+			}
+		} else {
+			graphData.UpdatedAt = append(graphData.UpdatedAt, truncatedTime)
+		}
+
+		tx = dbG.Model(&models.RecipientNotifications{})
+		if notificationFilter.RecipientID != "" {
+			tx = tx.Where("recipient_id = ?", recipient.ID)
+		}
+		if notificationFilter.ChannelName != "" {
+			tx = tx.Where("channel_name = ?", notificationFilter.ChannelName)
+		}
+		if !notificationFilter.From.IsZero() && !notificationFilter.To.IsZero() {
+			tx = tx.Where("updated_at BETWEEN ? AND ?", notificationFilter.From, notificationFilter.To)
+		}
+		results := []successFailedData{}
+
+		res = tx.Select("status, count(*) as count").Where("notification_id = ?", value.NotificationID).Group("status").Scan(&results)
+		if res.Error != nil {
+			return nil, res.Error
+		}
+
+		idx := 0
+		for _, val := range results {
+			if idx == 1 {
+				if val.Status == constants.Success {
+					graphData.Successful[graphIndex] = graphData.Successful[graphIndex] + val.Count
+					graphData.Total[graphIndex] = graphData.Total[graphIndex] + val.Count
+				} else if val.Status == constants.Failure {
+					graphData.Failed[graphIndex] = graphData.Failed[graphIndex] + val.Count
+					graphData.Total[graphIndex] = graphData.Total[graphIndex] + val.Count
+				}
+			} else {
+				graphData.Total = append(graphData.Total, val.Count)
+				if val.Status == constants.Success {
+					graphData.Successful = append(graphData.Successful, val.Count)
+					graphData.Failed = append(graphData.Failed, 0)
+				} else if val.Status == constants.Failure {
+					graphData.Successful = append(graphData.Successful, 0)
+					graphData.Failed = append(graphData.Failed, val.Count)
+				}
+				idx++
+			}
+		}
+	}
+	return &graphData, nil
+}

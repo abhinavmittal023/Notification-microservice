@@ -1,0 +1,36 @@
+{
+  "server": {
+    "port": "8080",
+    "domain": "0.0.0.0"
+  },
+  "database": {
+    "dbstring": "user=<username> password=<password> dbname=<database_name> sslmode=disable"
+    "dbstring_test": "user=<username> password=<password> dbname=<test_database_name> sslmode=disable"
+  },
+  "token": {
+    "secret_key": "<secret_key>",
+    "header_prefix": "Bearer",
+    "expiry_time": {
+      "validation_token": 2,
+      "access_token": 1,
+      "refresh_token": 3
+    }
+  },
+  "email_notification": {
+    "from": "<displayed_email_id>",
+    "email": "<email_id>",
+    "password": "",
+    "smtp_host": "127.0.0.1",
+    "smtp_port": "1025"
+  },
+  "password_hash": "<hash_key>",
+  "api_hash": "<another_hash_key>",
+  "reset_token_hash": "<reset_token_hash_key>",
+  "web_notification": {
+    "server_key": "<firebase_server_key>",
+    "url": "https://fcm.googleapis.com/fcm/send"
+  },
+  "push_notification": {
+    "server_key": "<firebase_server_key>"
+  }
+}
